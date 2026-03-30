@@ -1,0 +1,25 @@
+<app-background-animation></app-background-animation>
+<app-brand-header></app-brand-header>
+
+<div class="app-container">
+  <div class="visual-panel">
+    <app-visual-display [selectedMethod]="selectedMethod()"></app-visual-display>
+  </div>
+
+  <div class="form-panel">
+    <div class="form-glass-card">
+      <app-payment-card (methodChange)="onMethodChange($event)"></app-payment-card>
+    </div>
+  </div>
+
+  <div class="global-footer">
+    <div class="gf-left">
+      Trusted by 50,000+ businesses worldwide for secure, instant payments
+    </div>
+    <div class="gf-right">
+      Secured by <strong>Kuber Financial</strong> &middot; All transactions encrypted
+    </div>
+  </div>
+</div>
+
+<router-outlet />

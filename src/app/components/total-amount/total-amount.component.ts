@@ -1,0 +1,31 @@
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-total-amount',
+  standalone: true,
+  template: `
+    <div class="total-amount-container">
+      <div class="label">Total Amount</div>
+      <div class="amount">
+        <span class="currency-symbol">$</span>789.60 <span class="currency-code">AUD</span>
+      </div>
+      <div class="security-badges">
+        <div class="badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+          Bank-grade Security
+        </div>
+        <div class="badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+          </svg>
+          256-bit Encryption
+        </div>
+      </div>
+    </div>
+  `,
+  styles: []
+})
+export class TotalAmountComponent {}

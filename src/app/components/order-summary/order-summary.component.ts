@@ -1,0 +1,102 @@
+import { Component, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'app-order-summary',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
+    <div class="order-summary glass" [class.expanded]="isExpanded()">
+      <div class="summary-header" (click)="toggleExpand()">
+        <div class="info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+            <path d="M3 6h18M16 10a4 4 0 0 1-8 0" />
+          </svg>
+          <div class="text">
+            <div class="title">Order Summary</div>
+            <div class="item-count">{{ items.length }} items</div>
+          </div>
+        </div>
+        <div class="price-info">
+          <div class="total">$789.60</div>
+          <svg class="chevron" [class.rotated]="isExpanded()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
+      </div>
+
+      <div class="summary-body">
+        <div class="items-list">
+          <div *ngFor="let item of items" class="item">
+            <div class="item-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <path d="M9 3v18M15 3v18M3 9h18M3 15h18" />
+              </svg>
+            </div>
+            <div class="item-details">
+              <div class="item-top">
+                <span class="item-name">{{ item.name }}</span>
+                <span class="item-price">{{ item.price | currency }}</span>
+              </div>
+              <div class="item-desc">{{ item.desc }}</div>
+              <div class="item-qty">Qty: {{ item.qty }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="breakdown">
+          <div class="line">
+            <span>Subtotal</span>
+            <span>$786.00</span>
+          </div>
+          <div class="line">
+            <span>Shipping</span>
+            <span class="free">FREE</span>
+          </div>
+          <div class="line">
+            <span>Tax (GST)</span>
+            <span>$78.60</span>
+          </div>
+          <div class="line discount">
+            <span>Discount Applied</span>
+            <span>-$75.00</span>
+          </div>
+          
+          <div class="promo-code">
+            <input type="text" placeholder="Promo code">
+            <button>Apply</button>
+          </div>
+
+          <div class="final-total">
+            <div class="total-label">
+              <span>Total</span>
+              <span class="gst-label">Including GST</span>
+            </div>
+            <div class="total-value">$789.60</div>
+          </div>
+        </div>
+        
+        <div class="footer-badges">
+           <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Secure checkout</span>
+           <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg> Fast delivery</span>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: []
+})
+export class OrderSummaryComponent {
+  isExpanded = signal(true);
+
+  items = [
+    { name: 'Premium Wireless Headphones', price: 599.00, desc: 'Noise cancelling, 40hr battery', qty: 1 },
+    { name: 'Leather Carrying Case', price: 89.00, desc: 'Genuine leather, fits all sizes', qty: 1 },
+    { name: 'USB-C Fast Charger', price: 98.00, desc: '65W GaN Technology', qty: 2 }
+  ];
+
+  toggleExpand() {
+    this.isExpanded.set(!this.isExpanded());
+  }
+}
