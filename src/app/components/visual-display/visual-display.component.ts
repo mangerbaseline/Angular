@@ -15,139 +15,225 @@ import { CommonModule } from '@angular/common';
       <div class="main-visual" [ngSwitch]="selectedMethod">
 
         <!-- CARD -->
-        <div *ngSwitchCase="'card'" class="card-3d fade-in">
-          <div class="card-shine"></div>
-          <div class="card-top">
-            <div class="chip">
-              <div class="chip-line"></div>
-              <div class="chip-line"></div>
-              <div class="chip-line"></div>
+        <div *ngSwitchCase="'card'" class="fade-in" style="position: relative;">
+          <div class="card-glow"></div>
+          <div class="card-3d">
+            <div class="card-shine-beam"></div>
+            <div class="card-chip">
+              <div class="chip-grid">
+                <div class="chip-cell"></div><div class="chip-cell"></div><div class="chip-cell"></div>
+                <div class="chip-cell"></div><div class="chip-cell"></div><div class="chip-cell"></div>
+              </div>
             </div>
-            <div class="network-logo">
-              <div class="circle-red"></div>
-              <div class="circle-orange"></div>
+            <div class="card-logos-v">
+              <div class="logo-circle logo-c1"></div>
+              <div class="logo-circle logo-c2"></div>
             </div>
+            <div class="card-number-v">
+              <span>••••</span><span>••••</span><span>••••</span><span>1234</span>
+            </div>
+            <div class="card-holder-label">CARDHOLDER NAME</div>
+            <div class="card-expiry-v">12/28</div>
           </div>
-          <div class="card-number">•••• •••• •••• 4582</div>
-          <div class="card-bottom">
-            <span class="cardholder">Alex Johnson</span>
-            <span class="expiry">12/28</span>
-          </div>
+          <div class="card-verified-v">V</div>
         </div>
 
         <!-- APPLE PAY -->
-        <div *ngSwitchCase="'apple'" class="phone-3d fade-in">
-          <div class="phone-notch"></div>
-          <div class="phone-screen-inner">
-            <svg viewBox="0 0 24 24" class="apple-icon" fill="white">
-              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83"/>
-              <path d="M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-            </svg>
-            <div class="apple-pay-text">Pay</div>
-            <div class="face-id">
-              <div class="fi-dot tl"></div><div class="fi-dot tr"></div>
-              <div class="fi-dot bl"></div><div class="fi-dot br"></div>
-              <div class="fi-line"></div>
+        <div *ngSwitchCase="'apple'" class="fade-in" style="position: relative;">
+          <div class="phone-glow"></div>
+          <div class="phone-ripple r1"></div>
+          <div class="phone-ripple r2"></div>
+          <div class="phone-ripple r3"></div>
+          <div class="phone-3d">
+            <div class="phone-notch"></div>
+            <div class="phone-screen">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="64" height="64" style="color: white; margin-bottom: 8px;">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83"/>
+                <path d="M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+              </svg>
+              <span style="color: white; font-size: 24px; font-weight: 600;">Pay</span>
+              <div class="face-id-circle">
+                <div class="circle-inner"></div>
+              </div>
+              <p class="double-click-text">Double-click to pay</p>
             </div>
           </div>
-          <div class="phone-home-bar"></div>
         </div>
 
         <!-- GOOGLE PAY -->
-        <div *ngSwitchCase="'google'" class="gpay-card fade-in">
-          <div class="gpay-logo">
-            <span style="color:#4285F4">G</span><span style="color:#EA4335">o</span><span style="color:#FBBC05">o</span><span style="color:#4285F4">g</span><span style="color:#34A853">l</span><span style="color:#EA4335">e</span>
-          </div>
-          <div class="gpay-text">Pay</div>
-          <div class="nfc-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32">
-              <path d="M13 2.05A10 10 0 0 1 22 12a10 10 0 0 1-9 9.95"/>
-              <path d="M9 2.31a10 10 0 0 0-6.95 12.15A10 10 0 0 0 9 21.7"/>
-              <path d="M12 12m-1 0a1 1 0 1 0 2 0a1 1 0 1 0-2 0"/>
-            </svg>
+        <div *ngSwitchCase="'google'" class="fade-in" style="position: relative;">
+          <div class="gpay-glow"></div>
+          <div class="gpay-card">
+            <div class="gpay-circles">
+              <div class="gpay-circle gc1"></div>
+              <div class="gpay-circle gc2"></div>
+              <div class="gpay-circle gc3"></div>
+              <div class="gpay-circle gc4"></div>
+            </div>
+            <div class="gpay-text-v">Google Pay</div>
           </div>
         </div>
 
         <!-- BANK -->
-        <div *ngSwitchCase="'bank'" class="bank-visual fade-in">
-          <svg viewBox="0 0 64 64" class="bank-icon" fill="none" stroke="#10b981" stroke-width="1.5">
-            <rect x="8" y="52" width="48" height="4" rx="2"/>
-            <rect x="4" y="24" width="56" height="4" rx="2"/>
-            <rect x="10" y="28" width="6" height="24"/>
-            <rect x="22" y="28" width="6" height="24"/>
-            <rect x="36" y="28" width="6" height="24"/>
-            <rect x="48" y="28" width="6" height="24"/>
-            <polygon points="32,4 60,24 4,24"/>
-            <circle cx="32" cy="16" r="3" fill="#10b981"/>
-          </svg>
-          <div class="floating-coins">
-            <span class="coin c1">$</span>
-            <span class="coin c2">$</span>
-            <span class="coin c3">$</span>
+        <div *ngSwitchCase="'bank'" class="fade-in" style="position: relative;">
+          <div class="bank-visual">
+            <svg class="w-64 h-56" viewBox="0 0 200 180" style="width: 256px; height: 224px;">
+              <defs>
+                <linearGradient id="bankGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#10b981"></stop>
+                  <stop offset="100%" stop-color="#06b6d4"></stop>
+                </linearGradient>
+              </defs>
+              <path d="M100 10 L180 60 L20 60 Z" fill="none" stroke="url(#bankGradient)" stroke-width="3"></path>
+              <rect x="30" y="60" width="140" height="100" fill="none" stroke="url(#bankGradient)" stroke-width="3" rx="2"></rect>
+              <rect x="42" y="70" width="12" height="80" fill="url(#bankGradient)" fill-opacity="0.3" stroke="url(#bankGradient)" stroke-width="2" rx="2"></rect>
+              <rect x="77" y="70" width="12" height="80" fill="url(#bankGradient)" fill-opacity="0.3" stroke="url(#bankGradient)" stroke-width="2" rx="2"></rect>
+              <rect x="112" y="70" width="12" height="80" fill="url(#bankGradient)" fill-opacity="0.3" stroke="url(#bankGradient)" stroke-width="2" rx="2"></rect>
+              <rect x="147" y="70" width="12" height="80" fill="url(#bankGradient)" fill-opacity="0.3" stroke="url(#bankGradient)" stroke-width="2" rx="2"></rect>
+              <path d="M20 160 L20 170 L180 170 L180 160" fill="none" stroke="url(#bankGradient)" stroke-width="3"></path>
+              <text x="100" y="50" text-anchor="middle" fill="url(#bankGradient)" font-size="24" font-weight="bold">$</text>
+            </svg>
+            <div class="coin-v cv1">$</div>
+            <div class="coin-v cv2">$</div>
+            <div class="coin-v cv3">$</div>
           </div>
         </div>
 
         <!-- UPI -->
-        <div *ngSwitchCase="'upi'" class="upi-visual fade-in">
-          <div class="qr-frame">
-            <div class="qr-corner tl"></div><div class="qr-corner tr"></div>
-            <div class="qr-corner bl"></div><div class="qr-corner br"></div>
-            <div class="qr-inner">
-              <div class="qr-grid">
-                <div *ngFor="let i of qrPixels" class="qp" [class.filled]="i === 1"></div>
+        <div *ngSwitchCase="'upi'" class="fade-in" style="position: relative;">
+          <div class="upi-glow"></div>
+          <div class="upi-phone">
+            <div class="upi-badge-instant">Instant</div>
+            <div class="upi-screen">
+              <div class="flex justify-between items-center text-white/40 text-[10px] mb-4">
+                <span>9:41</span>
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M16 10V6a4 4 0 0 0-8 0v4H5v11h14V10h-3zm-6-4a2 2 0 1 1 4 0v4h-4V6zm7 13H7v-7h10v7z"/></svg>
               </div>
+              <div style="text-align: center; margin-bottom: 12px;">
+                <span style="background: rgba(255,255,255,0.1); color: #6ee7b7; font-size: 14px; font-weight: 800; padding: 4px 12px; border-radius: 8px;">UPI</span>
+              </div>
+              <div class="qr-box">
+                <div class="qr-grid-v">
+                  <div class="qr-dot-v fill"></div><div class="qr-dot-v"></div><div class="qr-dot-v fill"></div><div class="qr-dot-v fill"></div><div class="qr-dot-v"></div>
+                  <div class="qr-dot-v"></div><div class="qr-dot-v fill"></div><div class="qr-dot-v"></div><div class="qr-dot-v"></div><div class="qr-dot-v fill"></div>
+                  <div class="qr-dot-v fill"></div><div class="qr-dot-v fill"></div><div class="qr-dot-v fill"></div><div class="qr-dot-v fill"></div><div class="qr-dot-v fill"></div>
+                  <div class="qr-dot-v fill"></div><div class="qr-dot-v"></div><div class="qr-dot-v fill"></div><div class="qr-dot-v"></div><div class="qr-dot-v fill"></div>
+                  <div class="qr-dot-v fill"></div><div class="qr-dot-v fill"></div><div class="qr-dot-v"></div><div class="qr-dot-v fill"></div><div class="qr-dot-v fill"></div>
+                </div>
+              </div>
+              <p style="color: rgba(255,255,255,0.4); font-size: 10px; text-align: center; margin: 8px 0;">Scan to pay</p>
+              <div class="upi-pay-btn-v">Pay Now</div>
             </div>
           </div>
-          <div class="scan-line"></div>
-          <div class="upi-tag">UPI</div>
         </div>
 
         <!-- PAYTO -->
-        <div *ngSwitchCase="'payto'" class="payto-visual fade-in">
-          <div class="node-container">
-            <div class="node user-node">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              <span>You</span>
+        <div *ngSwitchCase="'payto'" class="fade-in" style="position: relative;">
+          <div class="payto-glow"></div>
+          <div class="payto-container">
+            <div class="payto-node user-bg">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
+              <span class="node-label">You</span>
             </div>
-            <div class="node-line">
-              <div class="line-dot"></div>
-              <div class="payto-label">PayTo</div>
+            <div class="flow-connector">
+              <div class="dot-row">
+                <div class="flow-dot" style="animation-delay: 0.1s"></div>
+                <div class="flow-dot" style="animation-delay: 0.2s"></div>
+                <div class="flow-dot" style="animation-delay: 0.3s"></div>
+              </div>
+              <div class="dot-row">
+                <div class="flow-dot" style="animation-delay: 0.4s"></div>
+                <div class="flow-dot" style="animation-delay: 0.5s"></div>
+                <div class="flow-dot" style="animation-delay: 0.6s"></div>
+              </div>
+              <div class="dot-row">
+                <div class="flow-dot" style="animation-delay: 0.7s"></div>
+                <div class="flow-dot" style="animation-delay: 0.8s"></div>
+                <div class="flow-dot" style="animation-delay: 0.9s"></div>
+              </div>
             </div>
-            <div class="node merchant-node">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M12 10v11M4 10l8-7 8 7"/></svg>
-              <span>Merchant</span>
+            <div class="payto-node merchant-bg">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4M10 10h4M10 14h4M10 18h4"/></svg>
+              <span class="node-label">Merchant</span>
             </div>
           </div>
+          <div class="payto-pill">Pay<span style="color:#22d3ee">To</span></div>
         </div>
 
         <!-- ZIP -->
-        <div *ngSwitchCase="'zip'" class="brand-visual fade-in">
-          <div class="brand-logo zip-bg">zip</div>
-          <div class="brand-tag">0% Interest</div>
-          <p class="brand-desc">Buy now, pay later</p>
+        <div *ngSwitchCase="'zip'" class="fade-in" style="position: relative;">
+          <div class="zip-glow"></div>
+          <div class="zip-card-v">
+            <div class="zip-badge-0">0% Interest</div>
+            <div class="zip-logo-row">
+              <div class="zip-logo-box"></div>
+              <span class="zip-text-logo">zip</span>
+            </div>
+            <p style="color: rgba(255,255,255,0.8); font-size: 14px; font-weight: 500; margin-bottom: 4px;">Buy now, pay later</p>
+            <p style="color: rgba(255,255,255,0.4); font-size: 10px;">Shop today, pay over time with 0% interest</p>
+            <div class="zip-installment-bar">
+              <div class="zip-step active"></div>
+              <div class="zip-step"></div>
+              <div class="zip-step"></div>
+              <div class="zip-step"></div>
+            </div>
+          </div>
         </div>
 
         <!-- AFTERPAY -->
-        <div *ngSwitchCase="'afterpay'" class="brand-visual fade-in">
-          <div class="brand-logo ap-bg">afterpay</div>
-          <div class="timeline">
-            <div class="time-step active"><div class="step-dot"></div><span>Today</span></div>
-            <div class="time-line"></div>
-            <div class="time-step"><div class="step-dot"></div><span>Wk 4</span></div>
-            <div class="time-line"></div>
-            <div class="time-step"><div class="step-dot"></div><span>Wk 8</span></div>
+        <div *ngSwitchCase="'afterpay'" class="fade-in" style="position: relative;">
+          <div class="afterpay-glow"></div>
+          <div class="afterpay-card-v">
+            <div class="ap-logo-row-v">
+              <div class="ap-logo-circle-v"></div>
+              <span class="ap-text-logo-v">afterpay</span>
+            </div>
+            <div class="ap-steps-row-v">
+              <div class="ap-step-v active">
+                <div class="ap-step-circle-v">1</div>
+                <span class="ap-step-label-v">Today</span>
+              </div>
+              <div class="ap-step-v">
+                <div class="ap-step-circle-v">2</div>
+                <span class="ap-step-label-v">Wk 4</span>
+              </div>
+              <div class="ap-step-v">
+                <div class="ap-step-circle-v">3</div>
+                <span class="ap-step-label-v">Wk 6</span>
+              </div>
+              <div class="ap-step-v">
+                <div class="ap-step-circle-v">4</div>
+                <span class="ap-step-label-v">Wk 8</span>
+              </div>
+            </div>
+            <div class="ap-progress-track-v">
+              <div class="ap-progress-fill-v"></div>
+            </div>
+            <p class="ap-footer-text-v">Pay over time, interest-free</p>
           </div>
-          <p class="brand-desc">Pay over time, interest-free</p>
         </div>
 
         <!-- KLARNA -->
-        <div *ngSwitchCase="'klarna'" class="klarna-card fade-in">
-          <div class="kl-logo">Klarna<span>.</span></div>
-          <div class="kl-options">
-            <div class="kl-opt active">Pay now</div>
-            <div class="kl-opt">Pay in 4</div>
+        <div *ngSwitchCase="'klarna'" class="fade-in" style="position: relative;">
+          <div class="klarna-glow"></div>
+          <div class="klarna-card-v">
+            <div class="kl-text-logo-v">Klarna.</div>
+            <div class="kl-options-v">
+              <div class="kl-option-row-v">
+                <span>💳</span>
+                <span>Pay now</span>
+              </div>
+              <div class="kl-option-row-v">
+                <span>📅</span>
+                <span>Pay in 4</span>
+              </div>
+              <div class="kl-option-row-v">
+                <span>⏰</span>
+                <span>Pay in 30 days</span>
+              </div>
+            </div>
+            <div class="kl-badge-v">Smoooth payments</div>
           </div>
-          <div class="kl-footer">Smoooth payments</div>
         </div>
 
         <!-- DEFAULT (Fallback) -->
@@ -199,16 +285,16 @@ export class VisualDisplayComponent {
   @Input() selectedMethod = 'card';
 
   qrPixels = [
-    1,0,1,1,0,1,1,0,1,0,
-    0,1,0,0,1,0,0,1,0,1,
-    1,0,1,0,0,1,0,0,1,0,
-    1,1,0,1,0,0,1,0,1,1,
-    0,0,1,0,1,0,0,1,0,0,
-    1,0,0,1,0,1,1,0,1,0,
-    0,1,1,0,1,0,0,1,0,1,
-    1,0,0,1,0,1,0,0,1,0,
-    0,1,0,0,1,0,1,0,0,1,
-    1,0,1,1,0,1,0,1,1,0,
+    1, 0, 1, 1, 0, 1, 1, 0, 1, 0,
+    0, 1, 0, 0, 1, 0, 0, 1, 0, 1,
+    1, 0, 1, 0, 0, 1, 0, 0, 1, 0,
+    1, 1, 0, 1, 0, 0, 1, 0, 1, 1,
+    0, 0, 1, 0, 1, 0, 0, 1, 0, 0,
+    1, 0, 0, 1, 0, 1, 1, 0, 1, 0,
+    0, 1, 1, 0, 1, 0, 0, 1, 0, 1,
+    1, 0, 0, 1, 0, 1, 0, 0, 1, 0,
+    0, 1, 0, 0, 1, 0, 1, 0, 0, 1,
+    1, 0, 1, 1, 0, 1, 0, 1, 1, 0,
   ];
 
   getGlowColor() {

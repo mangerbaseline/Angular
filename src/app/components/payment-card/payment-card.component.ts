@@ -144,6 +144,40 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
             </div>
           </div>
 
+          <!-- BANK -->
+          <div *ngSwitchCase="'bank'" class="payment-form fade-in">
+            <div class="input-group">
+              <label>Account Number</label>
+              <div class="icon-input">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M12 10v11M4 10l8-7 8 7"/></svg>
+                <input type="text" placeholder="Enter your account number">
+              </div>
+            </div>
+            <div class="input-group">
+              <label>BSB Number</label>
+              <div class="icon-input">
+                <input type="text" placeholder="000-000">
+              </div>
+            </div>
+            <div class="input-group">
+              <label>Account Holder Name</label>
+              <div class="icon-input">
+                <input type="text" placeholder="John Doe">
+              </div>
+            </div>
+          </div>
+
+          <!-- UPI -->
+          <div *ngSwitchCase="'upi'" class="payment-form fade-in">
+            <div class="input-group">
+              <label>UPI ID</label>
+              <div class="icon-input">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
+                <input type="text" placeholder="yourname@upi">
+              </div>
+            </div>
+          </div>
+
           <!-- PayTo -->
           <div *ngSwitchCase="'payto'" class="payment-form fade-in">
             <h3 class="form-title">Bank-grade Security</h3>
@@ -271,7 +305,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
             <div class="br-row"><span>Subtotal</span><span>$786.00</span></div>
             <div class="br-row">
               <span class="with-icon">
-                <svg viewBox="0 0 16 16" fill="none" width="11"><path d="M8 2l2 4h4l-3 3 1 4-4-2-4 2 1-4-3-3h4z" stroke="#475569" stroke-width="1"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" width="13" stroke="currentColor" stroke-width="2"><path d="M10 17h4V5H2v12h3m15-4h-9v4m9-4v4m-12 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0m10 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0M17 9l3 2v4h-3V9z"/></svg>
                 Shipping
               </span>
               <span class="green">FREE</span>
@@ -279,7 +313,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
             <div class="br-row"><span>Tax (GST)</span><span>$78.60</span></div>
             <div class="br-row discount-row">
               <span class="with-icon green">
-                <svg viewBox="0 0 16 16" fill="none" width="11"><path d="M8 2l2 4h4l-3 3 1 4-4-2-4 2 1-4-3-3h4z" fill="#10b981"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" width="13" stroke="currentColor" stroke-width="2"><path d="m15 5 6.3 6.3a2.4 2.4 0 0 1 0 3.4L14.7 21a2.4 2.4 0 0 1-3.4 0L5 14.7V5z"/><path d="M9 9h.01"/></svg>
                 Discount Applied
               </span>
               <span class="red">-$75.00</span>
@@ -304,12 +338,12 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
           <!-- Trust badges -->
           <div class="trust-row">
             <span class="trust-item">
-              <svg viewBox="0 0 16 16" fill="none" width="12"><path d="M8 1.333l5.333 2v5.334c0 3.083-2.5 5.916-5.333 7-2.833-1.084-5.333-3.917-5.333-7V3.333L8 1.333z" stroke="#10b981" stroke-width="1"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" width="12" height="12"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
               Secure checkout
             </span>
             <span class="trust-sep">·</span>
             <span class="trust-item">
-              <svg viewBox="0 0 16 16" fill="none" width="12"><path d="M2 8l4 4 8-8" stroke="#10b981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" width="12" height="12"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
               Fast delivery
             </span>
           </div>
@@ -431,6 +465,14 @@ export class PaymentCardComponent {
     {
       id: 'google', name: 'Google Pay', sub: 'Fast checkout',
       svg: '<svg viewBox="0 0 24 24" width="100%" height="100%"><circle cx="6" cy="12" r="4" fill="#4285F4"/><circle cx="10" cy="12" r="4" fill="#EA4335"/><circle cx="14" cy="12" r="4" fill="#FBBC05"/><circle cx="18" cy="12" r="4" fill="#34A853"/></svg>'
+    },
+    {
+      id: 'bank', name: 'Bank', sub: 'Direct transfer',
+      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="100%" height="100%"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M12 10v11M4 10l8-7 8 7"/></svg>'
+    },
+    {
+      id: 'upi', name: 'UPI', sub: 'Scan & Pay',
+      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="100%" height="100%"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>'
     },
     {
       id: 'payto', name: 'PayTo', sub: 'Real-time',

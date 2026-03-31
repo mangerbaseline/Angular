@@ -22,7 +22,7 @@ import { CommonModule } from '@angular/common';
         <div class="paying-label">
           Paying to &nbsp;
           <span class="verified-badge">
-            <svg viewBox="0 0 16 16" fill="#10b981" width="9" height="9"><path d="M8 1.333l5.333 2v5.334c0 3.083-2.5 5.916-5.333 7-2.833-1.084-5.333-3.917-5.333-7V3.333L8 1.333z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="10" height="10" style="margin-right: 2px;"><path d="M12 22l8-4V5l-8-3-8 3v7l8 4z"/><path d="M9 12l2 2 4-4"/></svg>
             Verified
           </span>
         </div>
@@ -34,9 +34,7 @@ import { CommonModule } from '@angular/common';
             </svg>
           </div>
           <span class="merchant-name">TechStore Pro</span>
-          <svg viewBox="0 0 20 20" fill="none" width="14" height="14" class="ext-icon">
-            <path d="M11 3H17V9M17 3L9 11M5 7H3V17H13V15" stroke="#475569" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <svg viewBox="0 0 24 24" fill="none" width="14" height="14" class="ext-icon" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6m4-3h6v6m-11 5L21 3"/></svg>
         </div>
       </div>
     </div>
@@ -135,4 +133,4 @@ import { CommonModule } from '@angular/common';
     .ext-icon:hover { opacity: 0.7; }
   `]
 })
-export class BrandHeaderComponent {}
+export class BrandHeaderComponent { }
