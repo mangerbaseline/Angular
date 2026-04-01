@@ -10,10 +10,10 @@ import { CommonModule } from '@angular/common';
   selector: 'app-root',
   standalone: true,
   imports: [
-    CommonModule, 
-    RouterOutlet, 
-    BackgroundAnimationComponent, 
-    BrandHeaderComponent, 
+    CommonModule,
+    RouterOutlet,
+    BackgroundAnimationComponent,
+    BrandHeaderComponent,
     PaymentCardComponent,
     VisualDisplayComponent
   ],
@@ -35,42 +35,41 @@ import { CommonModule } from '@angular/common';
       min-width: 0;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-end; /* Push to center line */
+      padding: 40px 140px 40px 40px; /* Increased space from center line */
       z-index: 10;
       overflow: hidden;
     }
 
     .form-panel {
-      width: clamp(450px, 42vw, 600px);
-      flex-shrink: 0;
+      flex: 1;
+      min-width: 0;
       z-index: 20;
       display: flex;
       flex-direction: column;
-      justify-content: center; /* Vertical centering */
-      padding: 40px 10vw 80px 20px;
+      justify-content: center;
+      align-items: flex-start; /* Push to center line */
+      padding: 40px 40px 40px 140px; /* Increased space from center line */
       position: relative;
-      min-height: 100vh; /* Ensure centering works against viewport height */
+      min-height: 100vh;
+  
+      background: rgba(0, 0, 0, 0.1);
     }
 
     .form-glass-card {
-      background: rgba(8, 14, 28, 0.88);
-      backdrop-filter: blur(32px);
-      -webkit-backdrop-filter: blur(32px);
-      border: none;
-      border-radius: 24px;
-      box-shadow: 0 40px 120px rgba(0, 0, 0, 0.5);
       width: 100%;
-      height: auto;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
+      max-width: 500px; /* Increased from 420px */
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      overflow: visible;
     }
 
     .global-footer {
       position: absolute;
-      bottom: 24px;
-      left: 0;
-      right: 0;
+      bottom: 0px;
+      left: 10%;
+      right: 20%;
       display: flex;
       justify-content: space-between;
       padding: 0 40px;
@@ -112,18 +111,22 @@ import { CommonModule } from '@angular/common';
     @media (max-width: 860px) {
       .app-container {
         flex-direction: column;
-        overflow-y: auto;
         height: auto;
         min-height: 100vh;
       }
       .visual-panel {
         min-height: 45vh;
         width: 100%;
+        padding: 32px 16px;
+        justify-content: center;
       }
       .form-panel {
         width: 100%;
+        min-width: 100%;
         max-width: 100%;
         height: auto;
+        padding: 32px 16px;
+        align-items: center;
         border-left: none;
         border-top: 1px solid rgba(255, 255, 255, 0.05);
         box-shadow: none;

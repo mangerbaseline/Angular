@@ -236,6 +236,25 @@ import { CommonModule } from '@angular/common';
           </div>
         </div>
 
+        <!-- LINK -->
+        <div *ngSwitchCase="'link'" class="fade-in" style="position: relative;">
+          <div class="link-glow" style="position:absolute; inset:-32px; background:linear-gradient(to right, rgba(34,197,94,0.3), rgba(52,211,153,0.2), rgba(34,197,94,0.3)); border-radius:60px; filter:blur(40px); opacity:0.6; pointer-events:none;"></div>
+          <div class="link-card-v" style="position:relative; width: 288px; height: 176px; border-radius: 16px; overflow: hidden; background: linear-gradient(to bottom right, #00D66F, #00B85C); padding: 24px; box-shadow: 0 20px 40px rgba(0, 214, 111, 0.3);">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 12px;">
+              <div>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width: 48px; height: 48px; color: white;"><path d="M7 8h10M7 12h7M7 16h4"></path></svg>
+              </div>
+              <p style="color: white; font-weight: 700; font-size: 20px; margin: 0;">Link</p>
+              <p style="color: rgba(255,255,255,0.7); font-size: 12px; margin: 0;">1-click checkout by Stripe</p>
+              <div style="display: flex; gap: 4px; margin-top: 4px;">
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.8);"></div>
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5);"></div>
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.3);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- DEFAULT (Fallback) -->
         <div *ngSwitchDefault class="default-visual fade-in">
           <svg viewBox="0 0 64 64" fill="none" stroke="#10b981" stroke-width="1.5" width="120" height="120">
@@ -305,6 +324,7 @@ export class VisualDisplayComponent {
       bank: 'rgba(16,185,129,0.5)',
       upi: 'rgba(99,102,241,0.5)',
       payto: 'rgba(16,185,129,0.5)',
+      link: 'rgba(0,214,111,0.5)',
       zip: 'rgba(170,143,255,0.4)',
       afterpay: 'rgba(178,252,228,0.4)',
       klarna: 'rgba(255,179,199,0.4)',

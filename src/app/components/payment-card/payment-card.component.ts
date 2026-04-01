@@ -9,58 +9,43 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
   template: `
     <div class="sidebar-root">
 
-      <!-- Step Indicator (pill style, top) -->
-      <div class="steps-bar">
-        <div class="step-pill active">
-          <svg viewBox="0 0 16 16" fill="none" width="12"><rect x="1" y="3" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M1 7h14" stroke="currentColor" stroke-width="1.5"/></svg>
-          Card Details
+      <!-- Step Indicator -->
+      <div class="flex items-center justify-center gap-2 mb-8" style="display:flex; justify-content:center; align-items:center; gap: 8px; margin-bottom: 32px;">
+        <div style="display:flex; align-items:center;">
+          <div style="display:flex; align-items:center; gap: 8px; padding: 8px 16px; border-radius: 9999px; background: rgba(16,185,129,0.2); color: #10b981;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px;"><rect width="20" height="14" x="2" y="5" rx="2"></rect><line x1="2" x2="22" y1="10" y2="10"></line></svg>
+            <span style="font-size:14px; font-weight:500;">Card Details</span>
+          </div>
+          <div style="width:32px; height:2px; margin: 0 8px; background: rgba(255,255,255,0.1);"></div>
         </div>
-        <div class="step-line"></div>
-        <div class="step-pill">
-          <svg viewBox="0 0 16 16" fill="none" width="12"><path d="M8 1.333l5.333 2v5.334c0 3.083-2.5 5.916-5.333 7-2.833-1.084-5.333-3.917-5.333-7V3.333L8 1.333z" stroke="currentColor" stroke-width="1.5"/></svg>
-          Verification
+        <div style="display:flex; align-items:center;">
+          <div style="display:flex; align-items:center; gap: 8px; padding: 8px 16px; border-radius: 9999px; background: rgba(255,255,255,0.05); color: #94a3b8;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px;"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span style="font-size:14px; font-weight:500;">Verification</span>
+          </div>
+          <div style="width:32px; height:2px; margin: 0 8px; background: rgba(255,255,255,0.1);"></div>
         </div>
-        <div class="step-line"></div>
-        <div class="step-pill">
-          <svg viewBox="0 0 16 16" fill="none" width="12"><path d="M13 4L6.5 11 3 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Complete
+        <div style="display:flex; align-items:center;">
+          <div style="display:flex; align-items:center; gap: 8px; padding: 8px 16px; border-radius: 9999px; background: rgba(255,255,255,0.05); color: #94a3b8;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px;"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg>
+            <span style="font-size:14px; font-weight:500;">Complete</span>
+          </div>
         </div>
       </div>
 
       <!-- Method tabs with drag-scroll & navigation arrows -->
-      <div class="method-tabs-section">
-        <div class="method-tabs"
-          #tabsContainer
-          (mousedown)="onTabsDragStart($event)"
-          (mousemove)="onTabsDragMove($event)"
-          (mouseup)="onTabsDragEnd()"
-          (mouseleave)="onTabsDragEnd()"
-          (scroll)="onTabsScroll($event)">
+      <div class="method-tabs-section" style="margin-bottom: 24px;">
+        <p style="font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 14px;">Choose payment method</p>
+        <div class="method-tabs" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; width: 100%;">
           <button
             *ngFor="let m of methods"
             [class.selected]="selectedMethod() === m.id"
             (click)="selectMethod(m.id)"
             class="method-tab">
-            <span class="tab-icon" [innerHTML]="m.svg | safeHtml"></span>
+            <span class="tab-icon" [innerHTML]="m.svg | safeHtml" style="display:flex; align-items:center; justify-content:center; width: 20px; height: 20px; margin-bottom: 2px;"></span>
             <div class="tab-text">
               <span class="tab-name">{{ m.name }}</span>
-              <span class="tab-sub">{{ m.sub }}</span>
             </div>
-          </button>
-        </div>
-        <!-- Scrollbar indicator track with arrows -->
-        <div class="scroll-track-container">
-          <button class="scroll-nav-btn left" (click)="moveTabs('left')">
-            <svg viewBox="0 0 16 16" width="10" height="10"><path d="M10 4L6 8l4 4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-          </button>
-          <div class="scroll-track" #scrollTrack>
-            <div class="scroll-thumb" 
-              [style.width.px]="thumbWidth" 
-              [style.left.px]="thumbLeft"
-              (mousedown)="onThumbStartDrag($event)"></div>
-          </div>
-          <button class="scroll-nav-btn right" (click)="moveTabs('right')">
-            <svg viewBox="0 0 16 16" width="10" height="10"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
           </button>
         </div>
       </div>
@@ -239,6 +224,38 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
             </div>
           </div>
 
+          <!-- LINK -->
+          <div *ngSwitchCase="'link'" class="fade-in" style="width: 100%;">
+            <div class="glass rounded-2xl p-6 mb-5" style="background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 24px; margin-bottom: 20px;">
+              <div class="flex items-center gap-3 mb-4" style="display:flex; align-items:center; gap: 12px; margin-bottom: 16px;">
+                <div class="w-10 h-10 rounded-lg bg-[#00D66F] flex items-center justify-center" style="width: 40px; height: 40px; border-radius: 8px; background: #00D66F; display:flex; align-items:center; justify-content:center;">
+                  <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="width: 20px; color: white;"><path d="M7 8h10M7 12h7M7 16h4"></path></svg>
+                </div>
+                <div>
+                  <h3 class="font-display font-semibold text-foreground" style="font-weight: 600; font-size: 16px; color: white; margin: 0;">Link</h3>
+                  <p class="text-xs text-muted-foreground" style="font-size: 12px; color: var(--text-secondary); margin: 0;">Fast, secure 1-click checkout</p>
+                </div>
+              </div>
+              <p class="text-sm text-muted-foreground mb-4" style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.4;">Save your payment info once and check out with a single click across thousands of merchants. Powered by Stripe.</p>
+              <div class="space-y-3">
+                <div class="relative">
+                  <label class="block text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wider" style="display:block; font-size:11px; margin-bottom: 8px; color: var(--text-secondary); text-transform: uppercase;">Email</label>
+                  <div class="relative group">
+                    <div class="relative flex items-center">
+                      <input type="text" placeholder="you@example.com" style="width: 100%; padding: 14px 16px; background: rgba(30,41,59,0.5); border: 1px solid var(--glass-border); border-radius: 12px; color: white; outline: none; box-sizing: border-box; font-family: inherit;">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button class="relative w-full py-4 px-6 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30" tabindex="0" style="width: 100%; padding: 16px 24px; border-radius: 12px; border: none; background: linear-gradient(to right, #10b981, #34d399); color: white; font-weight: 600; display:flex; gap: 12px; justify-content:center; align-items:center; cursor: pointer; font-size: 16px; font-family: inherit; font-size: 16px;">
+              <span class="relative flex items-center gap-2">Continue with Link
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+              </span>
+            </button>
+            <p class="text-center text-xs text-muted-foreground" style="text-align: center; font-size: 12px; margin-top: 16px; color: var(--text-secondary);">⚡ 1-click checkout • Saved securely • Powered by Stripe</p>
+          </div>
+
           <!-- DEFAULT -->
           <div *ngSwitchDefault class="wallet-form fade-in">
             <div class="wallet-card">
@@ -254,11 +271,11 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
       </div>
 
       <!-- Pay CTA -->
-      <div class="cta-section">
+      <div class="cta-section" *ngIf="selectedMethod() !== 'link'">
         <button class="pay-btn" (click)="pay()" [class.loading]="isProcessing()">
           <ng-container *ngIf="!isProcessing()">
             {{ getCTA() }}
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" width="18"><path d="M4 10h12M10 4l6 6-6 6"/></svg>
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" width="18"><path d="M4 10h12M10 4l6 6-6 6"/></svg>
           </ng-container>
           <div class="spinner" *ngIf="isProcessing()"></div>
         </button>
@@ -352,7 +369,124 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 
     </div>
   `,
-  styles: []
+  styles: [`
+    .sidebar-root {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Steps sizing */
+    .steps-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 32px; /* mb-8 */
+    }
+    .step-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px; /* px-4 py-2 */
+      border-radius: 9999px;
+      font-size: 14px; /* text-sm */
+      font-weight: 500;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--text-secondary);
+    }
+    .step-pill.active {
+      background: rgba(16, 185, 129, 0.2); /* bg-primary/20 */
+      border-color: transparent;
+      color: var(--brand-green);
+    }
+    .step-line {
+      width: 32px; /* w-8 */
+      height: 2px; /* h-0.5 */
+      margin: 0 8px; /* mx-2 */
+      background: var(--text-secondary);
+      opacity: 0.3;
+    }
+
+    /* Method Grid */
+    .method-tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 10px 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(15, 23, 42, 0.4);
+      color: #94a3b8;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .method-tab:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+    .method-tab.selected {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.6);
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.25);
+      color: #10b981;
+    }
+    .tab-name {
+      font-size: 11.5px;
+      font-weight: 600;
+      text-align: center;
+      width: 100%;
+    }
+
+    /* Input Styling */
+    .input-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+    .icon-input input {
+      width: 100%;
+      padding: 16px 18px !important;
+      border-radius: 12px !important;
+      background: rgba(15, 23, 42, 0.5) !important;
+      border: 1px solid var(--glass-border) !important;
+      color: var(--text-primary) !important;
+      font-size: 15px !important;
+    }
+    .icon-input.has-icon input { padding-left: 48px !important; }
+
+    /* Footer / Total */
+    .pay-btn {
+      width: 100% !important;
+      padding: 14px !important;
+      border-radius: 12px !important;
+      font-size: 16px !important;
+      font-weight: 600 !important;
+      margin-top: 10px;
+    }
+    .order-summary {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .summary-header {
+      padding: 14px !important;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    /* Hide subtabs for clean grid */
+    .tab-sub { display: none; }
+  `]
 })
 export class PaymentCardComponent {
   @ViewChild('tabsContainer') tabsContainer!: ElementRef;
@@ -455,40 +589,44 @@ export class PaymentCardComponent {
 
   methods = [
     {
-      id: 'card', name: 'Card', sub: 'Visa, MC, Amex',
-      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="100%" height="100%"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>'
+      id: 'card', name: 'Card',
+      svg: '<div style="display:flex; align-items:center; gap: 2px;"><svg style="width:16px; height:12px;" viewBox="0 0 48 32"><rect width="48" height="32" rx="4" fill="#1A1F71"></rect><path d="M19.5 21h-3.2l2-12.4h3.2L19.5 21zm13.3-12.1c-.6-.3-1.6-.5-2.9-.5-3.2 0-5.4 1.7-5.4 4.1 0 1.8 1.6 2.8 2.8 3.4 1.2.6 1.6 1 1.6 1.5 0 .8-1 1.2-1.9 1.2-1.2 0-1.9-.2-2.9-.6l-.4-.2-.4 2.7c.7.3 2.1.6 3.5.6 3.4 0 5.6-1.7 5.6-4.2 0-1.4-.8-2.5-2.7-3.4-1.1-.6-1.8-.9-1.8-1.5 0-.5.6-1 1.8-1 1 0 1.8.2 2.4.5l.3.1.4-2.7z" fill="#fff"></path><path d="M37.3 8.6h-2.5c-.8 0-1.3.2-1.7 1L28.8 21h3.4l.7-1.9h4.1l.4 1.9H40L37.3 8.6zm-3.5 8.1l1.7-4.7.5 2.3.5 2.4h-2.7z" fill="#fff"></path><path d="M15.6 8.6L12.4 17l-.3-1.7c-.6-2-2.4-4.2-4.4-5.3l2.9 11h3.4l5.1-12.4h-3.5z" fill="#fff"></path><path d="M9.8 8.6H4.6l-.1.3c4 1 6.7 3.5 7.8 6.5l-1.1-5.7c-.2-.8-.8-1-1.4-1.1z" fill="#F7B600"></path></svg><svg style="width:16px; height:12px;" viewBox="0 0 48 32"><rect width="48" height="32" rx="4" fill="#252525"></rect><circle cx="19" cy="16" r="8" fill="#EB001B"></circle><circle cx="29" cy="16" r="8" fill="#F79E1B"></circle><path d="M24 10.3a8 8 0 010 11.4 8 8 0 010-11.4z" fill="#FF5F00"></path></svg><svg style="width:16px; height:12px;" viewBox="0 0 48 32"><rect width="48" height="32" rx="4" fill="#2E77BC"></rect><path d="M6 16l3-8h4l3 8-3 8H9L6 16zm12-8h10l2 3 2-3h10l-6 8 6 8H32l-2-3-2 3H18l6-8-6-8z" fill="#fff" opacity="0.9"></path></svg></div>'
     },
     {
-      id: 'apple', name: 'Apple Pay', sub: 'Touch to pay',
-      svg: '<svg viewBox="0 0 24 24" fill="currentColor" width="100%" height="100%"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83"/><path d="M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>'
+      id: 'apple', name: 'Apple Pay',
+      svg: '<svg style="width:20px; height:20px;" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"></path></svg>'
     },
     {
-      id: 'google', name: 'Google Pay', sub: 'Fast checkout',
-      svg: '<svg viewBox="0 0 24 24" width="100%" height="100%"><circle cx="6" cy="12" r="4" fill="#4285F4"/><circle cx="10" cy="12" r="4" fill="#EA4335"/><circle cx="14" cy="12" r="4" fill="#FBBC05"/><circle cx="18" cy="12" r="4" fill="#34A853"/></svg>'
+      id: 'google', name: 'Google Pay',
+      svg: '<svg style="width:20px; height:20px;" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"></path><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"></path><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"></path><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"></path></svg>'
     },
     {
-      id: 'bank', name: 'Bank', sub: 'Direct transfer',
-      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="100%" height="100%"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M12 10v11M4 10l8-7 8 7"/></svg>'
+      id: 'bank', name: 'Bank',
+      svg: '<svg style="width:20px; height:20px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v4M12 14v4M16 14v4"></path></svg>'
     },
     {
-      id: 'upi', name: 'UPI', sub: 'Scan & Pay',
-      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="100%" height="100%"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>'
+      id: 'upi', name: 'UPI',
+      svg: '<svg style="width:20px; height:20px;" viewBox="0 0 24 24"><path d="M11 4L7 20" stroke="#097939" stroke-width="2.5" stroke-linecap="round"></path><path d="M13 4L17 20" stroke="#ED752E" stroke-width="2.5" stroke-linecap="round"></path><path d="M7 4L11 20" stroke="#097939" stroke-width="2.5" stroke-linecap="round"></path></svg>'
     },
     {
-      id: 'payto', name: 'PayTo', sub: 'Real-time',
-      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="100%" height="100%"><path d="M17 8l4 4-4 4M3 12h18"/></svg>'
+      id: 'payto', name: 'PayTo',
+      svg: '<svg style="width:20px; height:20px;" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="3" stroke="currentColor" stroke-width="1.5"></rect><path d="M7 12h6M13 12l-2-2M13 12l-2 2" stroke="#22d3ee" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="17" cy="12" r="1.5" fill="#22d3ee"></circle></svg>'
     },
     {
-      id: 'zip', name: 'Zip', sub: 'Pay in 4',
-      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="100%" height="100%"><circle cx="12" cy="12" r="10"/><path d="M9 9h6l-6 6h6"/></svg>'
+      id: 'zip', name: 'Zip',
+      svg: '<span style="font-weight:800; font-size:14px; letter-spacing:-0.02em; background: linear-gradient(to right, #a78bfa, #e879f9); -webkit-background-clip: text; color: transparent;">zip</span>'
     },
     {
-      id: 'afterpay', name: 'Afterpay', sub: 'Pay later',
-      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="100%" height="100%"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>'
+      id: 'afterpay', name: 'Afterpay',
+      svg: '<svg style="width:20px; height:20px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="url(#apGrad)"></circle><defs><linearGradient id="apGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#b2fce4"></stop><stop offset="100%" stop-color="#2dd4bf"></stop></linearGradient></defs><path d="M8.5 12.5l2.5 2.5 4.5-5" stroke="#0d3d2e" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>'
     },
     {
-      id: 'klarna', name: 'Klarna', sub: 'Flexible',
-      svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="100%" height="100%"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"/><path d="M9 12l2 2 4-4"/></svg>'
+      id: 'klarna', name: 'Klarna',
+      svg: '<svg style="width:20px; height:20px;" viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="#FFB3C7"></rect><path d="M7 6c0 2.5-1 4.5-3 6 2 1.5 3 3.5 3 6" stroke="#0A0B09" stroke-width="2" fill="none" stroke-linecap="round"></path><line x1="13" y1="6" x2="13" y2="18" stroke="#0A0B09" stroke-width="2" stroke-linecap="round"></line><circle cx="18" cy="16" r="2" fill="#0A0B09"></circle></svg>'
+    },
+    {
+      id: 'link', name: 'Link',
+      svg: '<svg style="width:20px; height:20px;" viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="#00D66F"></rect><path d="M7 8h10M7 12h7M7 16h4" stroke="white" stroke-width="2" stroke-linecap="round"></path></svg>'
     }
   ];
 
