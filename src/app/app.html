@@ -3,12 +3,12 @@
 
 <div class="app-container">
   <div class="visual-panel">
-    <app-visual-display [selectedMethod]="selectedMethod()"></app-visual-display>
+<app-visual-display [selectedMethod]="selectedMethod()" [cardType]="cardType()"></app-visual-display>
   </div>
 
   <div class="form-panel">
     <div class="form-glass-card">
-      <app-payment-card (methodChange)="onMethodChange($event)"></app-payment-card>
+      <app-payment-card (methodChange)="onMethodChange($event)" (cardTypeChange)="onCardTypeChange($event)"></app-payment-card>
     </div>
   </div>
 

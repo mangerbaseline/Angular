@@ -93,6 +93,43 @@ import { CommonModule } from '@angular/common';
       color: #475569;
     }
 
+    @media (max-width: 1300px) {
+      .visual-panel {
+        padding: 40px 60px 40px 40px;
+      }
+      .form-panel {
+        padding: 40px 40px 40px 60px;
+      }
+      .global-footer {
+        left: 5%;
+        right: 10%;
+      }
+    }
+
+    /* Nest Hub / Landscape Tablet / Small Laptop Fixes */
+    @media (max-width: 1050px) and (min-width: 860px) {
+      .visual-panel {
+        padding: 20px 30px 20px 30px !important;
+      }
+      .form-panel {
+        padding: 20px 30px 20px 30px !important;
+      }
+      .form-glass-card {
+        max-width: 440px;
+      }
+    }
+
+    @media (max-height: 700px) and (min-width: 860px) {
+      .visual-panel, .form-panel {
+        padding-top: 10px !important;
+        padding-bottom: 30px !important;
+        min-height: auto;
+      }
+      .global-footer {
+        display: none; /* Hide on very short landscape screens to save space */
+      }
+    }
+
     @media (max-width: 1100px) {
       .global-footer {
         position: static;
@@ -115,20 +152,16 @@ import { CommonModule } from '@angular/common';
         min-height: 100vh;
       }
       .visual-panel {
-        min-height: 45vh;
-        width: 100%;
-        padding: 32px 16px;
-        justify-content: center;
+        display: none;
       }
       .form-panel {
         width: 100%;
         min-width: 100%;
         max-width: 100%;
         height: auto;
-        padding: 32px 16px;
+        padding: 15px 0px;
         align-items: center;
         border-left: none;
-        border-top: 1px solid rgba(255, 255, 255, 0.05);
         box-shadow: none;
       }
     }
@@ -137,8 +170,13 @@ import { CommonModule } from '@angular/common';
 export class App {
   title = 'angularpaymentui';
   selectedMethod = signal('card');
+  cardType = signal('visa');
 
   onMethodChange(method: string) {
     this.selectedMethod.set(method);
+  }
+
+  onCardTypeChange(type: string) {
+    this.cardType.set(type);
   }
 }

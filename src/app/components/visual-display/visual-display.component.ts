@@ -35,7 +35,9 @@ import { CommonModule } from '@angular/common';
             <div class="card-holder-label">CARDHOLDER NAME</div>
             <div class="card-expiry-v">12/28</div>
           </div>
-          <div class="card-verified-v">V</div>
+          <div class="card-verified-v" [style.background]="getCardTypeColor()" *ngIf="cardType">
+            {{ getCardSymbol() }}
+          </div>
         </div>
 
         <!-- APPLE PAY -->
@@ -76,22 +78,22 @@ import { CommonModule } from '@angular/common';
 
         <!-- BANK -->
         <div *ngSwitchCase="'bank'" class="fade-in" style="position: relative;">
-          <div class="bank-visual">
-            <svg class="w-64 h-56" viewBox="0 0 200 180" style="width: 256px; height: 224px;">
+          <div class="bank-visual-container">
+            <svg class="bank-svg-v" viewBox="0 0 200 180" style="width: 256px; height: 224px;">
               <defs>
                 <linearGradient id="bankGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stop-color="#10b981"></stop>
                   <stop offset="100%" stop-color="#06b6d4"></stop>
                 </linearGradient>
               </defs>
-              <path d="M100 10 L180 60 L20 60 Z" fill="none" stroke="url(#bankGradient)" stroke-width="3"></path>
-              <rect x="30" y="60" width="140" height="100" fill="none" stroke="url(#bankGradient)" stroke-width="3" rx="2"></rect>
-              <rect x="42" y="70" width="12" height="80" fill="url(#bankGradient)" fill-opacity="0.3" stroke="url(#bankGradient)" stroke-width="2" rx="2"></rect>
-              <rect x="77" y="70" width="12" height="80" fill="url(#bankGradient)" fill-opacity="0.3" stroke="url(#bankGradient)" stroke-width="2" rx="2"></rect>
-              <rect x="112" y="70" width="12" height="80" fill="url(#bankGradient)" fill-opacity="0.3" stroke="url(#bankGradient)" stroke-width="2" rx="2"></rect>
-              <rect x="147" y="70" width="12" height="80" fill="url(#bankGradient)" fill-opacity="0.3" stroke="url(#bankGradient)" stroke-width="2" rx="2"></rect>
-              <path d="M20 160 L20 170 L180 170 L180 160" fill="none" stroke="url(#bankGradient)" stroke-width="3"></path>
-              <text x="100" y="50" text-anchor="middle" fill="url(#bankGradient)" font-size="24" font-weight="bold">$</text>
+              <path class="part s1" d="M100 10 L180 60 L20 60 Z" fill="none" stroke="url(#bankGradient)" stroke-width="3" pathLength="1"></path>
+              <rect class="part s2" x="30" y="60" width="140" height="100" fill="none" stroke="url(#bankGradient)" stroke-width="3" rx="2" pathLength="1"></rect>
+              <rect class="part s3" x="42" y="70" width="12" height="80" fill="url(#bankGradient)" fill-opacity="0.3" stroke="url(#bankGradient)" stroke-width="2" rx="2"></rect>
+              <rect class="part s4" x="77" y="70" width="12" height="80" fill="url(#bankGradient)" fill-opacity="0.3" stroke="url(#bankGradient)" stroke-width="2" rx="2"></rect>
+              <rect class="part s5" x="112" y="70" width="12" height="80" fill="url(#bankGradient)" fill-opacity="0.3" stroke="url(#bankGradient)" stroke-width="2" rx="2"></rect>
+              <rect class="part s6" x="147" y="70" width="12" height="80" fill="url(#bankGradient)" fill-opacity="0.3" stroke="url(#bankGradient)" stroke-width="2" rx="2"></rect>
+              <path class="part s7" d="M20 160 L20 170 L180 170 L180 160" fill="none" stroke="url(#bankGradient)" stroke-width="3" pathLength="1"></path>
+              <text class="part s8" x="100" y="50" text-anchor="middle" fill="url(#bankGradient)" font-size="24" font-weight="bold">$</text>
             </svg>
             <div class="coin-v cv1">$</div>
             <div class="coin-v cv2">$</div>
@@ -232,24 +234,27 @@ import { CommonModule } from '@angular/common';
                 <span>Pay in 30 days</span>
               </div>
             </div>
-            <div class="kl-badge-v">Smoooth payments</div>
+          </div>
+          <div class="kl-badge-v">
+            <span>Smoooth</span>
+            <span>payments</span>
           </div>
         </div>
 
         <!-- LINK -->
         <div *ngSwitchCase="'link'" class="fade-in" style="position: relative;">
           <div class="link-glow" style="position:absolute; inset:-32px; background:linear-gradient(to right, rgba(34,197,94,0.3), rgba(52,211,153,0.2), rgba(34,197,94,0.3)); border-radius:60px; filter:blur(40px); opacity:0.6; pointer-events:none;"></div>
-          <div class="link-card-v" style="position:relative; width: 288px; height: 176px; border-radius: 16px; overflow: hidden; background: linear-gradient(to bottom right, #00D66F, #00B85C); padding: 24px; box-shadow: 0 20px 40px rgba(0, 214, 111, 0.3);">
+          <div class="link-card-v">
             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 12px;">
               <div>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width: 48px; height: 48px; color: white;"><path d="M7 8h10M7 12h7M7 16h4"></path></svg>
               </div>
               <p style="color: white; font-weight: 700; font-size: 20px; margin: 0;">Link</p>
               <p style="color: rgba(255,255,255,0.7); font-size: 12px; margin: 0;">1-click checkout by Stripe</p>
-              <div style="display: flex; gap: 4px; margin-top: 4px;">
-                <div style="width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.8);"></div>
-                <div style="width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.5);"></div>
-                <div style="width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.3);"></div>
+              <div style="display: flex; gap: 6px; margin-top: 4px; align-items: center;">
+                <div class="link-dot-v active"></div>
+                <div class="link-dot-v"></div>
+                <div class="link-dot-v"></div>
               </div>
             </div>
           </div>
@@ -298,10 +303,110 @@ import { CommonModule } from '@angular/common';
       <div class="ghost-orb"></div>
     </div>
   `,
-  styles: []
+  styles: [`
+    .visual-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .glow-orb { position: absolute; width: 400px; height: 400px; border-radius: 50%; filter: blur(80px); opacity: 0.3; transition: all 1s ease; z-index: 1; }
+    .main-visual { display: flex; align-items: center; justify-content: center; width: 100%; z-index: 2; min-height: 230px; }
+    .amount-display { margin-top: 40px; text-align: center; z-index: 3; }
+    .amount-label { font-size: 14px; color: rgba(255,255,255,0.4); letter-spacing: 0.1em; margin-bottom: 8px; }
+    .amount-value { font-size: 56px; font-weight: 800; color: #10b981; line-height: 1; }
+    .currency { font-size: 16px; color: rgba(255,255,255,0.4); margin-left: 8px; font-weight: 400; }
+    .trust-badges { 
+      display: grid; 
+      grid-template-columns: repeat(4, auto); 
+      gap: 5px; 
+      margin-top: 20px; 
+      justify-content: center;
+    }
+    .trust-badge { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 99px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.6); font-size: 11px; white-space: nowrap; }
+
+    /* Responsive Badges */
+    @media (max-width: 1300px) {
+      .trust-badges { 
+        grid-template-columns: repeat(3, auto);
+      }
+      .trust-badge:last-child {
+        grid-column: span 3;
+        justify-self: center;
+        width: fit-content;
+      }
+    }
+    @media (max-width: 950px) {
+      .trust-badges { 
+        grid-template-columns: repeat(2, auto);
+      }
+      .trust-badge:last-child {
+        grid-column: span 1;
+        justify-self: stretch;
+      }
+    }
+
+    /* Bank Visual Sequence */
+    .bank-visual-container {
+      position: relative;
+      width: 256px;
+      height: 224px;
+      animation: bankFloat-sys 4s ease-in-out infinite;
+    }
+    .bank-svg-v { width: 100%; height: 100%; overflow: visible; }
+    
+    /* Architectural Line Drawing */
+    .part { opacity: 0; }
+    .bank-svg-v path.part {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: drawLine-sys 1s ease forwards, fadeIn-sys 1s ease forwards;
+    }
+    /* Solid Columns Fade In Only */
+    .bank-svg-v rect.part, .bank-svg-v text.part, .coin-v.part {
+      animation: fadeIn-sys 1s ease forwards;
+    }
+
+    .part.s1 { animation-delay: 0.1s; } .part.s2 { animation-delay: 0.4s; }
+    .part.s3 { animation-delay: 0.7s; } .part.s4 { animation-delay: 0.9s; }
+    .part.s5 { animation-delay: 1.1s; } .part.s6 { animation-delay: 1.3s; }
+    .part.s7 { animation-delay: 1.6s; } .part.s8 { animation-delay: 1.9s; }
+
+    @keyframes drawLine-sys { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+    @keyframes fadeIn-sys { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes bankFloat-sys { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+    .coin-v { 
+      position: absolute; 
+      width: 32px; 
+      height: 32px; 
+      background: radial-gradient(circle at 30% 30%, #fcd34d, #d97706); 
+      border-radius: 50%; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      color: white; 
+      font-weight: bold; 
+      box-shadow: 0 4px 12px rgba(217,119,6,0.3);
+      z-index: 5;
+      animation: coinFloat-sys 3s ease-in-out infinite;
+    }
+    @keyframes coinFloat-sys { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+    
+    .cv1 { top: -20px; left: -10px; animation-delay: 0s; } 
+    .cv2 { top: 20px; right: -30px; animation-delay: 0.5s; } 
+    .cv3 { bottom: 40px; right: -40px; animation-delay: 1.2s; }
+
+    .fade-in { animation: fadeIn 0.5s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  `]
 })
 export class VisualDisplayComponent {
   @Input() selectedMethod = 'card';
+  @Input() cardType = '';
 
   qrPixels = [
     1, 0, 1, 1, 0, 1, 1, 0, 1, 0,
@@ -315,6 +420,20 @@ export class VisualDisplayComponent {
     0, 1, 0, 0, 1, 0, 1, 0, 0, 1,
     1, 0, 1, 1, 0, 1, 0, 1, 1, 0,
   ];
+
+  getCardSymbol() {
+    if (this.cardType === 'visa') return 'V';
+    if (this.cardType === 'mastercard') return 'M';
+    if (this.cardType === 'amex') return 'A';
+    return '';
+  }
+
+  getCardTypeColor() {
+    if (this.cardType === 'visa') return '#2563eb';
+    if (this.cardType === 'mastercard') return '#ea580c';
+    if (this.cardType === 'amex') return '#06b6d4';
+    return '#2563eb';
+  }
 
   getGlowColor() {
     const colors: Record<string, string> = {
