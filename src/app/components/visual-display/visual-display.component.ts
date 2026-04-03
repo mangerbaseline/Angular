@@ -49,11 +49,11 @@ import { CommonModule } from '@angular/common';
           <div class="phone-3d">
             <div class="phone-notch"></div>
             <div class="phone-screen">
-              <svg viewBox="0 0 24 24" fill="currentColor" width="64" height="64" style="color: white; margin-bottom: 8px;">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="64" height="64" style="color: white; margin-bottom: 0px;">
                 <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83"/>
                 <path d="M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
               </svg>
-              <span style="color: white; font-size: 24px; font-weight: 600;">Pay</span>
+              <span style="color: white; font-size: 24px; font-weight: 600; margin-bottom: 32px;">Pay</span>
               <div class="face-id-circle">
                 <div class="circle-inner"></div>
               </div>
@@ -88,12 +88,12 @@ import { CommonModule } from '@angular/common';
               </defs>
               <path class="part s1" d="M100 10 L180 60 L20 60 Z" fill="none" stroke="url(#bankGradient)" stroke-width="3" pathLength="1"></path>
               <rect class="part s2" x="30" y="60" width="140" height="100" fill="none" stroke="url(#bankGradient)" stroke-width="3" rx="2" pathLength="1"></rect>
-              <rect class="part s3" x="42" y="70" width="12" height="80" fill="url(#bankGradient)" fill-opacity="0.3" stroke="url(#bankGradient)" stroke-width="2" rx="2"></rect>
-              <rect class="part s4" x="77" y="70" width="12" height="80" fill="url(#bankGradient)" fill-opacity="0.3" stroke="url(#bankGradient)" stroke-width="2" rx="2"></rect>
-              <rect class="part s5" x="112" y="70" width="12" height="80" fill="url(#bankGradient)" fill-opacity="0.3" stroke="url(#bankGradient)" stroke-width="2" rx="2"></rect>
-              <rect class="part s6" x="147" y="70" width="12" height="80" fill="url(#bankGradient)" fill-opacity="0.3" stroke="url(#bankGradient)" stroke-width="2" rx="2"></rect>
+              <rect class="part s3" x="42" y="70" width="12" height="80" fill="url(#bankGradient)" fill-opacity="0.3" stroke="url(#bankGradient)" stroke-width="2" rx="2" pathLength="1"></rect>
+              <rect class="part s4" x="77" y="70" width="12" height="80" fill="url(#bankGradient)" fill-opacity="0.3" stroke="url(#bankGradient)" stroke-width="2" rx="2" pathLength="1"></rect>
+              <rect class="part s5" x="112" y="70" width="12" height="80" fill="url(#bankGradient)" fill-opacity="0.3" stroke="url(#bankGradient)" stroke-width="2" rx="2" pathLength="1"></rect>
+              <rect class="part s6" x="147" y="70" width="12" height="80" fill="url(#bankGradient)" fill-opacity="0.3" stroke="url(#bankGradient)" stroke-width="2" rx="2" pathLength="1"></rect>
               <path class="part s7" d="M20 160 L20 170 L180 170 L180 160" fill="none" stroke="url(#bankGradient)" stroke-width="3" pathLength="1"></path>
-              <text class="part s8" x="100" y="50" text-anchor="middle" fill="url(#bankGradient)" font-size="24" font-weight="bold">$</text>
+              <text class="part s8" x="100" y="50" text-anchor="middle" fill="url(#bankGradient)" font-size="24" font-weight="bold" pathLength="1">$</text>
             </svg>
             <div class="coin-v cv1">$</div>
             <div class="coin-v cv2">$</div>
@@ -250,7 +250,7 @@ import { CommonModule } from '@angular/common';
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width: 48px; height: 48px; color: white;"><path d="M7 8h10M7 12h7M7 16h4"></path></svg>
               </div>
               <p style="color: white; font-weight: 700; font-size: 20px; margin: 0;">Link</p>
-              <p style="color: rgba(255,255,255,0.7); font-size: 12px; margin: 0;">1-click checkout by Stripe</p>
+              <p style="color: rgba(255,255,255,0.7); font-size: 12px; margin: 0;">1-click checkout </p>
               <div style="display: flex; gap: 6px; margin-top: 4px; align-items: center;">
                 <div class="link-dot-v active"></div>
                 <div class="link-dot-v"></div>
@@ -360,20 +360,21 @@ import { CommonModule } from '@angular/common';
     
     /* Architectural Line Drawing */
     .part { opacity: 0; }
-    .bank-svg-v path.part {
+    .bank-svg-v .part {
       stroke-dasharray: 1;
       stroke-dashoffset: 1;
-      animation: drawLine-sys 1s ease forwards, fadeIn-sys 1s ease forwards;
+      animation: drawLine-sys 1s ease-out forwards, fadeIn-sys 0.8s ease-out forwards;
     }
-    /* Solid Columns Fade In Only */
-    .bank-svg-v rect.part, .bank-svg-v text.part, .coin-v.part {
-      animation: fadeIn-sys 1s ease forwards;
-    }
-
-    .part.s1 { animation-delay: 0.1s; } .part.s2 { animation-delay: 0.4s; }
-    .part.s3 { animation-delay: 0.7s; } .part.s4 { animation-delay: 0.9s; }
-    .part.s5 { animation-delay: 1.1s; } .part.s6 { animation-delay: 1.3s; }
-    .part.s7 { animation-delay: 1.6s; } .part.s8 { animation-delay: 1.9s; }
+    
+    /* Specific Part Delays for Architectural Build-up */
+    .part.s7 { animation-delay: 0.1s; } /* Foundation */
+    .part.s2 { animation-delay: 0.3s; } /* Main Walls */
+    .part.s3 { animation-delay: 0.6s; } /* Window 1 */
+    .part.s4 { animation-delay: 0.8s; } /* Window 2 */
+    .part.s5 { animation-delay: 1.0s; } /* Window 3 */
+    .part.s6 { animation-delay: 1.2s; } /* Window 4 */
+    .part.s1 { animation-delay: 1.5s; } /* Roof */
+    .part.s8 { animation-delay: 1.8s; } /* Symbol */
 
     @keyframes drawLine-sys { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
     @keyframes fadeIn-sys { from { opacity: 0; } to { opacity: 1; } }

@@ -380,19 +380,37 @@ body {
 .phone-3d {
   width: 192px;
   height: 320px;
-  background: linear-gradient(to bottom, #1e293b, #0f172a);
+  background: linear-gradient(145deg, #1e293b 0%, #1e3a8a 50%, #020617 100%);
   border-radius: 40px;
   padding: 8px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    inset 0 0 1px 1px rgba(16, 124, 224, 0.1);
+  border: 1.5px solid rgba(56, 189, 248, 0.3);
+  /* Night sky blue border */
   position: relative;
   z-index: 10;
+  overflow: hidden;
+}
+
+/* Sky Texture Layer */
+.phone-3d::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, #fff, transparent),
+    radial-gradient(1px 1px at 30% 50%, #fff, transparent),
+    radial-gradient(2px 2px at 80% 30%, #fff, transparent),
+    radial-gradient(1px 1px at 60% 80%, #fff, transparent);
+  opacity: 0.1;
+  pointer-events: none;
 }
 
 .phone-screen {
   width: 100%;
   height: 100%;
-  background: #000;
+  background: linear-gradient(to bottom, #0f172a, #000);
   border-radius: 32px;
   overflow: hidden;
   position: relative;
@@ -400,7 +418,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 24px;
+  gap: 6px;
 }
 
 .phone-notch {
@@ -417,49 +435,70 @@ body {
 }
 
 .face-id-circle {
-  width: 80px;
-  height: 80px;
+  width: 70px;
+  height: 70px;
   border-radius: 50%;
-  border: 2px solid rgba(105, 198, 157, 0.7);
+  border: 2px solid rgba(253, 254, 254, 0.306);
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: scale(1.08);
-  animation: faceIdPulse 2s ease-in-out infinite;
+  transform: scale(1.0);
+  animation: faceIdPulse 2.5s ease-in-out infinite;
+  z-index: 5;
 }
 
 .circle-inner {
-  width: 64px;
-  height: 64px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+  animation: innerCircleBreath 2.5s ease-in-out infinite;
 }
 
 @keyframes faceIdPulse {
 
   0%,
   100% {
-    transform: scale(1.08);
-    opacity: 0.7;
+    transform: scale(1.0);
+    border-color: rgba(253, 254, 254, 0.306);
+    opacity: 0.6;
   }
 
   50% {
     transform: scale(1.15);
+    border-color: #10b981;
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
     opacity: 1;
+  }
+}
+
+@keyframes innerCircleBreath {
+
+  0%,
+  100% {
+    transform: scale(1.0);
+    opacity: 0.4;
+  }
+
+  50% {
+    transform: scale(0.85);
+    opacity: 0.8;
   }
 }
 
 .phone-ripple {
   position: absolute;
-  right: -32px;
-  top: 50%;
+  right: -28px;
+  top: 45%;
   transform: translateY(-50%);
-  width: 64px;
-  height: 64px;
-  border: 2px solid rgba(16, 185, 129, 0.4);
+  width: 56px;
+  height: 56px;
+  border: 1.5px solid rgba(16, 185, 129, 0.4);
   border-radius: 50%;
   pointer-events: none;
-  animation: rippleMove 3s ease-in-out infinite;
+  animation: rippleMove 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  z-index: 30;
+  /* Higher to clearly show above card */
 }
 
 .r1 {
@@ -474,7 +513,7 @@ body {
 
 .r3 {
   animation-delay: 1s;
-  transform: translateY(-50%) scale(2.34);
+  transform: translateY(-50%) scale(1.8);
 }
 
 @keyframes rippleMove {
@@ -494,7 +533,7 @@ body {
 }
 
 .double-click-text {
-  color: rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.6);
   font-size: 11px;
   margin-top: 16px;
 }
@@ -755,9 +794,9 @@ body {
 }
 
 .phone-3d {
-  width: 160px;
-  height: 290px;
-  background: linear-gradient(180deg, #1c1c1e 0%, #2c2c2e 100%);
+  width: 170px;
+  height: 300px;
+  background: linear-gradient(180deg, #1e293b 0%, #2c2c2e 100%);
   border-radius: 36px;
   border: 2px solid rgba(255, 255, 255, 0.1);
   overflow: hidden;
@@ -770,7 +809,7 @@ body {
 
 .phone-notch {
   width: 80px;
-  height: 28px;
+  height: 22px;
   background: #000;
   border-radius: 0 0 20px 20px;
   margin-bottom: 8px;
@@ -1065,9 +1104,21 @@ body {
   padding: 8px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   border: 1.5px solid rgba(255, 255, 255, 0.1);
-  position: relative;
   z-index: 10;
-  animation: upiEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: upiEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1), upiBreathing 4s ease-in-out infinite;
+}
+
+@keyframes upiBreathing {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.7), 0 0 40px rgba(16, 185, 129, 0.2);
+  }
 }
 
 @keyframes upiEntrance {
@@ -1115,8 +1166,60 @@ body {
 }
 
 .qr-dot-v {
-  border-radius: 2px;
-  background: transparent;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  /* Circle shape as requested */
+  background: rgba(30, 41, 59, 0.08);
+  animation: qrRowStep 3s linear infinite;
+}
+
+/* Row-by-Row Scanning using nth-child logic (5 dots per row) */
+/* Row 1 (1-5) */
+.qr-dot-v:nth-child(-n+5) {
+  animation-delay: 0s;
+}
+
+/* Row 2 (6-10) */
+.qr-dot-v:nth-child(n+6):nth-child(-n+10) {
+  animation-delay: 0.4s;
+}
+
+/* Row 3 (11-15) */
+.qr-dot-v:nth-child(n+11):nth-child(-n+15) {
+  animation-delay: 0.8s;
+}
+
+/* Row 4 (16-20) */
+.qr-dot-v:nth-child(n+16):nth-child(-n+20) {
+  animation-delay: 1.2s;
+}
+
+/* Row 5 (21-25) */
+.qr-dot-v:nth-child(n+21):nth-child(-n+25) {
+  animation-delay: 1.6s;
+}
+
+@keyframes qrRowStep {
+
+  0%,
+  8% {
+    opacity: 0.15;
+    transform: scale(0.9);
+  }
+
+  10%,
+  20% {
+    opacity: 1;
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.3));
+  }
+
+  25%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.9);
+  }
 }
 
 .qr-dot-v.fill {
@@ -1414,8 +1517,8 @@ body {
 
 .payto-pill {
   position: absolute;
-  bottom: -32px;
-  left: 50%;
+  bottom: -22px;
+  left: 53%;
   transform: translateX(-50%);
   background: linear-gradient(to right, #06b6d4, #3b82f6);
   padding: 8px 24px;
@@ -1864,10 +1967,13 @@ body {
 }
 
 @keyframes linkBreathing {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0) scale(1.0);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 15px rgba(0, 214, 111, 0.2);
   }
+
   50% {
     transform: translateY(-8px) scale(1.06);
     box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5), 0 0 45px rgba(0, 214, 111, 0.5);
@@ -1891,8 +1997,17 @@ body {
 }
 
 @keyframes linkDotPulse {
-  0%, 100% { transform: scale(1.2); opacity: 1; }
-  50% { transform: scale(0.8); opacity: 0.5; }
+
+  0%,
+  100% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
 }
 
 .kl-options-v {

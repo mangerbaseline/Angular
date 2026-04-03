@@ -152,12 +152,22 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 
           <!-- UPI -->
           <div *ngSwitchCase="'upi'" class="payment-form fade-in">
-            <div class="input-group">
+            <div class="input-group" style="margin-bottom: 24px;">
               <label>UPI ID</label>
-              <div class="icon-input">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
+              <div class="icon-input has-icon">
+                <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
                 <input type="text" placeholder="yourname@upi">
               </div>
+            </div>
+
+            <!-- Lovable HTML Implementation -->
+            <div class="glass" style="background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 24px; text-align: center;">
+              <div style="width: 160px; height: 160px; margin: 0 auto 16px; background: white; border-radius: 12px; padding: 12px;">
+                <div style="width: 100%; height: 100%; border-radius: 8px; display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(5, 1fr); gap: 2px; padding: 4px;">
+                  <div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div><div style="border-radius: 1px; background: #111827;"></div>
+                </div>
+              </div>
+              <p style="font-size: 14px; color: var(--text-secondary); margin: 0;">Scan with any UPI app to pay instantly</p>
             </div>
           </div>
 
@@ -571,6 +581,61 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
       .sidebar-root {
         padding: 12px 10px 10px; /* Reduced top padding from 40px to 12px */
       }
+    }
+
+    /* UPI QR Scan Area Styling (Red Box Design) */
+    .upi-qr-scan-area {
+      background: rgba(15, 23, 42, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      margin-top: 10px;
+      transition: all 0.5s ease;
+    }
+
+    .qr-main-box {
+      width: 140px;
+      height: 140px;
+      background: #ffffff;
+      border-radius: 18px;
+      position: relative;
+      padding: 12px;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .qr-grid-overlay {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      border: 2px solid #000000;
+      border-radius: 8px;
+      background: #000000;
+      overflow: hidden;
+    }
+
+    .grid-row {
+      flex: 1;
+      display: flex;
+      gap: 1px;
+    }
+
+    .grid-row span {
+      flex: 1;
+      background: #ffffff;
+    }
+
+    .qr-helper-text {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 13px;
+      font-weight: 500;
+      text-align: center;
+      margin: 0;
     }
   `]
 })
