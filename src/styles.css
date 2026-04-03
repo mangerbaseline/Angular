@@ -3387,5 +3387,13 @@ body {
 .u-text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
 .u-font-bold { font-weight: 700; }
 .u-font-semibold { font-weight: 600; }
-.u-text-gradient { background: linear-gradient(to right, #10b981, #14b8a6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.u-text-gradient { background: linear-gradient(to right, #10b981, #14b8a6); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 .u-glass { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(24px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+.u-grid { display: grid; }
+.u-grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+.u-gap-3 { gap: 0.75rem; }
+.u-mt-6 { margin-top: 1.5rem; }
+.u-p-4 { padding: 1rem; }
+.u-rounded-xl { border-radius: 0.75rem; }
+.u-rounded-2xl { border-radius: 1rem; }
+.u-gap-2 { gap: 0.5rem; }
