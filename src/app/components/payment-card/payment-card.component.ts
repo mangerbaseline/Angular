@@ -832,8 +832,13 @@ export class PaymentCardComponent {
     this.showSummary.set(!this.showSummary());
   }
 
+  @Output() paymentSuccess = new EventEmitter<void>();
+
   pay() {
     this.isProcessing.set(true);
-    setTimeout(() => this.isProcessing.set(false), 2000);
+    setTimeout(() => {
+      this.isProcessing.set(false);
+      this.paymentSuccess.emit();
+    }, 2000);
   }
 }

@@ -2,15 +2,27 @@
 <app-brand-header></app-brand-header>
 
 <div class="app-container">
-  <div class="visual-panel">
-<app-visual-display [selectedMethod]="selectedMethod()" [cardType]="cardType()"></app-visual-display>
-  </div>
+  @if (!paymentSuccess()) {
+    <div class="checkout-layout">
+      <div class="visual-panel">
+        <app-visual-display [selectedMethod]="selectedMethod()" [cardType]="cardType()"></app-visual-display>
+      </div>
 
-  <div class="form-panel">
-    <div class="form-glass-card">
-      <app-payment-card (methodChange)="onMethodChange($event)" (cardTypeChange)="onCardTypeChange($event)"></app-payment-card>
+      <div class="form-panel">
+        <div class="form-glass-card">
+          <app-payment-card 
+            (methodChange)="onMethodChange($event)" 
+            (cardTypeChange)="onCardTypeChange($event)"
+            (paymentSuccess)="onPaymentSuccess()"
+          ></app-payment-card>
+        </div>
+      </div>
     </div>
-  </div>
+  } @else {
+    <div class="success-layout">
+      <app-success-page (return)="onReturnToCheckout()"></app-success-page>
+    </div>
+  }
 
   <div class="global-footer">
     <div class="gf-left">
