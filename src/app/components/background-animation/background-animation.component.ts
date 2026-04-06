@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div style="position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -999; pointer-events: none; overflow: hidden; background-color: #020617;">
+    <div style="position: absolute; top: 0; left: 0; width: 100%; min-height: 100%; z-index: -999; pointer-events: none; overflow: visible; background-color: #020617;">
       <!-- Nebula Dust (Subtle base gradient) -->
       <div class="absolute inset-0 opacity-40" 
         style="background: radial-gradient(circle at 30% 50%, rgba(16, 185, 127, 0.08) 0%, transparent 60%);">
@@ -58,13 +58,22 @@ import { CommonModule } from '@angular/common';
         </div>
       </div>
 
-      <!-- Ghosting elements for depth -->
-      <div class="absolute top-20 left-[20%] w-24 h-24 border border-primary/10 rounded-xl" 
-        style="transform: rotate(30deg); animation: drift1 15s ease-in-out infinite alternate;">
+      <!-- PREMIUM TURBINE OBJECTS (Now integrated into background component) -->
+      <div class="diamond-turbine">
+        <div class="spin-layer">
+          <div class="breathe-layer"></div>
+        </div>
       </div>
-      <div class="absolute bottom-32 left-[15%] w-32 h-32 border border-accent/10" 
-        style="border-radius: 40% 60% 60% 40% / 40% 40% 60% 60%; animation: drift2 20s ease-in-out infinite alternate;">
+
+      <div class="blob-turbine">
+        <div class="spin-layer">
+          <div class="breathe-layer"></div>
+        </div>
       </div>
+
+      <!-- Bonus drifting subtle particles -->
+      <div class="bonus-particle"><div></div></div>
+      <div class="bonus-particle-2"><div></div></div>
     </div>
   `,
   styles: [`
@@ -101,15 +110,69 @@ import { CommonModule } from '@angular/common';
       to { transform: scale(1.15) translate(-50%, -50%); opacity: 1; }
     }
 
-    @keyframes drift1 {
-      0% { transform: translate(0,0) rotate(30deg); }
-      100% { transform: translate(40px, -20px) rotate(45deg); }
+    /* PREMIUM TURBINE/BREATHABLE STYLES */
+    @keyframes slowSpinClockwise {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
-    @keyframes drift2 {
-      0% { transform: translate(0,0) scale(1) rotate(0deg); }
-      100% { transform: translate(-40px, 30px) scale(1.1) rotate(-15deg); }
+    @keyframes slowSpinCounterClockwise {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(-360deg); }
     }
+
+    @keyframes breathePulse {
+      0%, 100% { transform: scale(1) translateY(0); opacity: 0.6; }
+      50% { transform: scale(1.08) translateY(-15px); opacity: 0.9; }
+    }
+
+    @keyframes breathePulseBlob {
+      0%, 100% { transform: scale(1); opacity: 0.65; }
+      50% { transform: scale(1.1); opacity: 0.95; }
+    }
+
+    .diamond-turbine {
+      position: absolute; top: 100px; left: 13%; width: 70px; height: 70px;
+    }
+
+    .diamond-turbine .spin-layer {
+      width: 100%; height: 100%; animation: slowSpinClockwise 18s linear infinite; transform-origin: center center;
+    }
+
+    .diamond-turbine .breathe-layer {
+      width: 100%; height: 100%; border: 1px solid rgba(16, 185, 127, 0.6); 
+      border-radius: 1.0rem; transform: rotate(45deg); backdrop-filter: blur(1px);
+      animation: breathePulse 8s ease-in-out infinite;
+    }
+
+    .blob-turbine {
+      position: absolute; bottom: 240px; left: 12%; width: 60px; height: 55px;
+    }
+
+    .blob-turbine .spin-layer {
+      width: 100%; height: 100%; animation: slowSpinCounterClockwise 22s linear infinite; transform-origin: center center;
+    }
+
+    .blob-turbine .breathe-layer {
+      width: 100%; height: 100%; border: 1px solid rgba(184, 174, 32, 0.5);
+      border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; backdrop-filter: blur(0.8px);
+      animation: breathePulseBlob 9s ease-in-out infinite;
+    }
+
+    .bonus-particle { position: absolute; top: 15%; right: 12%; width: 60px; height: 60px; opacity: 0.4; }
+    .bonus-particle div { 
+      width: 100%; height: 100%; border: 1px solid rgba(16, 185, 127, 0.3); border-radius: 40%;
+      animation: slowSpinClockwise 45s linear infinite; backdrop-filter: blur(2px);
+    }
+
+    .bonus-particle-2 { position: absolute; bottom: 5%; right: 8%; width: 45px; height: 45px; opacity: 0.35; }
+    .bonus-particle-2 div {
+      width: 100%; height: 100%; border: 1px solid rgba(32, 184, 166, 0.35); border-radius: 50%;
+      animation: slowSpinCounterClockwise 55s linear infinite;
+    }
+
+    .spin-layer { will-change: transform; backface-visibility: hidden; transform-style: preserve-3d; }
+    .breathe-layer { will-change: transform, opacity, box-shadow; }
   `]
 })
 export class BackgroundAnimationComponent {
