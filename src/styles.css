@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playwrite+AR:wght@100..400&family=Space+Grotesk:wght@300..700&display=swap');
 
 :root {
   /* Brand Colors */
@@ -2300,6 +2301,7 @@ body {
 }
 
 .tab-text {
+  font-family: 'Inter';
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -2429,10 +2431,34 @@ body {
   transition: all 0.2s;
 }
 
-.icon-input input:focus {
-  border-color: var(--brand-green);
-  box-shadow: 0 0 10px var(--brand-green-glow);
+
+
+
+
+/* .icon-input input:focus {
+  border-color: #22c55e;
+
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.15), 0 0 40px rgb(185, 16, 16);
+} */
+.icon-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  transition: border-color 0.25s, box-shadow 0.25s;
 }
+
+.icon-input:focus-within {
+  background: linear-gradient(rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.6)) padding-box,
+    linear-gradient(90deg, #10b981 0%, transparent 50%, #f9741675 100%) border-box;
+  border: 1px solid transparent;
+  box-shadow:
+    0 0 20px rgba(16, 185, 129, 0.12),
+    0 0 20px rgba(249, 116, 22, 0.438);
+}
+
+
 
 .net-icons {
   position: absolute;
@@ -2492,14 +2518,45 @@ body {
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   cursor: pointer;
 }
 
-.save-check input {
+/* .save-check input {
+  appearance: none;
+  -webkit-appearance: none;
   accent-color: var(--brand-green);
   width: 14px;
   height: 14px;
+  background: #020617;
+  border-radius: 50%;
+
+} */
+.save-check input {
+  appearance: none;
+  -webkit-appearance: none;
+  accent-color: var(--brand-green);
+  /* has no effect once appearance is none */
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid rgb(43, 43, 43);
+  /* ← unchecked border color */
+  border-radius: 50px;
+  background: transparent;
+  cursor: pointer;
+}
+
+
+
+.save-check input:checked {
+  background: url("/tick.svg");
+  background-color: #00D66F;
+  background-repeat: no-repeat;
+  background-size: 8px 8px;
+  background-position: center;
+
+  /* border-color: var(--brand-green); */
+  /* add ::after tick separately */
 }
 
 .wallet-card {
@@ -2514,21 +2571,57 @@ body {
   gap: 12px;
 }
 
+@keyframes pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.08);
+  }
+}
+
 .wallet-icon-wrap {
   width: 64px;
   height: 64px;
-  border-radius: 50%;
+  padding: 10px;
+  border-radius: 30%;
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: pulse 1.5s ease-in-out infinite;
 }
+
+
+
 
 .apple-w {
-  background: #000;
+  background: linear-gradient(135deg,
+      #1f3d2b 0%,
+      /* deep green */
+      #2f4f3a 40%,
+      /* muted green */
+      #5a4a2a 70%,
+      /* green → brownish */
+      #7a4b1f 100%
+      /* full orange */
+    );
 }
 
+
 .google-w {
-  background: #fff;
+  background: linear-gradient(135deg,
+      #1f3d2b 0%,
+      /* deep green */
+      #2f4f3a 40%,
+      /* muted green */
+      #5a4a2a 70%,
+      /* green → brownish */
+      #7a4b1f 100%
+      /* full orange */
+    );
 }
 
 .g-dots-row {
@@ -2573,19 +2666,19 @@ body {
   justify-content: center;
   gap: 10px;
   cursor: pointer;
-  box-shadow: 0 8px 30px var(--brand-green-glow);
+  /* box-shadow: 0 8px 30px var(--brand-green-glow); */
   transition: all 0.3s;
 }
 
 .pay-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px var(--brand-green-glow);
+  box-shadow: 0 20px 20px var(--brand-green-glow);
 }
 
 .cta-note {
   font-size: 11px;
   text-align: center;
-  color: var(--brand-green);
+  color: var(--text-muted);
   margin-top: 16px;
   font-weight: 700;
 }
@@ -2633,8 +2726,9 @@ body {
 .bag-icon-wrap {
   width: 36px;
   height: 36px;
+  color: #0d9488;
   background: rgba(16, 185, 129, 0.1);
-  border-radius: 10px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2686,12 +2780,19 @@ body {
 .item-icon-wrap {
   width: 40px;
   height: 40px;
-  background: rgba(255, 255, 255, 0.03);
+  background: linear-gradient(135deg,
+      #1f3d2b 0%,
+
+      #2f4f3a 40%,
+
+      #5a4a2a 70%,
+
+      #7a4b1f 100%);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-muted);
+  color: rgb(1, 194, 129);
 }
 
 .item-body {
@@ -2711,7 +2812,7 @@ body {
 
 .item-qty {
   font-size: 11px;
-  color: var(--brand-green);
+  color: var(--text-muted);
   margin-top: 4px;
   font-weight: 600;
 }
@@ -2815,7 +2916,7 @@ body {
 
 .trust-item {
   font-size: 10px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
   gap: 4px;
@@ -3022,10 +3123,10 @@ body {
   animation-delay: 0.3s;
 }
 
-.cta-section {
+/* .cta-section {
   animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
   animation-delay: 0.4s;
-}
+} */
 
 .order-summary {
   animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -3139,10 +3240,10 @@ body {
   }
 }
 
-.pay-btn {
+/* .pay-btn {
   animation: btnGlow 2.5s ease-in-out infinite;
   position: relative;
-}
+} */
 
 .pay-btn:active {
   transform: scale(0.97);
@@ -3183,10 +3284,12 @@ body {
 /* --- 8. INPUT FOCUS GLOW --- */
 .icon-input {
   transition: border-color 0.25s, box-shadow 0.25s;
+  overflow: hidden;
 }
 
 .icon-input:focus-within {
   border-color: rgba(16, 185, 129, 0.4) !important;
+  background-color: rgba(16, 185, 129, 0.4) !important;
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.08), 0 0 20px rgba(16, 185, 129, 0.05);
 }
 
@@ -3301,6 +3404,7 @@ body {
 .glow-orb {
   animation: orbPulse 4s ease-in-out infinite;
 }
+
 
 /* --- 16. SAVE CHECKBOX INTERACTION --- */
 .save-check {

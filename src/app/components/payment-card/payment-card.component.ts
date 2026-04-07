@@ -92,7 +92,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
               </div>
             </div>
             <label class="save-check">
-              <input type="checkbox">
+              <input  type="checkbox">
               <span>Save card for future payments</span>
             </label>
           </div>
@@ -100,7 +100,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
           <!-- APPLE PAY -->
           <div *ngSwitchCase="'apple'" class="wallet-form fade-in">
             <div class="wallet-card">
-              <div class="wallet-icon-wrap apple-w">
+              <div class="wallet-icon-wrap apple-w ">
                 <svg viewBox="0 0 24 24" fill="white" width="36">
                   <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83"/>
                   <path d="M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
@@ -258,8 +258,8 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
                 </div>
               </div>
             </div>
-            <button class="relative w-full py-4 px-6 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30" tabindex="0" style="width: 100%; padding: 16px 24px; border-radius: 12px; border: none; background: linear-gradient(to right, #10b981, #34d399); color: white; font-weight: 600; display:flex; gap: 12px; justify-content:center; align-items:center; cursor: pointer; font-size: 16px; font-family: inherit; font-size: 16px;">
-              <span class="relative flex items-center gap-2">Continue with Link
+            <button class="relative w-full py-4 px-6 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 " tabindex="0" style="width: 100%; padding: 16px 24px; border-radius: 12px; border: none; background: linear-gradient(to right, #10b981, #34d399); color: black; font-weight: 600; display:flex; gap: 12px; justify-content:center; align-items:center; cursor: pointer; font-size: 16px; font-family: inherit; font-size: 16px;">
+              <span class="relative flex items-center gap-2 ">Continue with Link
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
               </span>
             </button>
@@ -290,7 +290,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
           <div class="spinner" *ngIf="isProcessing()"></div>
         </button>
         <p class="cta-note" style="margin-top:16px;">0% interest • No hidden fees • Approval in seconds</p>
-        <p class="tos-text" style="color:rgba(255,255,255,0.4); font-size:11px; margin-top:12px;">By continuing, you agree to our <a href="#" style="color:#10b981; text-decoration:none;">Terms of Service</a> and <a href="#" style="color:#10b981; text-decoration:none;">Privacy Policy</a></p>
+        <!-- <p class="tos-text" style="color:rgba(255,255,255,0.4); font-size:11px; margin-top:12px;">By continuing, you agree to our <a href="#" style="color:#10b981; text-decoration:none;">Terms of Service</a> and <a href="#" style="color:#10b981; text-decoration:none;">Privacy Policy</a></p> -->
       </div>
 
       <!-- Order Summary -->
@@ -298,7 +298,11 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
         <button class="summary-header" (click)="toggleSummary()">
           <div class="sh-left">
             <div class="bag-icon-wrap">
-              <svg viewBox="0 0 20 20" fill="none" width="16"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="#10b981" stroke-width="1.5"/><path d="M3 6h18M16 10a4 4 0 01-8 0" stroke="#10b981" stroke-width="1.5"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" width="18" stroke="currentColor" stroke-width="2">
+                <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+                <path d="m3.3 7 8.7 5 8.7-5" />
+                <path d="M12 22V12" />
+              </svg>
             </div>
             <div>
               <div class="sh-title">Order Summary</div>
@@ -542,6 +546,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
       margin-bottom: 10px;
     }
     .icon-input input {
+      position: relative;
       width: 100%;
       padding: 16px 18px !important;
       border-radius: 12px !important;
@@ -550,6 +555,12 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
       color: var(--text-primary) !important;
       font-size: 15px !important;
     }
+    .icon-input svg {
+  position: absolute;  /* ← add this */
+  left: 16px;
+  pointer-events: none;
+  color: var(--text-secondary);
+}
     .icon-input.has-icon input { padding-left: 48px !important; }
 
     /* Footer / Total */
