@@ -1,4 +1,6 @@
-import { Component, signal, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
+import { Component, signal, Output, EventEmitter, ViewChild, ElementRef, OnInit } from '@angular/core';
+
+declare var Stripe: any;
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 
@@ -278,6 +280,8 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
           </div>
 
         </div>
+        <!-- Stripe Element Container -->
+        <div id="stripe-payment-element-mount-point" [style.display]="isStripeMethod() ? 'block' : 'none'" style="margin-top: 24px; min-height: 150px; background: rgba(30, 41, 59, 0.3); padding: 16px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05);"></div>
       </div>
 
       <!-- Pay CTA -->
@@ -379,278 +383,52 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
             </span>
           </div>
         </div>
+        <!-- Stripe Element Container -->
+        <div id="stripe-payment-element-mount-point" [style.display]="isStripeMethod() ? 'block' : 'none'" style="margin-top: 24px; min-height: 150px; background: rgba(30, 41, 59, 0.3); padding: 16px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05);"></div>
       </div>
-
     </div>
   `,
   styles: [`
-    .sidebar-root {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    /* Steps sizing */
-    .step-text {
-      font-size: 14px;
-      font-weight: 500;
-      display: none;
-    }
-    @media (min-width: 640px) {
-      .step-text {
-        display: inline;
-      }
-    }
-    .steps-bar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 32px; /* mb-8 */
-    }
-    .step-pill {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 16px; /* px-4 py-2 */
-      border-radius: 9999px;
-      font-size: 14px; /* text-sm */
-      font-weight: 500;
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      color: var(--text-secondary);
-    }
-    .step-pill.active {
-      background: rgba(16, 185, 129, 0.2); /* bg-primary/20 */
-      border-color: transparent;
-      color: var(--brand-green);
-    }
-    .step-line {
-      width: 32px; /* w-8 */
-      height: 2px; /* h-0.5 */
-      margin: 0 8px; /* mx-2 */
-      background: var(--text-secondary);
-      opacity: 0.3;
-    }
-
-    @media (max-width: 1300px) and (min-width: 860px) {
-      .method-tabs { gap: 4px; }
-      .tab-name { font-size: 8.5px; }
-      .tab-icon { width: 16px; height: 16px; min-width: 16px; }
-      .method-tab { padding: 8px 4px; }
-    }
-
-    @media (max-width: 860px) {
-      .sidebar-root {
-        padding: 12px 10px 10px;
-      }
-    }
-
-    .method-tabs-section {
-      margin-bottom: 24px;
-    }
-    .section-title {
-      font-size: 13px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #94a3b8;
-      margin-bottom: 14px;
-    }
-    .method-tabs {
-       display: grid;
-       grid-template-columns: repeat(5, minmax(0, 1fr)); /* Force equal widths */
-       gap: 6px;
-       width: 100%;
-       box-sizing: border-box;
-    }
-
-    .method-tab {
-      width: 100%; /* Fill the grid cell */
-      min-width: 0; /* Allow shrinking below content width */
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      padding: 10px 6px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      background: rgba(15, 23, 42, 0.4);
-      color: #94a3b8;
-      transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-      cursor: pointer;
-      position: relative;
-      overflow: visible; /* Fixed clipping */
-    }
-    .method-tab:hover {
-      background: color-mix(in srgb, var(--m-color) 12%, rgba(15, 23, 42, 0.4));
-      border-color: color-mix(in srgb, var(--m-color) 50%, transparent);
-      color: var(--m-color);
-      transform: none;
-    }
-    .method-tab.selected {
-      background: color-mix(in srgb, var(--m-color) 15%, rgba(15, 23, 42, 0.4));
-      border-color: color-mix(in srgb, var(--m-color) 60%, transparent);
-      box-shadow: 0 0 16px -2px color-mix(in srgb, var(--m-color) 30%, transparent);
-      color: var(--m-color);
-      transform: none;
-    }
-    .tab-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 20px;
-      height: 20px;
-      margin-bottom: 2px;
-      transition: transform 2.5s cubic-bezier(0.19, 1, 0.22, 1);
-      will-change: transform;
-    }
-    .method-tab:active .tab-icon {
-      transform: rotate(-70deg) scale(1.8);
-    }
-    .method-tab:active {
-      transform: none;
-    }
-    .tab-name {
-      font-size: 10px;
-      font-weight: 600;
-      text-align: center;
-      width: 100%;
-    }
-
-    .net-icons {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .mc, .net-icons svg {
-      opacity: 0.2;
-      transition: opacity 0.3s ease;
-    }
-    .active-net {
-      opacity: 1 !important;
-    }
-
-    /* Input Styling */
-    .input-group label {
-      display: block;
-      font-size: 12px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-secondary);
-      margin-bottom: 10px;
-    }
-    .icon-input input {
-      position: relative;
-      width: 100%;
-      padding: 16px 18px !important;
-      border-radius: 12px !important;
-      background: rgba(15, 23, 42, 0.5) !important;
-      border: 1px solid var(--glass-border) !important;
-      color: var(--text-primary) !important;
-      font-size: 15px !important;
-    }
-    .icon-input svg {
-  position: absolute;  /* ← add this */
-  left: 16px;
-  pointer-events: none;
-  color: var(--text-secondary);
-}
+    .sidebar-root { width: 100%; display: flex; flex-direction: column; gap: 24px; }
+    .step-text { font-size: 14px; font-weight: 500; display: none; }
+    @media (min-width: 640px) { .step-text { display: inline; } }
+    .steps-bar { display: flex; align-items: center; justify-content: center; margin-bottom: 32px; }
+    .step-pill { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 9999px; font-size: 14px; font-weight: 500; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-secondary); }
+    .step-pill.active { background: rgba(16, 185, 129, 0.2); border-color: transparent; color: var(--brand-green); }
+    .step-line { width: 32px; height: 2px; margin: 0 8px; background: var(--text-secondary); opacity: 0.3; }
+    @media (max-width: 1300px) and (min-width: 860px) { .method-tabs { gap: 4px; } .tab-name { font-size: 8.5px; } .tab-icon { width: 16px; height: 16px; min-width: 16px; } .method-tab { padding: 8px 4px; } }
+    @media (max-width: 860px) { .sidebar-root { padding: 12px 10px 10px; } }
+    .method-tabs-section { margin-bottom: 24px; }
+    .section-title { font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 14px; }
+    .method-tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; width: 100%; box-sizing: border-box; }
+    .method-tab { width: 100%; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); background: rgba(15, 23, 42, 0.4); color: #94a3b8; transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: pointer; position: relative; overflow: visible; }
+    .method-tab:hover { background: color-mix(in srgb, var(--m-color) 12%, rgba(15, 23, 42, 0.4)); border-color: color-mix(in srgb, var(--m-color) 50%, transparent); color: var(--m-color); transform: none; }
+    .method-tab.selected { background: color-mix(in srgb, var(--m-color) 15%, rgba(15, 23, 42, 0.4)); border-color: color-mix(in srgb, var(--m-color) 60%, transparent); box-shadow: 0 0 16px -2px color-mix(in srgb, var(--m-color) 30%, transparent); color: var(--m-color); transform: none; }
+    .tab-icon { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin-bottom: 2px; transition: transform 2.5s cubic-bezier(0.19, 1, 0.22, 1); will-change: transform; }
+    .method-tab:active .tab-icon { transform: rotate(-70deg) scale(1.8); }
+    .method-tab:active { transform: none; }
+    .tab-name { font-size: 10px; font-weight: 600; text-align: center; width: 100%; }
+    .net-icons { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 8px; }
+    .mc, .net-icons svg { opacity: 0.2; transition: opacity 0.3s ease; }
+    .active-net { opacity: 1 !important; }
+    .input-group label { display: block; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 10px; }
+    .icon-input input { position: relative; width: 100%; padding: 16px 18px !important; border-radius: 12px !important; background: rgba(15, 23, 42, 0.5) !important; border: 1px solid var(--glass-border) !important; color: var(--text-primary) !important; font-size: 15px !important; }
+    .icon-input svg { position: absolute; left: 16px; pointer-events: none; color: var(--text-secondary); }
     .icon-input.has-icon input { padding-left: 48px !important; }
-
-    /* Footer / Total */
-    .pay-btn {
-      width: 100% !important;
-      padding: 14px !important;
-      border-radius: 12px !important;
-      font-size: 16px !important;
-      font-weight: 600 !important;
-      margin-top: 10px;
-    }
-    .order-summary {
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      border-radius: 16px;
-      overflow: hidden;
-    }
-    .summary-header {
-      padding: 14px !important;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-    }
-
-    /* Hide subtabs for clean grid */
+    .pay-btn { width: 100% !important; padding: 14px !important; border-radius: 12px !important; font-size: 16px !important; font-weight: 600 !important; margin-top: 10px; }
+    .order-summary { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; overflow: hidden; }
+    .summary-header { padding: 14px !important; display: flex; justify-content: space-between; align-items: center; width: 100%; }
     .tab-sub { display: none; }
-    @media (max-width: 860px) {
-      .sidebar-root {
-        padding: 12px 10px 10px; /* Reduced top padding from 40px to 12px */
-      }
-    }
-
-    /* UPI QR Scan Area Styling (Red Box Design) */
-    .upi-qr-scan-area {
-      background: rgba(15, 23, 42, 0.3);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 20px;
-      padding: 32px 24px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      margin-top: 10px;
-      transition: all 0.5s ease;
-    }
-
-    .qr-main-box {
-      width: 140px;
-      height: 140px;
-      background: #ffffff;
-      border-radius: 18px;
-      position: relative;
-      padding: 12px;
-      box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
-    }
-
-    .qr-grid-overlay {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      border: 2px solid #000000;
-      border-radius: 8px;
-      background: #000000;
-      overflow: hidden;
-    }
-
-    .grid-row {
-      flex: 1;
-      display: flex;
-      gap: 1px;
-    }
-
-    .grid-row span {
-      flex: 1;
-      background: #ffffff;
-    }
-
-    .qr-helper-text {
-      color: rgba(255, 255, 255, 0.5);
-      font-size: 13px;
-      font-weight: 500;
-      text-align: center;
-      margin: 0;
-    }
+    @media (max-width: 860px) { .sidebar-root { padding: 12px 10px 10px; } }
+    .upi-qr-scan-area { background: rgba(15, 23, 42, 0.3); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; padding: 32px 24px; display: flex; flex-direction: column; align-items: center; gap: 20px; margin-top: 10px; transition: all 0.5s ease; }
+    .qr-main-box { width: 140px; height: 140px; background: #ffffff; border-radius: 18px; position: relative; padding: 12px; box-shadow: 0 0 40px rgba(0, 0, 0, 0.4); }
+    .qr-grid-overlay { width: 100%; height: 100%; display: flex; flex-direction: column; gap: 1px; border: 2px solid #000000; border-radius: 8px; background: #000000; overflow: hidden; }
+    .grid-row { flex: 1; display: flex; gap: 1px; }
+    .grid-row span { flex: 1; background: #ffffff; }
+    .qr-helper-text { color: rgba(255, 255, 255, 0.5); font-size: 13px; font-weight: 500; text-align: center; margin: 0; }
   `]
 })
-export class PaymentCardComponent {
+export class PaymentCardComponent implements OnInit {
   @ViewChild('tabsContainer') tabsContainer!: ElementRef;
   @ViewChild('scrollTrack') scrollTrack!: ElementRef;
   @Output() methodChange = new EventEmitter<string>();
@@ -660,6 +438,97 @@ export class PaymentCardComponent {
   detectedCardType = signal('visa');
   isProcessing = signal(false);
   showSummary = signal(true);
+
+  stripe: any;
+  elements: any;
+  paymentElement: any;
+
+  stripeMethods = ['apple', 'google', 'klarna', 'afterpay', 'zip'];
+
+  backendMap: { [key: string]: string } = {
+    'apple': 'applePay',
+    'google': 'googlePay',
+    'klarna': 'klarna',
+    'afterpay': 'afterPay',
+    'zip': 'zipPay'
+  };
+
+  stripeTypeMap: { [key: string]: string } = {
+    'applePay': 'apple_pay',
+    'googlePay': 'google_pay',
+    'klarna': 'klarna',
+    'afterPay': 'afterpay_clearpay',
+    'zipPay': 'zip'
+  };
+
+  ngOnInit() {
+    // Initialize Stripe once
+    try {
+      this.stripe = Stripe("pk_test_51Q0xUnBrVsb68zkxVIQXjAHQqONjjk6jyFoE9HQ7zIn44MszuDGs6QT97k6QKQhNUfs7b54dVTV6A6tumWvD3nU200nU1Q1Yel");
+    } catch (e) {
+      console.error("Stripe.js not loaded", e);
+    }
+  }
+
+  isStripeMethod() {
+    return this.stripeMethods.includes(this.selectedMethod());
+  }
+
+  async initStripeElement(id: string) {
+    const backendType = this.backendMap[id];
+    if (!backendType) return;
+    
+    const stripeType = this.stripeTypeMap[backendType];
+
+    console.log(`Fetching session for ${backendType}...`);
+
+    try {
+      const res = await fetch("https://backend.kuberfinancial.com.au/api/payments/createPaymentSession", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paymentType: backendType })
+      });
+      const data = await res.json();
+
+      console.log("Session created. Initializing Elements...");
+
+      this.elements = this.stripe.elements({
+        clientSecret: data.clientSecret,
+        appearance: { 
+          theme: 'night', 
+          variables: { 
+            colorPrimary: '#10b981',
+            colorBackground: '#1e293b',
+            colorText: '#ffffff',
+            borderRadius: '12px'
+          } 
+        }
+      });
+
+      if (this.paymentElement) {
+        this.paymentElement.destroy();
+      }
+
+      console.log(`Creating element with paymentMethodOrder: [${stripeType}]`);
+
+      this.paymentElement = this.elements.create("payment", {
+        layout: 'tabs',
+        paymentMethodOrder: [stripeType]
+      });
+
+      // Wait a tick for the container to be visible if it was hidden
+      setTimeout(() => {
+        this.paymentElement.mount("#stripe-payment-element-mount-point");
+      }, 0);
+
+      this.paymentElement.on('ready', () => {
+        console.log("Stripe UI Ready.");
+      });
+
+    } catch (e: any) {
+      console.error("ERROR: " + e.message);
+    }
+  }
 
   onCardNumberInput(event: any) {
     const val = event.target.value.replace(/\s+/g, '');
@@ -820,9 +689,13 @@ export class PaymentCardComponent {
     { name: 'USB-C Fast Charger', desc: '65W GaN Technology', qty: 2, price: 98.00 },
   ];
 
-  selectMethod(id: string) {
+  async selectMethod(id: string) {
     this.selectedMethod.set(id);
     this.methodChange.emit(id);
+
+    if (this.isStripeMethod()) {
+      await this.initStripeElement(id);
+    }
   }
 
   getMethodName() {
@@ -845,11 +718,31 @@ export class PaymentCardComponent {
 
   @Output() paymentSuccess = new EventEmitter<void>();
 
-  pay() {
-    this.isProcessing.set(true);
-    setTimeout(() => {
-      this.isProcessing.set(false);
-      this.paymentSuccess.emit();
-    }, 2000);
+  async pay() {
+    if (this.isStripeMethod() && this.paymentElement) {
+      this.isProcessing.set(true);
+      try {
+        const { error } = await this.stripe.confirmPayment({
+          elements: this.elements,
+          confirmParams: {
+            return_url: window.location.origin + '/payment-success',
+          },
+        });
+
+        if (error) {
+          console.error(error.message);
+          this.isProcessing.set(false);
+        }
+      } catch (e) {
+        console.error("Payment confirmation failed", e);
+        this.isProcessing.set(false);
+      }
+    } else {
+      this.isProcessing.set(true);
+      setTimeout(() => {
+        this.isProcessing.set(false);
+        this.paymentSuccess.emit();
+      }, 2000);
+    }
   }
 }
