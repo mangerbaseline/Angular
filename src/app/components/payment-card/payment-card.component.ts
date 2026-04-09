@@ -1,4 +1,4 @@
-import { Component, signal, Output, EventEmitter, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { Component, signal, Output, EventEmitter, ViewChild, ElementRef, OnInit, AfterViewInit } from '@angular/core';
 
 declare var Stripe: any;
 import { CommonModule, CurrencyPipe } from '@angular/common';
@@ -58,45 +58,14 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
         <div [ngSwitch]="selectedMethod()" class="form-switch">
 
           <!-- CARD -->
-          <div *ngSwitchCase="'card'" class="payment-form fade-in">
-            <div class="input-group">
-              <label>CARD NUMBER</label>
-              <div class="icon-input has-icon">
-                <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
-                <input type="text" placeholder="1234 5678 9012 3456" (input)="onCardNumberInput($event)">
-                <div class="net-icons">
-                  <div class="mc" [class.active-net]="detectedCardType() === 'mastercard'"><div class="mc-r"></div><div class="mc-o"></div></div>
-                  <svg viewBox="0 0 38 14" width="24" [class.active-net]="detectedCardType() === 'visa'"><text y="12" font-size="11" fill="#1434CB" font-weight="800">VISA</text></svg>
-                </div>
+          <div *ngSwitchCase="'card'" class="wallet-form fade-in">
+            <div class="wallet-card">
+              <div class="wallet-icon-wrap default-w">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="1.5" width="40"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
               </div>
+              <h3>Credit or Debit Card</h3>
+              <p>Enter your card details safely and securely below</p>
             </div>
-            <div class="input-group">
-              <label>CARDHOLDER NAME</label>
-              <div class="icon-input">
-                <input type="text" placeholder="John Doe">
-              </div>
-            </div>
-            <div class="row-2col">
-              <div class="input-group">
-                <label>EXPIRY DATE</label>
-                <div class="icon-input">
-                  <input type="text" placeholder="MM/YY">
-                </div>
-              </div>
-              <div class="input-group">
-                <label>SECURITY CODE</label>
-                <div class="icon-input">
-                  <input type="password" placeholder="•••">
-                  <button class="eye-btn">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="15"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-            <label class="save-check">
-              <input  type="checkbox">
-              <span>Save card for future payments</span>
-            </label>
           </div>
 
           <!-- APPLE PAY -->
@@ -176,22 +145,24 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
           <!-- PayTo -->
           <div *ngSwitchCase="'payto'" class="payment-form fade-in">
             <div class="input-group">
-              <label>BSB NUMBER</label>
+              <label>FULL NAME</label>
               <div class="icon-input has-icon">
-                <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M12 10v11M4 10l8-7 8 7"/></svg>
-                <input type="text" placeholder="000-000">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <input type="text" placeholder="John Doe" (input)="paytoName.set($any($event.target).value)">
               </div>
             </div>
             <div class="input-group">
-              <label>ACCOUNT NUMBER</label>
-              <div class="icon-input">
-                <input type="text" placeholder="Enter your account number">
+              <label>EMAIL ADDRESS</label>
+              <div class="icon-input has-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <input type="email" placeholder="john@example.com" (input)="paytoEmail.set($any($event.target).value)">
               </div>
             </div>
             <div class="input-group">
-              <label>ACCOUNT NAME</label>
-              <div class="icon-input">
-                <input type="text" placeholder="John Doe">
+              <label>PAYID (EMAIL OR PHONE)</label>
+              <div class="icon-input has-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <input type="text" placeholder="your@payid.com" (input)="paytoID.set($any($event.target).value)">
               </div>
             </div>
             
@@ -201,7 +172,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
               </div>
               <div>
                 <h4 style="margin:0; font-size:14px; font-weight:700; color:white;">Real-time authorization</h4>
-                <p style="margin:0; font-size:12px; color:rgba(255,255,255,0.6);">Direct debit with instant confirmation</p>
+                <p style="margin:0; font-size:12px; color:rgba(255,255,255,0.6);">Direct debit with instant confirmation via PayID</p>
               </div>
             </div>
           </div>
@@ -237,35 +208,14 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
           </div>
 
           <!-- LINK -->
-          <div *ngSwitchCase="'link'" class="fade-in" style="width: 100%;">
-            <div class="glass rounded-2xl p-6 mb-5" style="background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 24px; margin-bottom: 20px;">
-              <div class="flex items-center gap-3 mb-4" style="display:flex; align-items:center; gap: 12px; margin-bottom: 16px;">
-                <div class="w-10 h-10 rounded-lg bg-[#00D66F] flex items-center justify-center" style="width: 40px; height: 40px; border-radius: 8px; background: #00D66F; display:flex; align-items:center; justify-content:center;">
-                  <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="width: 20px; color: white;"><path d="M7 8h10M7 12h7M7 16h4"></path></svg>
-                </div>
-                <div>
-                  <h3 class="font-display font-semibold text-foreground" style="font-weight: 600; font-size: 16px; color: white; margin: 0;">Link</h3>
-                  <p class="text-xs text-muted-foreground" style="font-size: 12px; color: var(--text-secondary); margin: 0;">Fast, secure 1-click checkout</p>
-                </div>
+          <div *ngSwitchCase="'link'" class="wallet-form fade-in">
+            <div class="wallet-card">
+              <div class="wallet-icon-wrap link-w" style="background: #00D66F; padding: 10px; border-radius: 12px; display:flex; align-items:center; justify-content:center;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" width="36" stroke-linecap="round"><path d="M7 8h10M7 12h7M7 16h4"></path></svg>
               </div>
-              <p class="text-sm text-muted-foreground mb-4" style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.4;">Save your payment info once and check out with a single click across thousands of merchants. Powered by Stripe.</p>
-              <div class="space-y-3">
-                <div class="relative">
-                  <label class="block text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wider" style="display:block; font-size:11px; margin-bottom: 8px; color: var(--text-secondary); text-transform: uppercase;">Email</label>
-                  <div class="relative group">
-                    <div class="relative flex items-center">
-                      <input type="text" placeholder="you@example.com" style="width: 100%; padding: 14px 16px; background: rgba(30,41,59,0.5); border: 1px solid var(--glass-border); border-radius: 12px; color: white; outline: none; box-sizing: border-box; font-family: inherit;">
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <h3>Link</h3>
+              <p>Fast, secure 1-click checkout powered by Stripe</p>
             </div>
-            <button class="relative w-full py-4 px-6 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 " tabindex="0" style="width: 100%; padding: 16px 24px; border-radius: 12px; border: none; background: linear-gradient(to right, #10b981, #34d399); color: black; font-weight: 600; display:flex; gap: 12px; justify-content:center; align-items:center; cursor: pointer; font-size: 16px; font-family: inherit; font-size: 16px;">
-              <span class="relative flex items-center gap-2 ">Continue with Link
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
-              </span>
-            </button>
-            <p class="text-center text-xs text-muted-foreground" style="text-align: center; font-size: 12px; margin-top: 16px; color: var(--text-secondary);">⚡ 1-click checkout • Saved securely • Powered by Stripe</p>
           </div>
 
           <!-- DEFAULT -->
@@ -281,11 +231,17 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
 
         </div>
         <!-- Stripe Element Container -->
-        <div id="stripe-payment-element-mount-point" [style.display]="isStripeMethod() ? 'block' : 'none'" style="margin-top: 24px; min-height: 150px; background: rgba(30, 41, 59, 0.3); padding: 16px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05);"></div>
+        <div id="stripe-payment-element-mount-point" [style.display]="isStripeMethod() ? 'block' : 'none'" style="margin-top: 24px; min-height: 150px; background: rgba(30, 41, 59, 0.3); padding: 16px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05); position: relative;">
+          <!-- Loading Spinner -->
+          <div *ngIf="isStripeLoading()" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: rgba(30, 41, 59, 0.5); border-radius: 12px; z-index: 10;">
+            <div class="spinner"></div>
+            <span style="font-size: 13px; color: rgba(255,255,255,0.6);">Setting up secure payment...</span>
+          </div>
+        </div>
       </div>
 
       <!-- Pay CTA -->
-      <div class="cta-section" *ngIf="selectedMethod() !== 'link'">
+      <div class="cta-section">
         <button class="pay-btn" (click)="pay()" [class.loading]="isProcessing()">
           <ng-container *ngIf="!isProcessing()">
             {{ getCTA() }}
@@ -383,8 +339,6 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
             </span>
           </div>
         </div>
-        <!-- Stripe Element Container -->
-        <div id="stripe-payment-element-mount-point" [style.display]="isStripeMethod() ? 'block' : 'none'" style="margin-top: 24px; min-height: 150px; background: rgba(30, 41, 59, 0.3); padding: 16px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05);"></div>
       </div>
     </div>
   `,
@@ -428,7 +382,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
     .qr-helper-text { color: rgba(255, 255, 255, 0.5); font-size: 13px; font-weight: 500; text-align: center; margin: 0; }
   `]
 })
-export class PaymentCardComponent implements OnInit {
+export class PaymentCardComponent implements OnInit, AfterViewInit {
   @ViewChild('tabsContainer') tabsContainer!: ElementRef;
   @ViewChild('scrollTrack') scrollTrack!: ElementRef;
   @Output() methodChange = new EventEmitter<string>();
@@ -437,28 +391,38 @@ export class PaymentCardComponent implements OnInit {
   selectedMethod = signal('card');
   detectedCardType = signal('visa');
   isProcessing = signal(false);
+  isStripeLoading = signal(false);
   showSummary = signal(true);
+
+  // PayTo Specifics
+  paytoEmail = signal('');
+  paytoName = signal('');
+  paytoID = signal('');
 
   stripe: any;
   elements: any;
   paymentElement: any;
 
-  stripeMethods = ['apple', 'google', 'klarna', 'afterpay', 'zip'];
+  stripeMethods = ['card', 'apple', 'google', 'klarna', 'afterpay', 'zip', 'link'];
 
   backendMap: { [key: string]: string } = {
+    'card': 'card',
     'apple': 'applePay',
     'google': 'googlePay',
     'klarna': 'klarna',
     'afterpay': 'afterPay',
-    'zip': 'zipPay'
+    'zip': 'zipPay',
+    'link': 'payWithLink'
   };
 
   stripeTypeMap: { [key: string]: string } = {
+    'card': 'card',
     'applePay': 'apple_pay',
     'googlePay': 'google_pay',
     'klarna': 'klarna',
     'afterPay': 'afterpay_clearpay',
-    'zipPay': 'zip'
+    'zipPay': 'zip',
+    'payWithLink': 'link'
   };
 
   ngOnInit() {
@@ -470,17 +434,35 @@ export class PaymentCardComponent implements OnInit {
     }
   }
 
+  ngAfterViewInit() {
+    // If the default selected method is a stripe method, init it
+    if (this.isStripeMethod()) {
+      this.initStripeElement(this.selectedMethod());
+    }
+  }
+
   isStripeMethod() {
     return this.stripeMethods.includes(this.selectedMethod());
   }
 
   async initStripeElement(id: string) {
+    // 1. Clear existing element regardless of success to prevent UI ghosting/errors
+    if (this.paymentElement) {
+      try {
+        this.paymentElement.unmount();
+        this.paymentElement.destroy();
+        this.paymentElement = null;
+      } catch (e) {
+        console.warn("Error destroying previous element:", e);
+      }
+    }
+
     const backendType = this.backendMap[id];
     if (!backendType) return;
     
     const stripeType = this.stripeTypeMap[backendType];
-
-    console.log(`Fetching session for ${backendType}...`);
+    console.log(`[Stripe] Initializing ${id} (${backendType})...`);
+    this.isStripeLoading.set(true);
 
     try {
       const res = await fetch("https://backend.kuberfinancial.com.au/api/payments/createPaymentSession", {
@@ -488,9 +470,11 @@ export class PaymentCardComponent implements OnInit {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ paymentType: backendType })
       });
-      const data = await res.json();
 
-      console.log("Session created. Initializing Elements...");
+      if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+      
+      const data = await res.json();
+      if (!data.clientSecret) throw new Error("No clientSecret received from backend");
 
       this.elements = this.stripe.elements({
         clientSecret: data.clientSecret,
@@ -505,28 +489,36 @@ export class PaymentCardComponent implements OnInit {
         }
       });
 
-      if (this.paymentElement) {
-        this.paymentElement.destroy();
-      }
-
-      console.log(`Creating element with paymentMethodOrder: [${stripeType}]`);
+      console.log(`[Stripe] Creating ${stripeType} element...`);
 
       this.paymentElement = this.elements.create("payment", {
         layout: 'tabs',
         paymentMethodOrder: [stripeType]
       });
 
-      // Wait a tick for the container to be visible if it was hidden
+      // Ensure the mount point is ready. 
+      // Using a small timeout to ensure Angular has updated the [style.display]
       setTimeout(() => {
-        this.paymentElement.mount("#stripe-payment-element-mount-point");
-      }, 0);
+        const mountPoint = document.getElementById("stripe-payment-element-mount-point");
+        if (mountPoint && this.paymentElement) {
+          this.paymentElement.mount("#stripe-payment-element-mount-point");
+        }
+      }, 50);
 
       this.paymentElement.on('ready', () => {
-        console.log("Stripe UI Ready.");
+        console.log(`[Stripe] ${id} UI Ready.`);
+        this.isStripeLoading.set(false);
+      });
+
+      this.paymentElement.on('change', (event: any) => {
+        if (event.error) {
+          console.error("[Stripe Change Error]:", event.error.message);
+        }
       });
 
     } catch (e: any) {
-      console.error("ERROR: " + e.message);
+      console.error("[Stripe Init Error]:", e.message);
+      this.isStripeLoading.set(false);
     }
   }
 
@@ -719,26 +711,83 @@ export class PaymentCardComponent implements OnInit {
   @Output() paymentSuccess = new EventEmitter<void>();
 
   async pay() {
+    this.isProcessing.set(true);
+
+    if (this.selectedMethod() === 'payto') {
+      try {
+        console.log("[PayTo] Creating customer...");
+        const customerResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/customers", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: this.paytoEmail(),
+            name: this.paytoName()
+          })
+        });
+        const customerData = await customerResponse.json();
+        const customerId = customerData.customerId;
+
+        console.log("[PayTo] Creating payment...");
+        const paymentResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/createPayToPayment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customerId: customerId,
+            amount: 789.60
+          })
+        });
+        const paymentData = await paymentResponse.json();
+        const clientSecret = paymentData.clientSecret;
+
+        console.log("[PayTo] Confirming payment...");
+        const result = await this.stripe.confirmPayToPayment(
+          clientSecret,
+          {
+            payment_method: {
+              billing_details: {
+                name: this.paytoName(),
+                email: this.paytoEmail()
+              },
+              payto: {
+                pay_id: this.paytoID()
+              }
+            }
+          }
+        );
+
+        if (result.error) {
+          console.error(result.error.message);
+          alert(result.error.message);
+        } else {
+          console.log("PayTo request sent");
+          this.paymentSuccess.emit();
+        }
+      } catch (err: any) {
+        console.error("PayTo Error:", err);
+      } finally {
+        this.isProcessing.set(false);
+      }
+      return;
+    }
+
     if (this.isStripeMethod() && this.paymentElement) {
-      this.isProcessing.set(true);
       try {
         const { error } = await this.stripe.confirmPayment({
           elements: this.elements,
           confirmParams: {
-            return_url: window.location.origin + '/payment-success',
+            return_url: window.location.origin + '/success',
           },
         });
 
         if (error) {
           console.error(error.message);
-          this.isProcessing.set(false);
         }
       } catch (e) {
         console.error("Payment confirmation failed", e);
+      } finally {
         this.isProcessing.set(false);
       }
     } else {
-      this.isProcessing.set(true);
       setTimeout(() => {
         this.isProcessing.set(false);
         this.paymentSuccess.emit();

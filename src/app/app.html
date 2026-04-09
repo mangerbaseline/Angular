@@ -2,24 +2,8 @@
 
 <div class="app-container">
   <app-background-animation></app-background-animation>
-  @if (!paymentSuccess()) {
-  <div class="checkout-layout">
-    <div class="visual-panel">
-      <app-visual-display [selectedMethod]="selectedMethod()" [cardType]="cardType()"></app-visual-display>
-    </div>
-
-    <div class="form-panel">
-      <div class="form-glass-card">
-        <app-payment-card (methodChange)="onMethodChange($event)" (cardTypeChange)="onCardTypeChange($event)"
-          (paymentSuccess)="onPaymentSuccess()"></app-payment-card>
-      </div>
-    </div>
-  </div>
-  } @else {
-  <div class="success-layout">
-    <app-success-page (return)="onReturnToCheckout()"></app-success-page>
-  </div>
-  }
+  
+  <router-outlet />
 
   <div class="global-footer">
     <div class="gf-left">
@@ -30,5 +14,3 @@
     </div>
   </div>
 </div>
-
-<router-outlet />
