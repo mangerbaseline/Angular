@@ -2773,26 +2773,37 @@ body {
 .item-row {
   display: flex;
   gap: 12px;
-  padding: 16px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 12px 10px;
+  background: #1016263b;
+  border-radius: 20px;
+  margin: 8px;
+}
+
+.item-row:hover {
+  background-color: #131a29a9;
 }
 
 .item-icon-wrap {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   background: linear-gradient(135deg,
-      #1f3d2b 0%,
+      #183837 0%,
 
-      #2f4f3a 40%,
+      #213835 40%,
 
-      #5a4a2a 70%,
+      #31382e 70%,
 
-      #7a4b1f 100%);
-  border-radius: 8px;
+      #37382b 100%);
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: rgb(1, 194, 129);
+}
+
+.item-icon-wrap svg {
+  width: 25px;
+  height: 25px;
 }
 
 .item-body {
@@ -2844,11 +2855,16 @@ body {
 
 .green {
   color: var(--brand-green);
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .red {
   color: #f43f5e;
+  font-weight: 600;
+}
+
+.green {
+  color: #14b8a6;
   font-weight: 600;
 }
 
@@ -2862,16 +2878,16 @@ body {
   flex: 1;
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid var(--glass-border);
-  border-radius: 8px;
+  border-radius: 14px;
   padding: 10px 12px;
   color: #fff;
   font-size: 13px;
 }
 
 .apply-btn {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(8, 131, 59, 0.178);
   border: 1px solid var(--glass-border);
-  color: #fff;
+  color: #13be7d;
   padding: 0 16px;
   border-radius: 8px;
   font-size: 13px;
@@ -2900,8 +2916,8 @@ body {
 
 .total-price {
   font-size: 24px;
-  font-weight: 800;
-  color: #fff;
+  font-weight: 600;
+  color: #31da99;
 }
 
 .trust-row {
@@ -3446,6 +3462,7 @@ body {
   animation-delay: 0.7s;
 }
 
+
 /* --- 19. GLOBAL SUCCESS PAGE UTILS --- */
 .success-glass {
   background: rgba(15, 23, 42, 0.8);
@@ -3632,4 +3649,20 @@ body {
 
 .u-gap-2 {
   gap: 0.5rem;
+}
+
+.transaction-button {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: white;
+  transition: 0.3s;
+}
+
+.transaction-button:hover {
+  color: #cccccc;
+
+  background: rgba(255, 255, 255, 0.1);
+
 }

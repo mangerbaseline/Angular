@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { RouterOutlet, Router, NavigationEnd, Event } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { filter } from 'rxjs';
 import { BackgroundAnimationComponent } from './components/background-animation/background-animation.component';
 import { BrandHeaderComponent } from './components/brand-header/brand-header.component';
 
@@ -29,23 +30,37 @@ import { BrandHeaderComponent } from './components/brand-header/brand-header.com
 
     .global-footer {
       width: 100%;
+      max-width: 80rem;
+      margin-inline: auto;
       display: flex;
       justify-content: space-between;
-      padding: 40px 80px;
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.3);
+      align-items: center;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.4);
       font-weight: 500;
+      padding: 0 0 40px 0;
       z-index: 5;
-      margin-top: auto;
+      margin-top: auto; /* pull up if needed, or adjust */
     }
 
     .gf-left {
-      max-width: 300px;
-      line-height: 1.5;
+      flex: 1;
+      text-align: center;
+      line-height: 1.6;
+      padding: 0 140px 0 40px;
     }
 
-    .gf-right {
-      text-align: right;
+    .gf-right { 
+      flex: 1;
+      padding: 20px 40px 0 140px;
+      font-size: 12px;
+      text-align: center;
+    }
+    .footer-border{
+        display: flex;
+        width: 50%;
+        margin-left: auto;
+        border-top :  1px solid rgba(255, 255, 255, 0.08);
     }
 
     .gf-right strong {
@@ -66,6 +81,17 @@ import { BrandHeaderComponent } from './components/brand-header/brand-header.com
     }
   `],
 })
-export class App {
+export class App implements OnInit {
   title = 'angularpaymentui';
+  showHeaderFooter = true;
+
+  constructor(private router: Router) {}
+
+  ngOnInit() {
+    this.router.events.pipe(
+      filter((event: Event): event is NavigationEnd => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      this.showHeaderFooter = !event.urlAfterRedirects.includes('/success');
+    });
+  }
 }

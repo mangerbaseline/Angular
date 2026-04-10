@@ -103,8 +103,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
             <div class="input-group">
               <label>ACCOUNT NUMBER</label>
               <div class="icon-input has-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20"><path d="M3 21h18M3 10h18M5 10v11M19 10v11M12 10v11M4 10l8-7 8 7"/></svg>
-                <input type="text" placeholder="Enter your account number">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building2 w-5 h-5"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path><path d="M10 6h4"></path><path d="M10 10h4"></path><path d="M10 14h4"></path><path d="M10 18h4"></path></svg>                <input type="text" placeholder="Enter your account number">
               </div>
             </div>
             <div class="input-group">
@@ -270,7 +269,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
             </div>
           </div>
           <div class="sh-right">
-            <span class="sh-total">$789.60</span>
+            <span class="sh-total">{{ totalAmount() | currency }}</span>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" class="chev" [class.open]="showSummary()"><polyline points="6 9 12 15 18 9"/></svg>
           </div>
         </button>
@@ -307,7 +306,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
                 <svg viewBox="0 0 24 24" fill="none" width="13" stroke="currentColor" stroke-width="2"><path d="m15 5 6.3 6.3a2.4 2.4 0 0 1 0 3.4L14.7 21a2.4 2.4 0 0 1-3.4 0L5 14.7V5z"/><path d="M9 9h.01"/></svg>
                 Discount Applied
               </span>
-              <span class="red">-$75.00</span>
+              <span class="green">-$75.00</span>
             </div>
           </div>
 
@@ -323,7 +322,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
               <div class="total-label">Total</div>
               <div class="gst-note">Including GST</div>
             </div>
-            <div class="total-price">$789.60</div>
+            <div class="total-price">{{ totalAmount() | currency }}</div>
           </div>
 
           <!-- Trust badges -->
@@ -393,6 +392,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   isProcessing = signal(false);
   isStripeLoading = signal(false);
   showSummary = signal(true);
+  totalAmount = signal(789.6);
 
   // PayTo Specifics
   paytoEmail = signal('');
@@ -459,7 +459,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
 
     const backendType = this.backendMap[id];
     if (!backendType) return;
-    
+
     const stripeType = this.stripeTypeMap[backendType];
     console.log(`[Stripe] Initializing ${id} (${backendType})...`);
     this.isStripeLoading.set(true);
@@ -472,20 +472,20 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       });
 
       if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
-      
+
       const data = await res.json();
       if (!data.clientSecret) throw new Error("No clientSecret received from backend");
 
       this.elements = this.stripe.elements({
         clientSecret: data.clientSecret,
-        appearance: { 
-          theme: 'night', 
-          variables: { 
+        appearance: {
+          theme: 'night',
+          variables: {
             colorPrimary: '#10b981',
             colorBackground: '#1e293b',
             colorText: '#ffffff',
             borderRadius: '12px'
-          } 
+          }
         }
       });
 
@@ -696,12 +696,14 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
 
   getCTA() {
     const method = this.selectedMethod();
-    if (method === 'payto') return 'Authorize $789.60';
+    const amountStr = this.totalAmount().toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+
+    if (method === 'payto') return `Authorize ${amountStr}`;
     if (method === 'zip') return 'Continue with Zip';
     if (method === 'afterpay') return 'Continue with Afterpay';
     if (method === 'klarna') return 'Pay first instalment';
-    if (method === 'upi') return 'Verify & Pay $789.60';
-    return 'Pay $789.60';
+    if (method === 'upi') return `Verify & Pay ${amountStr}`;
+    return `Pay ${amountStr}`;
   }
 
   toggleSummary() {
@@ -725,7 +727,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
           })
         });
         const customerData = await customerResponse.json();
-        const customerId = customerData.customerId;
+        const customerId = customerData.id;
 
         console.log("[PayTo] Creating payment...");
         const paymentResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/createPayToPayment", {
@@ -733,7 +735,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             customerId: customerId,
-            amount: 789.60
+            amount: this.totalAmount()
           })
         });
         const paymentData = await paymentResponse.json();

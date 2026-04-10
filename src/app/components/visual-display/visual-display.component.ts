@@ -329,7 +329,7 @@ import { CommonModule } from '@angular/common';
     .trust-badge { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 99px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.6); font-size: 11px; white-space: nowrap; }
 
     /* Responsive Badges */
-    @media (max-width: 1300px) {
+    @media (max-width: 1500px) {
       .trust-badges { 
         grid-template-columns: repeat(3, auto);
       }
@@ -339,7 +339,7 @@ import { CommonModule } from '@angular/common';
         width: fit-content;
       }
     }
-    @media (max-width: 950px) {
+    @media (max-width: 1200px) {
       .trust-badges { 
         grid-template-columns: repeat(2, auto);
       }

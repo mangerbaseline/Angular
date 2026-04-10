@@ -1,16 +1,21 @@
+@if (showHeaderFooter) {
 <app-brand-header></app-brand-header>
+}
 
 <div class="app-container">
   <app-background-animation></app-background-animation>
   
   <router-outlet />
-
+  @if (showHeaderFooter) {
+  <div class="footer-border"></div>
   <div class="global-footer">
     <div class="gf-left">
-      Trusted by 50,000+ businesses worldwide for secure, instant payments
+      Trusted by 50,000+ businesses worldwide for <br /> secure, instant payments
     </div>
     <div class="gf-right">
-      Secured by <strong style="color: gold;">Kuber Financial</strong> &middot; All transactions encrypted
+      Secured by <strong style="color: rgb(212, 180, 0);">Kuber Financial</strong> &middot; All transactions
+      encrypted
     </div>
   </div>
+  }
 </div>

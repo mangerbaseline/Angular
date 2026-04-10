@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="success-layout anim-fade-in">
+    <div class="success-layout ">
       <div class="success-container">
         <div class="u-glass u-rounded-3xl u-p-8 u-space-y-6 max-w-lg u-w-full">
           <div class="u-flex u-flex-col u-items-center u-text-center">
@@ -35,7 +35,7 @@ import { Router } from '@angular/router';
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-receipt w-4 h-4"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"></path><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path><path d="M12 17.5v-11"></path></svg>Transaction Details
               </h2>
               <div class="u-space-y-3 text-sm">
-                <div class="u-flex u-justify-between"><span class="text-muted-foreground">Transaction ID</span><button class="u-flex u-items-center u-gap-2 "><span class="text-xs">KP-MNIMAIF1-Z67J</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy w-3 h-3"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div>
+                <div class="u-flex u-justify-between"><span class="text-muted-foreground">Transaction ID</span><button class="transaction-button u-flex u-items-center u-gap-2"  ><span class="text-xs">KP-MNIMAIF1-Z67J</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy w-3 h-3"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div>
                 <div class="u-flex u-justify-between"><span class="text-muted-foreground">Date & Time</span><span class="text-foreground u-text-right text-xs">Friday, 3 April 2026 at 1:33 pm</span></div>
                 <div class="u-flex u-justify-between"><span class="text-muted-foreground">Payment Method</span><span class="text-foreground">Apple Pay</span></div>
                 <div class="u-flex u-justify-between"><span class="text-muted-foreground">Status</span><span class="status-primary font-medium u-flex u-items-center u-gap-1"><div class="w-2 h-2 u-rounded-full bg-primary animate-pulse"></div>Completed</span></div>
@@ -79,7 +79,7 @@ import { Router } from '@angular/router';
       justify-content: center;
       z-index: 50;
     }
-
+    
     .success-container { width: 100%; display: flex; align-items: center; justify-content: center; padding: 60px 20px; z-index: 1000; overflow-y: auto; position: relative; }
     .max-w-lg { max-width: 32rem; }
     .pt-4 { padding-top: 1rem; }
@@ -138,13 +138,13 @@ import { Router } from '@angular/router';
     @keyframes shine { 100% { transform: translateX(100%); } }
     .action-btn { transition: all 0.2s ease; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.05); }
     .action-btn:hover { transform: translateY(-2px); }
-    .return-btn { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .return-btn { transition: transform 0.3s ease, box-shadow 0.3s ease; border: none; }
     .return-btn:hover { transform: translateY(-2px); box-shadow: 0 20px 20px rgba(16, 185, 129, 0.5); }
   `]
 })
 export class SuccessPageComponent {
-  constructor(private router: Router) {}
-  onReturn() { 
+  constructor(private router: Router) { }
+  onReturn() {
     this.router.navigate(['/']);
   }
 }
