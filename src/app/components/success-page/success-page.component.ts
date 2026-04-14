@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { OrderService } from '../../services/order.service';
 
 @Component({
   selector: 'app-success-page',
@@ -20,7 +21,7 @@ import { Router } from '@angular/router';
             <div class="u-mt-6">
               <h1 class="u-text-3xl u-font-bold text-foreground mb-2" style="font-family: 'Space Grotesk', sans-serif;">
                 Payment Successful!</h1>
-              <p class="text-muted-foreground">Your payment of <span class="u-text-gradient u-font-semibold">$789.60 AUD</span> has been processed</p>
+              <p class="text-muted-foreground">Your payment of <span class="u-text-gradient u-font-semibold">{{ orderService.totalAmount() | currency }} AUD</span> has been processed</p>
             </div>  
           </div>
           <div class="u-flex u-items-center u-justify-center u-gap-3 u-p-4 u-rounded-xl bg-secondary-50">
@@ -43,16 +44,8 @@ import { Router } from '@angular/router';
             </div>
             <div class="border-t border-border-50 pt-4">
               <h2 class="text-sm font-medium text-muted-foreground mb-3" style="font-family: 'Space Grotesk', sans-serif;">Order Summary</h2>
-              <div class="u-space-y-2 mb-4">
-                <div class="u-flex u-justify-between text-sm"><span class="text-foreground">Premium Wireless Headphones × 1</span><span class="text-muted-foreground">$599.00</span></div>
-                <div class="u-flex u-justify-between text-sm"><span class="text-foreground">Leather Carrying Case × 1</span><span class="text-muted-foreground">$89.00</span></div>
-                <div class="u-flex u-justify-between text-sm"><span class="text-foreground">USB-C Fast Charger × 2</span><span class="text-muted-foreground">$98.00</span></div>
-              </div>
-              <div class="u-space-y-2 text-sm pt-2 border-t border-border-30">
-                <div class="u-flex u-justify-between"><span class="text-muted-foreground">Subtotal</span><span class="text-foreground">$786.00</span></div>
-                <div class="u-flex u-justify-between"><span class="text-muted-foreground">Tax (10%)</span><span class="text-foreground">$78.60</span></div>
-                <div class="u-flex u-justify-between text-primary"><span>Discount</span><span>-$75.00</span></div>
-                <div class="u-flex u-justify-between u-font-semibold pt-2 border-t border-border-30"><span class="text-foreground">Total Paid</span><span class="u-text-gradient">$789.60</span></div>
+              <div class="u-space-y-4 text-sm pt-2 border-t border-border-30">
+                <div class="u-flex u-justify-between u-font-semibold pt-2 border-t border-border-30"><span class="text-foreground">Total Paid</span><span class="u-text-gradient">{{ orderService.totalAmount() | currency }}</span></div>
               </div>
             </div>
           </div>
@@ -143,6 +136,7 @@ import { Router } from '@angular/router';
   `]
 })
 export class SuccessPageComponent {
+  orderService = inject(OrderService);
   constructor(private router: Router) { }
   onReturn() {
     this.router.navigate(['/']);

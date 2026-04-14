@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { OrderService } from '../../services/order.service';
 
 @Component({
   selector: 'app-brand-header',
@@ -22,7 +23,7 @@ import { CommonModule } from '@angular/common';
         <!-- Mobile-only Price -->
         <div class="mobile-price">
           <div class="m-price-label">Amount</div>
-          <div class="m-price-value">$789.60</div>
+          <div class="m-price-value">{{ orderService.totalAmount() | currency }}</div>
         </div>
       </div>
 
@@ -261,4 +262,6 @@ import { CommonModule } from '@angular/common';
     .ext-icon:hover { opacity: 0.7; }
   `]
 })
-export class BrandHeaderComponent { }
+export class BrandHeaderComponent {
+  orderService = inject(OrderService);
+}

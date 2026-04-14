@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { OrderService } from '../../services/order.service';
 
 @Component({
   selector: 'app-order-summary',
@@ -15,11 +16,11 @@ import { CommonModule } from '@angular/common';
           </svg>
           <div class="text">
             <div class="title">Order Summary</div>
-            <div class="item-count">{{ items.length }} items</div>
+            <div class="item-count">{{ items().length }} items</div>
           </div>
         </div>
         <div class="price-info">
-          <div class="total">$789.60</div>
+          <div class="total">{{ total() | currency }}</div>
           <svg class="chevron" [class.rotated]="isExpanded()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
@@ -28,7 +29,11 @@ import { CommonModule } from '@angular/common';
 
       <div class="summary-body">
         <div class="items-list">
-          <div *ngFor="let item of items" class="item">
+          <div *ngIf="loading()" class="loading-state">
+            <div class="skeleton" style="height: 60px; margin-bottom: 12px; border-radius: 12px;"></div>
+            <div class="skeleton" style="height: 60px; margin-bottom: 12px; border-radius: 12px;"></div>
+          </div>
+          <div *ngFor="let item of items()" class="item">
             <div class="item-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
@@ -48,8 +53,8 @@ import { CommonModule } from '@angular/common';
 
         <div class="breakdown">
           <div class="line">
-            <span>Subtotal</span>
-            <span>$786.00</span>
+            <span>Subtotalll</span>
+            <span>{{ subtotal() | currency }}</span>
           </div>
           <div class="line">
             <span>Shipping</span>
@@ -57,11 +62,15 @@ import { CommonModule } from '@angular/common';
           </div>
           <div class="line">
             <span>Tax (GST)</span>
-            <span>$78.60</span>
+            <span>{{ tax() | currency }}</span>
           </div>
-          <div class="line discount">
+          <div class="line" *ngIf="fees() > 0">
+            <span>Platform Fees</span>
+            <span>{{ fees() | currency }}</span>
+          </div>
+          <div class="line discount" *ngIf="discount() > 0">
             <span>Discount Applied</span>
-            <span>-$75.00</span>
+            <span>-{{ discount() | currency }}</span>
           </div>
           
           <div class="promo-code">
@@ -74,7 +83,7 @@ import { CommonModule } from '@angular/common';
               <span>Total</span>
               <span class="gst-label">Including GST</span>
             </div>
-            <div class="total-value">$789.60</div>
+            <div class="total-value">{{ total() | currency }}</div>
           </div>
         </div>
         
@@ -85,16 +94,93 @@ import { CommonModule } from '@angular/common';
       </div>
     </div>
   `,
-  styles: []
+  styles: [`
+    .loading-state {
+      padding: 1rem;
+    }
+    .skeleton {
+      background: rgba(255, 255, 255, 0.05);
+      background: linear-gradient(90deg, 
+        rgba(255, 255, 255, 0.05) 25%, 
+        rgba(255, 255, 255, 0.1) 50%, 
+        rgba(255, 255, 255, 0.05) 75%
+      );
+      background-size: 200% 100%;
+      animation: skeleton-loading 1.5s infinite;
+    }
+    @keyframes skeleton-loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .free {
+      color: #10b981;
+      font-weight: 600;
+    }
+  `]
 })
-export class OrderSummaryComponent {
-  isExpanded = signal(true);
+export class OrderSummaryComponent implements OnInit {
+  private orderService = inject(OrderService);
 
-  items = [
-    { name: 'Premium Wireless Headphones', price: 599.00, desc: 'Noise cancelling, 40hr battery', qty: 1 },
-    { name: 'Leather Carrying Case', price: 89.00, desc: 'Genuine leather, fits all sizes', qty: 1 },
-    { name: 'USB-C Fast Charger', price: 98.00, desc: '65W GaN Technology', qty: 2 }
-  ];
+  isExpanded = signal(true);
+  loading = signal(true);
+  items = signal<any[]>([]);
+
+  subtotal = signal(0);
+  tax = signal(0);
+  fees = signal(0);
+  discount = signal(0);
+  total = signal(0);
+
+  ngOnInit() {
+    this.fetchOrderDetails();
+  }
+
+  fetchOrderDetails() {
+    this.loading.set(true);
+    // Static orderID as requested
+    const orderID = "69d8c39a8465304915452e1d";
+
+    this.orderService.getOrderItems(orderID).subscribe({
+      next: (response) => {
+        console.log('Order Items:', response);
+        if (response && response.data) {
+          const orderData = response.data;
+
+          // Map menuList to items
+          if (Array.isArray(orderData.menuList)) {
+            this.items.set(orderData.menuList.map((item: any) => ({
+              name: item.itemName || 'Unknown Item',
+              price: item.itemPrice || 0,
+              desc: item.description || '',
+              qty: item.quantity || 1
+            })));
+          }
+
+          // In this API structure:
+          // prevAmt seems to be the raw subtotal (sum of item prices)
+          // discount is the discount amount
+          // GSTAmt is the tax
+          // plateformFees is an additional fee
+          // finalAmount is the total to be paid
+
+          this.subtotal.set(orderData.prevAmt || 0);
+          this.tax.set(parseFloat(orderData.gstAmount || orderData.GSTAmt || 0));
+          this.fees.set(orderData.plateformFees || 0);
+          this.discount.set(orderData.discount || 0);
+          this.total.set(orderData.finalAmount || 0);
+
+          // If we want to show platform fees, we might need another line in the UI
+          // For now, let's keep it simple or include platform fees in the subtotal/tax if needed
+        }
+        this.loading.set(false);
+      },
+      error: (error) => {
+        console.error('Error fetching order items:', error);
+        this.loading.set(false);
+      }
+    });
+  }
+
 
   toggleExpand() {
     this.isExpanded.set(!this.isExpanded());

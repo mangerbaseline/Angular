@@ -11,7 +11,7 @@ import { VisualDisplayComponent } from '../visual-display/visual-display.compone
   template: `
     <div class="checkout-layout anim-fade-in">
       <div class="visual-panel">
-        <app-visual-display [selectedMethod]="selectedMethod()" [cardType]="cardType()"></app-visual-display>
+        <app-visual-display [selectedMethod]="selectedMethod()" [cardType]="cardType()" [totalAmount]="totalAmount()"></app-visual-display>
       </div>
 
       <div class="form-panel">
@@ -19,6 +19,7 @@ import { VisualDisplayComponent } from '../visual-display/visual-display.compone
           <app-payment-card 
             (methodChange)="onMethodChange($event)" 
             (cardTypeChange)="onCardTypeChange($event)"
+            (totalAmountChange)="onTotalAmountChange($event)"
             (paymentSuccess)="onPaymentSuccess()">
           </app-payment-card>
         </div>
@@ -97,6 +98,7 @@ import { VisualDisplayComponent } from '../visual-display/visual-display.compone
 export class CheckoutPageComponent {
   selectedMethod = signal('card');
   cardType = signal('visa');
+  totalAmount = signal(0);
 
   constructor(private router: Router) {}
 
@@ -106,6 +108,10 @@ export class CheckoutPageComponent {
 
   onCardTypeChange(type: string) {
     this.cardType.set(type);
+  }
+
+  onTotalAmountChange(amount: number) {
+    this.totalAmount.set(amount);
   }
 
   onPaymentSuccess() {

@@ -1,13 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { OrderService } from '../../services/order.service';
 
 @Component({
   selector: 'app-total-amount',
   standalone: true,
+  imports: [CommonModule],
   template: `
     <div class="total-amount-container">
       <div class="label">Total Amount</div>
       <div class="amount">
-        <span class="currency-symbol">$</span>789.60 <span class="currency-code">AUD</span>
+        {{ orderService.totalAmount() | currency }} <span class="currency-code">AUD</span>
       </div>
       <div class="security-badges">
         <div class="badge">
@@ -28,4 +31,6 @@ import { Component } from '@angular/core';
   `,
   styles: []
 })
-export class TotalAmountComponent {}
+export class TotalAmountComponent {
+  orderService = inject(OrderService);
+}

@@ -276,7 +276,7 @@ import { CommonModule } from '@angular/common';
       <div class="amount-display">
         <div class="amount-label">TOTAL AMOUNT</div>
         <div class="amount-value">
-          $789.60
+          {{ totalAmount | currency:'USD':'symbol':'1.2-2' }}
           <span class="currency">AUD</span>
         </div>
         <div class="trust-badges">
@@ -408,6 +408,7 @@ import { CommonModule } from '@angular/common';
 export class VisualDisplayComponent {
   @Input() selectedMethod = 'card';
   @Input() cardType = '';
+  @Input() totalAmount = 0;
 
   qrPixels = [
     1, 0, 1, 1, 0, 1, 1, 0, 1, 0,
