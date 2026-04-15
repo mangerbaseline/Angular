@@ -1,6 +1,7 @@
-import { Component, signal, Output, EventEmitter, ViewChild, ElementRef, OnInit, AfterViewInit, inject } from '@angular/core';
+import { Component, signal, Output, EventEmitter, ViewChild, ElementRef, OnInit, AfterViewInit, inject, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { OrderService } from '../../services/order.service';
+import * as CryptoJS from 'crypto-js';
 
 declare var Stripe: any;
 import { CommonModule, CurrencyPipe } from '@angular/common';
@@ -614,6 +615,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
 
   private orderService = inject(OrderService);
   private route = inject(ActivatedRoute);
+  private cdr = inject(ChangeDetectorRef);
 
   toastMessage = signal('');
   allMethods = [
@@ -692,11 +694,67 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     'payWithLink': 'link'
   };
 
+  decryptToken(token: string): any {
+    try {
+      const parts = token.split(":");
+      if (parts.length < 2) return null;
+      const ivPart = parts[0];
+      let encPart = parts[1];
+      if (encPart.endsWith("=")) {
+          encPart = encPart.slice(0, -1);
+      }
+      
+      const key = CryptoJS.SHA256("KuberSecureKey987654321");
+      const iv = CryptoJS.enc.Hex.parse(ivPart);
+      const cipherParams = CryptoJS.lib.CipherParams.create({ ciphertext: CryptoJS.enc.Hex.parse(encPart) });
+      const decrypted = CryptoJS.AES.decrypt(cipherParams, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
+      const decStr = decrypted.toString(CryptoJS.enc.Utf8);
+      
+      if (!decStr) return null;
+
+      const params = new URLSearchParams(decStr);
+      return {
+        merId: params.get('merId') || '',
+        orderId: params.get('orderId') || '',
+        paymentId: params.get('paymentId') || ''
+      };
+    } catch (error) {
+      console.error("Decryption error:", error);
+      return null;
+    }
+  }
+
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
-      this.merId = params['merId'] || '';
-      this.orderID = params['orderId'] || '';
-      this.paymentId = params['paymentId'] || '';
+      let token = params['token'] || '';
+      if (!token) {
+        const keys = Object.keys(params);
+        const tokenKey = keys.find(k => k.includes(':') && k.length > 30);
+        if (tokenKey) {
+          token = tokenKey;
+          if (params[tokenKey] && params[tokenKey] !== '') {
+            token += '=' + params[tokenKey];
+          }
+        }
+      }
+
+      let decryptedPayload = null;
+      if (token) {
+        console.log("=== ENCRYPTED TOKEN DETECTED ===", token);
+        decryptedPayload = this.decryptToken(token);
+        console.log("=== DECRYPTED PAYLOAD ===", decryptedPayload);
+      }
+
+      if (decryptedPayload) {
+        this.merId = decryptedPayload.merId;
+        this.orderID = decryptedPayload.orderId;
+        this.paymentId = decryptedPayload.paymentId;
+        console.log(`Extracted IDs - merId: ${this.merId}, orderId: ${this.orderID}, paymentId: ${this.paymentId}`);
+      } else {
+        this.merId = params['merId'] || '';
+        this.orderID = params['orderId'] || '';
+        this.paymentId = params['paymentId'] || '';
+      }
       this.useBackend = !!this.paymentId;
 
       this.startApiFlow();
@@ -818,30 +876,36 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   }
 
   private filterMethods(apiMethods: string[]) {
-    const apiMap: { [key: string]: string } = {
+    if (!apiMethods || !Array.isArray(apiMethods) || apiMethods.length === 0) {
+      this.methods = [...this.allMethods];
+      return;
+    }
+
+    const normalizedMap: { [key: string]: string } = {
       'card': 'card',
-      'Card': 'card',
-      'applePay': 'apple',
-      'Apple Pay': 'apple',
-      'googlePay': 'google',
-      'Google Pay': 'google',
-      'zipPay': 'zip',
-      'Zip Pay': 'zip',
-      'afterPay': 'afterpay',
-      'After Pay': 'afterpay',
-      'klarnaPay': 'klarna',
-      'Klarna Pay': 'klarna',
-      'payWithLink': 'link',
-      'Pay with Link': 'link',
-      'kuberId': 'upi',
+      'applepay': 'apple',
+      'googlepay': 'google',
+      'zippay': 'zip',
+      'afterpay': 'afterpay',
+      'klarnapay': 'klarna',
+      'klarna': 'klarna',
+      'paywithlink': 'link',
+      'link': 'link',
+      'kuberid': 'upi',
+      'upi': 'upi',
       'pay2': 'payto',
+      'payto': 'payto'
     };
 
-    const allowedIds = apiMethods.map(m => apiMap[m]).filter(id => !!id);
+    const allowedIds = apiMethods.map(m => {
+      if (!m || typeof m !== 'string') return null;
+      // Strip spaces and convert to lowercase for robust matching
+      const normalized = m.toLowerCase().replace(/\s+/g, '');
+      return normalizedMap[normalized] || null;
+    }).filter(id => id !== null);
 
     const uniqueIds = Array.from(new Set(allowedIds));
     this.methods = this.allMethods.filter(m => uniqueIds.includes(m.id));
-
 
     if (this.methods.length === 0) {
       this.methods = [...this.allMethods];
@@ -850,6 +914,8 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     if (!this.methods.find(m => m.id === this.selectedMethod())) {
       this.selectMethod(this.methods[0]?.id || 'card');
     }
+    
+    this.cdr.detectChanges();
   }
 
   fetchOrderDetails() {
@@ -1109,28 +1175,31 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
         const paymentData = await paymentResponse.json();
         const clientSecret = paymentData.clientSecret;
 
-        console.log("[PayTo] Confirming payment...");
-        const result = await this.stripe.confirmPayToPayment(
-          clientSecret,
-          {
-            payment_method: {
-              billing_details: {
-                name: this.paytoName(),
-                email: this.paytoEmail()
-              },
-              payto: {
-                pay_id: this.paytoID()
-              }
-            }
-          }
-        );
+        console.log("[PayTo] Confirming payment via Backend...");
+        const confirmResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/confirmPayToPayment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            paymentIntentId: clientSecret,
+            name: this.paytoName(),
+            email: this.paytoEmail(),
+            pay_id: this.paytoID()
+          })
+        });
 
-        if (result.error) {
-          console.error(result.error.message);
-          alert(result.error.message);
-        } else {
-          console.log("PayTo request sent");
+        if (confirmResponse.ok) {
+          const confirmData = await confirmResponse.json();
+          console.log("PayTo confirmation response:", confirmData);
           this.paymentSuccess.emit();
+        } else {
+          try {
+             const errorData = await confirmResponse.json();
+             console.error("Confirmation error:", errorData);
+             alert(errorData.message || "Failed to confirm PayTo payment");
+          } catch(e) {
+             console.error("Confirmation error status:", confirmResponse.status);
+             alert("Failed to confirm PayTo payment");
+          }
         }
       } catch (err: any) {
         console.error("PayTo Error:", err);
