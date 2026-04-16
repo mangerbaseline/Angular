@@ -46,5 +46,14 @@ export class OrderService {
     });
     return this.http.post(`${baseUrl}/order/checkout/getMyPaymentMethod`, {}, { headers });
   }
+
+  getPaymentStatus(token: string, deviceId: string, orderID: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'access_token': token,
+      'deviceid': deviceId,
+      'Content-Type': 'application/json'
+    });
+    return this.http.post(`${this.backendApi}/payments/getPaymentStatus`, { orderID }, { headers });
+  }
 }
 

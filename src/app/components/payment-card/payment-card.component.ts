@@ -12,7 +12,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
   standalone: true,
   imports: [CommonModule, SafeHtmlPipe, CurrencyPipe],
   template: `
-    <div class="sidebar-root">
+    <div class="sidebar-root" *ngIf="!tokenError()">
       <div *ngIf="toastMessage()" class="toast-overlay fade-in">
         <div class="toast-card">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
@@ -587,6 +587,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   @Output() methodChange = new EventEmitter<string>();
   @Output() cardTypeChange = new EventEmitter<string>();
   @Output() totalAmountChange = new EventEmitter<number>();
+  @Output() tokenErrorEvent = new EventEmitter<boolean>();
 
   selectedMethod = signal('card');
   detectedCardType = signal('visa');
@@ -594,6 +595,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   isStripeLoading = signal(false);
   showSummary = signal(true);
   loadingOrder = signal(true);
+  tokenError = signal(false);
 
   items = signal<any[]>([]);
   subtotal = signal(0);
@@ -641,7 +643,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     },
     {
       id: 'payto', name: 'PayTo', color: '#22d3ee',
-      svg: '<svg style="width:20px; height:20px;" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="3" stroke="currentColor" stroke-width="1.5"></rect><path d="M7 12h6M13 12l-2-2M13 12l-2 2" stroke="#22d3ee" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="17" cy="12" r="1.5" fill="#22d3ee"></circle></svg>'
+      svg: '<img src="payto-logo.png" style="width:20px; height:20px; object-fit: contain;">'
     },
     {
       id: 'zip', name: 'Zip', color: '#a78bfa',
@@ -667,6 +669,8 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   merId = '';
   paymentId = '';
   useBackend = false;
+  accessToken = '';
+  deviceId = '';
 
   stripe: any;
   elements: any;
@@ -701,15 +705,15 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       const ivPart = parts[0];
       let encPart = parts[1];
       if (encPart.endsWith("=")) {
-          encPart = encPart.slice(0, -1);
+        encPart = encPart.slice(0, -1);
       }
-      
+
       const key = CryptoJS.SHA256("KuberSecureKey987654321");
       const iv = CryptoJS.enc.Hex.parse(ivPart);
       const cipherParams = CryptoJS.lib.CipherParams.create({ ciphertext: CryptoJS.enc.Hex.parse(encPart) });
       const decrypted = CryptoJS.AES.decrypt(cipherParams, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
       const decStr = decrypted.toString(CryptoJS.enc.Utf8);
-      
+
       if (!decStr) return null;
 
       const params = new URLSearchParams(decStr);
@@ -743,6 +747,12 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
         console.log("=== ENCRYPTED TOKEN DETECTED ===", token);
         decryptedPayload = this.decryptToken(token);
         console.log("=== DECRYPTED PAYLOAD ===", decryptedPayload);
+        
+        if (!decryptedPayload) {
+          this.tokenError.set(true);
+          this.tokenErrorEvent.emit(true);
+          return;
+        }
       }
 
       if (decryptedPayload) {
@@ -802,12 +812,14 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
           this.handleOrderResponse(orderData);
 
           const deviceId = this.generateDeviceId();
+          this.deviceId = deviceId;
           const merchantID = orderData.merchantID;
 
           this.orderService.generateToken(merchantID, deviceId, this.useBackend).subscribe({
             next: (tokenRes) => {
               const token = tokenRes.data.token || tokenRes.data.deviceID;
               const accessToken = tokenRes.data.token;
+              this.accessToken = accessToken || token;
 
               if (accessToken) {
                 this.orderService.getMyPaymentMethod(accessToken, deviceId, this.useBackend).subscribe({
@@ -914,7 +926,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     if (!this.methods.find(m => m.id === this.selectedMethod())) {
       this.selectMethod(this.methods[0]?.id || 'card');
     }
-    
+
     this.cdr.detectChanges();
   }
 
@@ -1146,6 +1158,93 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
 
   @Output() paymentSuccess = new EventEmitter<void>();
 
+  // async pay() {
+  //   this.isProcessing.set(true);
+
+  //   if (this.selectedMethod() === 'payto') {
+  //     try {
+  //       console.log("[PayTo] Creating customer...");
+  //       const customerResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/customers", {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify({
+  //           email: this.paytoEmail(),
+  //           name: this.paytoName()
+  //         })
+  //       });
+  //       const customerData = await customerResponse.json();
+  //       const customerId = customerData.id;
+
+  //       console.log("[PayTo] Creating payment...");
+  //       const paymentResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/createPayToPayment", {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify({
+  //           customerId: customerId,
+  //           amount: this.totalAmount()
+  //         })
+  //       });
+  //       const paymentData = await paymentResponse.json();
+  //       const clientSecret = paymentData.clientSecret;
+
+  //       console.log("[PayTo] Confirming payment via Backend...");
+  //       const confirmResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/confirmPayToPayment", {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify({
+  //           paymentIntentId: clientSecret,
+  //           name: this.paytoName(),
+  //           email: this.paytoEmail(),
+  //           pay_id: this.paytoID()
+  //         })
+  //       });
+
+  //       if (confirmResponse.ok) {
+  //         const confirmData = await confirmResponse.json();
+  //         console.log("PayTo confirmation response:", confirmData);
+  //         this.paymentSuccess.emit();
+  //       } else {
+  //         try {
+  //            const errorData = await confirmResponse.json();
+  //            console.error("Confirmation error:", errorData);
+  //            alert(errorData.message || "Failed to confirm PayTo payment");
+  //         } catch(e) {
+  //            console.error("Confirmation error status:", confirmResponse.status);
+  //            alert("Failed to confirm PayTo payment");
+  //         }
+  //       }
+  //     } catch (err: any) {
+  //       console.error("PayTo Error:", err);
+  //     } finally {
+  //       this.isProcessing.set(false);
+  //     }
+  //     return;
+  //   }
+
+  //   if (this.isStripeMethod() && this.paymentElement) {
+  //     try {
+  //       const { error } = await this.stripe.confirmPayment({
+  //         elements: this.elements,
+  //         confirmParams: {
+  //           return_url: window.location.origin + '/success',
+  //         },
+  //       });
+
+  //       if (error) {
+  //         console.error(error.message);
+  //       }
+  //     } catch (e) {
+  //       console.error("Payment confirmation failed", e);
+  //     } finally {
+  //       this.isProcessing.set(false);
+  //     }
+  //   } else {
+  //     setTimeout(() => {
+  //       this.isProcessing.set(false);
+  //       this.paymentSuccess.emit();
+  //     }, 2000);
+  //   }
+  // }
   async pay() {
     this.isProcessing.set(true);
 
@@ -1190,20 +1289,23 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
         if (confirmResponse.ok) {
           const confirmData = await confirmResponse.json();
           console.log("PayTo confirmation response:", confirmData);
-          this.paymentSuccess.emit();
+          this.checkPaymentStatus();
         } else {
           try {
-             const errorData = await confirmResponse.json();
-             console.error("Confirmation error:", errorData);
-             alert(errorData.message || "Failed to confirm PayTo payment");
-          } catch(e) {
-             console.error("Confirmation error status:", confirmResponse.status);
-             alert("Failed to confirm PayTo payment");
+            const errorData = await confirmResponse.json();
+            console.error("Confirmation error:", errorData);
+            this.showToast(errorData.message || "Failed to confirm PayTo payment");
+          } catch (e) {
+            console.error("Confirmation error status:", confirmResponse.status);
+            this.showToast("Failed to confirm PayTo payment");
           }
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
+          this.isProcessing.set(false);
         }
       } catch (err: any) {
         console.error("PayTo Error:", err);
-      } finally {
         this.isProcessing.set(false);
       }
       return;
@@ -1211,26 +1313,55 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
 
     if (this.isStripeMethod() && this.paymentElement) {
       try {
-        const { error } = await this.stripe.confirmPayment({
+        const result = await this.stripe.confirmPayment({
           elements: this.elements,
-          confirmParams: {
-            return_url: window.location.origin + '/success',
-          },
+          redirect: 'if_required'
         });
 
-        if (error) {
-          console.error(error.message);
+        console.log("Stripe confirmation result:", result);
+
+        if (result.error) {
+          console.error(result.error.message);
+          this.showToast(result.error.message);
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
+          this.isProcessing.set(false);
+        } else {
+          this.checkPaymentStatus();
         }
       } catch (e) {
         console.error("Payment confirmation failed", e);
-      } finally {
         this.isProcessing.set(false);
       }
     } else {
       setTimeout(() => {
-        this.isProcessing.set(false);
-        this.paymentSuccess.emit();
+        this.checkPaymentStatus();
       }, 2000);
     }
   }
+
+  checkPaymentStatus() {
+    this.orderService.getPaymentStatus(this.accessToken, this.deviceId, this.orderID).subscribe({
+      next: (res) => {
+        console.log("Payment status response:", res);
+        if (res.status === 'Pending' || res.status === 'Success' || res.status === 'Completed' || res.status === 'Paid') {
+          this.paymentSuccess.emit();
+        } else {
+          this.showToast('Payment status: ' + res.status);
+          setTimeout(() => {
+             window.location.reload();
+          }, 3000);
+        }
+        this.isProcessing.set(false);
+      },
+      error: (err) => {
+        console.error("Error checking payment status", err);
+        // Fallback to emit just in case
+        this.paymentSuccess.emit();
+        this.isProcessing.set(false);
+      }
+    });
+  }
 }
+

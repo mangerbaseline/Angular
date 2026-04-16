@@ -9,18 +9,7 @@ import { OrderService } from '../../services/order.service';
   template: `
     <div class="brand-header">
       <div class="header-main-row">
-        <!-- Logo + Brand -->
-        <div class="logo-row">
-          <div class="brand-logo-circle">
-            <!-- <svg viewBox="0 0 24 24" fill="none" width="24" height="24">
-              <path d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8L12 2Z" fill="#10b981"/>
-            </svg> -->
-            <img src="kuber-logo.svg">
-          </div>
-          <span class="brand-name">Kuber<span class="brand-pay">Pay</span></span>
-        </div>
 
-        <!-- Mobile-only Price -->
         <div class="mobile-price">
           <div class="m-price-label">Amount</div>
           <div class="m-price-value">{{ orderService.totalAmount() | currency }}</div>
