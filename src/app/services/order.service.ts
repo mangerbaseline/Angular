@@ -17,6 +17,7 @@ export class OrderService {
 
   // Shared state 
   totalAmount = signal(0);
+  orderData = signal<any>(null);
 
   checkPaymentLinkStatus(paymentId: string): Observable<any> {
     return this.http.post(`${this.backendApi}/paymentlink/checkPaymentLinkStatus`, { paymentId });
@@ -26,8 +27,11 @@ export class OrderService {
     const baseUrl = useBackend ? this.backendApi : this.wwwApi;
     return this.http.post(`${baseUrl}/order/checkout/getItemListNew`, { orderID }).pipe(
       tap((response: any) => {
-        if (response && response.data && response.data.finalAmount) {
-          this.totalAmount.set(response.data.finalAmount);
+        if (response && response.data) {
+          this.orderData.set(response.data);
+          if (response.data.finalAmount) {
+            this.totalAmount.set(response.data.finalAmount);
+          }
         }
       })
     );

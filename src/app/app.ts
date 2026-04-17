@@ -88,6 +88,9 @@ export class App implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit() {
+    // Initial check for current URL
+    this.showHeaderFooter = !this.router.url.includes('/success');
+
     this.router.events.pipe(
       filter((event: Event): event is NavigationEnd => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {

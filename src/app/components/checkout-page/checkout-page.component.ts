@@ -209,7 +209,7 @@ export class CheckoutPageComponent {
   }
 
   onPaymentSuccess() {
-    this.router.navigate(['/success']);
+    this.router.navigate(['/success'], { queryParamsHandling: 'preserve' });
   }
 
   onTokenError(isError: boolean) {

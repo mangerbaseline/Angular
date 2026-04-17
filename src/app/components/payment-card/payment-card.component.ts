@@ -20,22 +20,22 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
         </div>
       </div>
       <div class="flex items-center justify-center gap-2 mb-8" style="display:flex; justify-content:center; align-items:center; gap: 12px; margin-bottom: 32px;">
-        <div style="display:flex; align-items:center;">
+        <!-- <div style="display:flex; align-items:center;">
           <div [style.background]="isStepActive(1) ? 'rgba(16,185,129,0.2)' : 'rgba(255,255,255,0.05)'" [style.color]="isStepActive(1) ? '#10b981' : '#94a3b8'" style="display:flex; align-items:center; gap: 8px; padding: 8px 16px; border-radius: 9999px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px;"><rect width="20" height="14" x="2" y="5" rx="2"></rect><line x1="2" x2="22" y1="10" y2="10"></line></svg>
             <span class="step-text" style="font-size:14px; font-weight:500;">Card Details</span>
           </div>
           <div style="width:32px; height:2px; margin: 0 8px; background: rgba(255,255,255,0.1);"></div>
-        </div>
+        </div> -->
         <div style="display:flex; align-items:center;">
-          <div [style.background]="isStepActive(2) ? 'rgba(16,185,129,0.2)' : 'rgba(255,255,255,0.05)'" [style.color]="isStepActive(2) ? '#10b981' : '#94a3b8'" style="display:flex; align-items:center; gap: 8px; padding: 8px 16px; border-radius: 9999px;">
+          <div [style.background]="isStepActive(1) ? 'rgba(16,185,129,0.2)' : 'rgba(255,255,255,0.05)'" [style.color]="isStepActive(2) ? '#10b981' : '#94a3b8'" style="display:flex; align-items:center; gap: 8px; padding: 8px 16px; border-radius: 9999px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px;"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             <span class="step-text" style="font-size:14px; font-weight:500;">Verification</span>
           </div>
-          <div style="width:32px; height:2px; margin: 0 8px; background: rgba(255,255,255,0.1);"></div>
+          <div style="width:185px; height:2px; margin: 0 8px; background: rgba(255,255,255,0.1);"></div>
         </div>
         <div style="display:flex; align-items:center;">
-          <div [style.background]="isStepActive(3) ? 'rgba(16,185,129,0.2)' : 'rgba(255,255,255,0.05)'" [style.color]="isStepActive(3) ? '#10b981' : '#94a3b8'" style="display:flex; align-items:center; gap: 8px; padding: 8px 16px; border-radius: 9999px;">
+          <div [style.background]="isStepActive(2) ? 'rgba(16,185,129,0.2)' : 'rgba(255,255,255,0.05)'" [style.color]="isStepActive(3) ? '#10b981' : '#94a3b8'" style="display:flex; align-items:center; gap: 8px; padding: 8px 16px; border-radius: 9999px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px;"><path d="M21.801 10A10 10 0 1 1 17 3.335"></path><path d="m9 11 3 3L22 4"></path></svg>
             <span class="step-text" style="font-size:14px; font-weight:500;">Complete</span>
           </div>
@@ -747,7 +747,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
         console.log("=== ENCRYPTED TOKEN DETECTED ===", token);
         decryptedPayload = this.decryptToken(token);
         console.log("=== DECRYPTED PAYLOAD ===", decryptedPayload);
-        
+
         if (!decryptedPayload) {
           this.tokenError.set(true);
           this.tokenErrorEvent.emit(true);
@@ -1315,6 +1315,9 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       try {
         const result = await this.stripe.confirmPayment({
           elements: this.elements,
+          confirmParams: {
+            return_url: window.location.origin + '/success' + window.location.search,
+          },
           redirect: 'if_required'
         });
 
@@ -1350,7 +1353,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
         } else {
           this.showToast('Payment status: ' + res.status);
           setTimeout(() => {
-             window.location.reload();
+            window.location.reload();
           }, 3000);
         }
         this.isProcessing.set(false);
