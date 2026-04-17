@@ -923,8 +923,14 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       this.methods = [...this.allMethods];
     }
 
-    if (!this.methods.find(m => m.id === this.selectedMethod())) {
+    const current = this.selectedMethod();
+    const isAvailable = this.methods.find(m => m.id === current);
+    
+    if (!isAvailable) {
       this.selectMethod(this.methods[0]?.id || 'card');
+    } else if (this.isStripeMethod()) {
+      // Ensure initial load hits createPaymentSession by forcing init
+      this.initStripeElement(current);
     }
 
     this.cdr.detectChanges();
@@ -935,10 +941,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-
-    if (this.isStripeMethod()) {
-      this.initStripeElement(this.selectedMethod());
-    }
+    // Initialization now handled by API flow in filterMethods to ensure data is ready
   }
 
   isStripeMethod() {
@@ -965,54 +968,60 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     this.isStripeLoading.set(true);
 
     try {
-      const res = await fetch("https://backend.kuberfinancial.com.au/api/payments/createPaymentSession", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ paymentType: backendType })
-      });
+      const orderData = this.orderService.orderData();
+      if (!orderData) throw new Error("Order data not available");
 
-      if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
+      if (!this.accessToken) {
+        console.warn("[Stripe Init] Access token not ready yet.");
+        return;
+      }
 
-      const data = await res.json();
-      if (!data.clientSecret) throw new Error("No clientSecret received from backend");
+      // Hit createPaymentSession directly using the token from startApiFlow
+      this.orderService.createPaymentSession(this.accessToken, this.deviceId, this.orderID, backendType).subscribe({
+        next: (data) => {
+          if (!data.clientSecret) throw new Error("No clientSecret received from backend");
 
-      this.elements = this.stripe.elements({
-        clientSecret: data.clientSecret,
-        appearance: {
-          theme: 'night',
-          variables: {
-            colorPrimary: '#10b981',
-            colorBackground: '#1e293b',
-            colorText: '#ffffff',
-            borderRadius: '12px'
-          }
-        }
-      });
+          this.elements = this.stripe.elements({
+            clientSecret: data.clientSecret,
+            appearance: {
+              theme: 'night',
+              variables: {
+                colorPrimary: '#10b981',
+                colorBackground: '#1e293b',
+                colorText: '#ffffff',
+                borderRadius: '12px'
+              }
+            }
+          });
 
-      console.log(`[Stripe] Creating ${stripeType} element...`);
+          console.log(`[Stripe] Creating ${stripeType} element...`);
 
-      this.paymentElement = this.elements.create("payment", {
-        layout: 'tabs',
-        paymentMethodOrder: [stripeType]
-      });
+          this.paymentElement = this.elements.create("payment", {
+            layout: 'tabs',
+            paymentMethodOrder: [stripeType]
+          });
 
+          setTimeout(() => {
+            const mountPoint = document.getElementById("stripe-payment-element-mount-point");
+            if (mountPoint && this.paymentElement) {
+              this.paymentElement.mount("#stripe-payment-element-mount-point");
+            }
+          }, 50);
 
+          this.paymentElement.on('ready', () => {
+            console.log(`[Stripe] ${id} UI Ready.`);
+            this.isStripeLoading.set(false);
+          });
 
-      setTimeout(() => {
-        const mountPoint = document.getElementById("stripe-payment-element-mount-point");
-        if (mountPoint && this.paymentElement) {
-          this.paymentElement.mount("#stripe-payment-element-mount-point");
-        }
-      }, 50);
-
-      this.paymentElement.on('ready', () => {
-        console.log(`[Stripe] ${id} UI Ready.`);
-        this.isStripeLoading.set(false);
-      });
-
-      this.paymentElement.on('change', (event: any) => {
-        if (event.error) {
-          console.error("[Stripe Change Error]:", event.error.message);
+          this.paymentElement.on('change', (event: any) => {
+            if (event.error) {
+              console.error("[Stripe Change Error]:", event.error.message);
+            }
+          });
+        },
+        error: (err) => {
+          console.error("[Stripe Session Error]:", err);
+          this.isStripeLoading.set(false);
         }
       });
 

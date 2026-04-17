@@ -59,5 +59,14 @@ export class OrderService {
     });
     return this.http.post(`${this.backendApi}/payments/getPaymentStatus`, { orderID }, { headers });
   }
+
+  createPaymentSession(token: string, deviceId: string, orderID: string, paymentType: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'token': token,
+      'deviceid': deviceId,
+      'Content-Type': 'application/json'
+    });
+    return this.http.post(`${this.backendApi}/payments/createPaymentSession`, { orderID, paymentType }, { headers });
+  }
 }
 
