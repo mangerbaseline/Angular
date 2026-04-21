@@ -2672,7 +2672,7 @@ body {
 
 .pay-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 20px 20px var(--brand-green-glow);
+  box-shadow: 0 0 20px 5px var(--brand-green-glow);
 }
 
 .cta-note {

@@ -53,6 +53,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
             <span class="tab-icon" [innerHTML]="m.svg | safeHtml"></span>
             <div class="tab-text">
               <span class="tab-name">{{ m.name }}</span>
+               <span *ngIf="m.name === 'UPI'" class="tab-name">Disabled</span>
             </div>
           </button>
         </div>
@@ -131,35 +132,106 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
               <p style="font-size: 14px; color: var(--text-secondary); margin: 0;">Scan with any UPI app to pay instantly</p>
             </div>
           </div>
-          <div *ngSwitchCase="'payto'" class="payment-form fade-in">
-            <div class="input-group">
-              <label>FULL NAME</label>
-              <div class="icon-input has-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                <input type="text" placeholder="John Doe" (input)="paytoName.set($any($event.target).value)">
+          <div *ngSwitchCase="'payto'" class="payto-container fade-in">
+            <!-- Payload State: Input -->
+            <div *ngIf="paytoState() === 'input'">
+              <div class="payto-header-row">
+                <h2 class="payto-main-title">Pay by Bank</h2>
+                <div class="payto-logos-top">
+                  <img src="https://backend.kuberfinancial.com.au/tableQR/assets/images/kuber-samal-logo.svg" style="height:15px; object-fit:contain; filter: brightness(0) invert(1);">
+                  <img src="/payto-logo.png" style="height:25px; object-fit:contain;">
+                </div>
+              </div>
+              <p class="payto-sub-desc">
+                Authorize payments instantly using PAY-ID linked to your bank — fast, secure, and hassle-free! It will take 2–3 minutes.
+              </p>
+
+              <div class="payid-banner">
+                <img src="/Payid.png" alt="PayID" style="height: 26px; object-fit: contain; filter: invert(1); mix-blend-mode: screen;">
+              </div>
+
+              <div class="payto-input-section">
+                <!-- Name Input -->
+                <div class="payto-row">
+                  <div class="payto-label-pill">Name</div>
+                  <div class="payto-input-pill">
+                    <input type="text" placeholder="Full Name" [value]="paytoName()" (input)="paytoName.set($any($event.target).value)">
+                  </div>
+                </div>
+
+                <div class="payto-row">
+                  <!-- Mobile/PayID Input -->
+                  <div class="payto-label-pill">Mobile</div>
+                  <div class="payto-input-pill" [class.error-border]="paytoValidationMessage()">
+                    <input type="text" placeholder="0123456789" [value]="paytoMobile()" (input)="validateMobile($any($event.target).value)">
+                  </div>
+                </div>
+
+                <div *ngIf="paytoValidationMessage()" class="validation-message-bar fade-in">
+                  {{ paytoValidationMessage() }}
+                </div>
+
+                <div class="payto-row">
+                  <!-- Email Input -->
+                  <div class="payto-label-pill">Email</div>
+                  <div class="payto-input-pill email-wrap">
+                    <input type="email" placeholder="example@gmail.com" [value]="paytoEmail()" (input)="paytoEmail.set($any($event.target).value)">
+                  </div>
+                </div>
+              </div>
+
+              <div class="bank-logos-footer">
+                <img src="/ANZ.png" alt="ANZ">
+                <img src="/Commonwealth.png" alt="CBA">
+                <img src="/Westpac.png" alt="Westpac">
+                <img src="/NAB.png" alt="NAB">
               </div>
             </div>
-            <div class="input-group">
-              <label>EMAIL ADDRESS</label>
-              <div class="icon-input has-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                <input type="email" placeholder="john@example.com" (input)="paytoEmail.set($any($event.target).value)">
+
+            <div *ngIf="paytoState() === 'authorizing'" class="payto-authorizing-overlay fade-in">
+              <div class="auth-spinner-wrap">
+                <div class="payto-custom-spinner logo-loader">
+                  <img src="https://backend.kuberfinancial.com.au/tableQR/assets/images/kuber-samal-logo.svg" alt="Loading...">
+                </div>
+                <h3>Authorizing payment...</h3>
               </div>
             </div>
-            <div class="input-group">
-              <label>PAYID (EMAIL OR PHONE)</label>
-              <div class="icon-input has-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                <input type="text" placeholder="your@payid.com" (input)="paytoID.set($any($event.target).value)">
+
+            
+            <!-- Payload State: Waiting for Approval -->
+            <div *ngIf="paytoState() === 'waiting'" class="payto-waiting-view fade-in">
+              <div class="waiting-header">
+                <h3>How to Approve Your One-Time Payment</h3>
+                <div class="timer-display" [class.timer-low]="paytoTimerValue() < 60">
+                  {{ formatTimer(paytoTimerValue()) }}
+                </div>
+                <button class="cancel-x-btn" (click)="showCancelConfirm.set(true)">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="20"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+              </div>
+
+              <p class="instruction-main">Open your banking app and search for "PAY-TO" in the app.</p>
+              
+              <ol class="steps-list">
+                <li>Locate the payment request from <strong>{{ merchantName() || 'The Merchant' }}</strong> for <strong>{{ totalAmount() | currency }}</strong>.</li>
+                <li>Approve the PayTo agreement to authorize the payment.</li>
+                <li>Return to this screen  your payment status will update to Success or Failed automatically.</li>
+              </ol>
+
+              <div class="info-note-box">
+                Note: Different banking apps may have PayTo in different sections. If you can't find it, try searching "PAY-TO" in your banking app.
               </div>
             </div>
-            <div class="glass p-4 rounded-xl mb-6" style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2); border-radius: 12px; padding: 16px; margin-bottom: 24px; display:flex; align-items:center; gap: 12px;">
-              <div class="w-8 h-8 rounded-full bg-[#10b981] flex items-center justify-center" style="width:32px; height:32px; background:#10b981; border-radius:50%; display:flex; align-items:center; justify-content:center;">
-                <svg viewBox="0 0 20 20" fill="none" width="16" stroke="white" stroke-width="2"><path d="M14 10h-8M10 4l6 6-6 6"/></svg>
-              </div>
-              <div>
-                <h4 style="margin:0; font-size:14px; font-weight:700; color:white;">Real-time authorization</h4>
-                <p style="margin:0; font-size:12px; color:rgba(255,255,255,0.6);">Direct debit with instant confirmation via PayID</p>
+
+            <!-- Cancel Confirmation Dialog -->
+            <div *ngIf="showCancelConfirm()" class="modal-backdrop fade-in" (click)="showCancelConfirm.set(false)">
+              <div class="cancel-modal" (click)="$event.stopPropagation()">
+                <h2 class="cancel-modal-title">CANCEL PAYMENT REQUEST?</h2>
+                <p class="cancel-modal-desc">Are you sure you want to cancel this payment request? This action cannot be undone.</p>
+                <div class="cancel-modal-actions">
+                  <button class="btn-confirm-cancel" (click)="confirmCancel()">Yes, Cancel</button>
+                  <button class="btn-continue" (click)="showCancelConfirm.set(false)">No, Continue</button>
+                </div>
               </div>
             </div>
           </div>
@@ -221,7 +293,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
           </ng-container>
           <div class="spinner" *ngIf="isProcessing()"></div>
         </button>
-        <p class="cta-note" style="margin-top:16px;">0% interest • No hidden fees • Approval in seconds</p>
+        <!-- <p class="cta-note" style="margin-top:16px;">0% interest • No hidden fees • Approval in seconds</p> -->
       </div>
 
       <div class="order-summary" [class.invoice-mode]="isInvoice()">
@@ -383,203 +455,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
       </div>
     </div>
   `,
-  styles: [`
-    .sidebar-root { width: 100%; display: flex; flex-direction: column; gap: 24px; position: relative; }
-    .toast-overlay {
-      position: fixed;
-      top: 24px;
-      right: 24px;
-      z-index: 9999;
-      pointer-events: none;
-    }
-    .toast-card {
-      background: rgba(16, 185, 129, 0.9);
-      backdrop-filter: blur(8px);
-      color: white;
-      padding: 12px 24px;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      font-weight: 500;
-      font-size: 14px;
-    }
-
-    .fade-in {
-      animation: fadeIn 0.4s ease-out forwards;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .step-text { font-size: 14px; font-weight: 500; display: none; }
-    @media (min-width: 640px) { .step-text { display: inline; } }
-    .steps-bar { display: flex; align-items: center; justify-content: center; margin-bottom: 32px; }
-    .step-pill { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 9999px; font-size: 14px; font-weight: 500; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-secondary); }
-    .step-pill.active { background: rgba(16, 185, 129, 0.2); border-color: transparent; color: var(--brand-green); }
-    .step-line { width: 32px; height: 2px; margin: 0 8px; background: var(--text-secondary); opacity: 0.3; }
-    @media (max-width: 1300px) and (min-width: 860px) { .method-tabs { gap: 4px; } .tab-name { font-size: 8.5px; } .tab-icon { width: 16px; height: 16px; min-width: 16px; } .method-tab { padding: 8px 4px; } }
-    @media (max-width: 860px) { .sidebar-root { padding: 12px 10px 10px; } }
-    .method-tabs-section { margin-bottom: 24px; }
-    .method-tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; width: 100%; box-sizing: border-box; }
-    .method-tab { width: 100%; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); background: rgba(15, 23, 42, 0.4); color: #94a3b8; transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); cursor: pointer; position: relative; overflow: visible; }
-    .method-tab:hover { background: color-mix(in srgb, var(--m-color) 12%, rgba(15, 23, 42, 0.4)); border-color: color-mix(in srgb, var(--m-color) 50%, transparent); color: var(--m-color); transform: none; }
-    .method-tab.selected { background: color-mix(in srgb, var(--m-color) 15%, rgba(15, 23, 42, 0.4)); border-color: color-mix(in srgb, var(--m-color) 60%, transparent); box-shadow: 0 0 16px -2px color-mix(in srgb, var(--m-color) 30%, transparent); color: var(--m-color); transform: none; }
-    .tab-icon { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin-bottom: 2px; transition: transform 2.5s cubic-bezier(0.19, 1, 0.22, 1); will-change: transform; }
-    .method-tab:active .tab-icon { transform: rotate(-70deg) scale(1.8); }
-    .method-tab:active { transform: none; }
-    .tab-name { font-size: 10px; font-weight: 600; text-align: center; width: 100%; }
-    .net-icons { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 8px; }
-    .mc, .net-icons svg { opacity: 0.2; transition: opacity 0.3s ease; }
-    .active-net { opacity: 1 !important; }
-    .input-group label { display: block; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 10px; }
-    .icon-input input { position: relative; width: 100%; padding: 16px 18px !important; border-radius: 12px !important; background: rgba(15, 23, 42, 0.5) !important; border: 1px solid var(--glass-border) !important; color: var(--text-primary) !important; font-size: 15px !important; }
-    .icon-input svg { position: absolute; left: 16px; pointer-events: none; color: var(--text-secondary); }
-    .icon-input.has-icon input { padding-left: 48px !important; }
-    .pay-btn { width: 100% !important; padding: 14px !important; border-radius: 12px !important; font-size: 16px !important; font-weight: 600 !important; margin-top: 10px; }
-    .order-summary { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; overflow: hidden; }
-    .summary-header { padding: 14px !important; display: flex; justify-content: space-between; align-items: center; width: 100%; background: none; border: none; cursor: pointer; }
-    .sh-left { display: flex; align-items: center; gap: 12px; }
-    .bag-icon-wrap { width: 40px; height: 40px; border-radius: 12px; background: rgba(255, 255, 255, 0.05); color: #94a3b8; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
-    .sh-title { font-size: 14px; font-weight: 600; color: #f8fafc; text-align: left; }
-    .sh-items { font-size: 11px; color: #64748b; text-align: left; margin-top: 1px; }
-    .sh-right { display: flex; align-items: center; gap: 8px; }
-    .sh-total { font-size: 15px; font-weight: 700; color: #f8fafc; }
-    .chev { color: #475569; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    .chev.open { transform: rotate(180deg); }
-    
-    .tab-sub { display: none; }
-    @media (max-width: 860px) { .sidebar-root { padding: 12px 10px 10px; } }
-    
-    .item-row { padding: 12px 14px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .item-icon-wrap { width: 36px; height: 36px; border-radius: 10px; background: rgba(16, 185, 129, 0.1); color: #10b981; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .item-body { flex: 1; min-width: 0; }
-    .item-name { font-size: 13px; font-weight: 600; color: #f8fafc; margin-bottom: 2px; }
-    .item-desc { font-size: 11px; color: #94a3b8; line-height: 1.4; white-space: pre-line; }
-    .item-qty { font-size: 10px; color: var(--brand-green); font-weight: 500; margin-top: 4px; }
-    .item-price { font-size: 13px; font-weight: 600; color: #f8fafc; }
-    
-    .breakdown { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .br-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #94a3b8; }
-    .with-icon { display: flex; align-items: center; gap: 6px; }
-    .green { color: #10b981 !important; }
-    .discount-row { background: rgba(16, 185, 129, 0.05); margin: 0 -4px; padding: 4px 18px; border-radius: 6px; }
-    
-    .promo-row { padding: 16px 14px; display: flex; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .promo-input { flex: 1; background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 8px 12px; font-size: 13px; color: #fff; }
-    .apply-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0 16px; font-size: 13px; font-weight: 500; color: #fff; transition: all 0.2s; }
-    .apply-btn:hover { background: rgba(255,255,255,0.1); }
-    
-    .total-row { padding: 20px 14px; display: flex; justify-content: space-between; align-items: center; background: rgba(16, 185, 129, 0.02); }
-    .total-label { font-size: 15px; font-weight: 600; color: #f8fafc; }
-    .gst-note { font-size: 11px; color: #64748b; margin-top: 2px; }
-    .total-price { font-size: 20px; font-weight: 700; color: #10b981; }
-    
-    .trust-row { padding: 16px; display: flex; justify-content: center; align-items: center; gap: 12px; background: rgba(15, 23, 42, 0.2); }
-    .trust-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #64748b; font-weight: 500; }
-    .trust-sep { color: rgba(255,255,255,0.1); }
-    
-    .upi-qr-scan-area { background: rgba(15, 23, 42, 0.3); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; padding: 32px 24px; display: flex; flex-direction: column; align-items: center; gap: 20px; margin-top: 10px; transition: all 0.5s ease; }
-    .qr-main-box { width: 140px; height: 140px; background: #ffffff; border-radius: 18px; position: relative; padding: 12px; box-shadow: 0 0 40px rgba(0, 0, 0, 0.4); }
-    .qr-grid-overlay { width: 100%; height: 100%; display: flex; flex-direction: column; gap: 1px; border: 2px solid #000000; border-radius: 8px; background: #000000; overflow: hidden; }
-    .grid-row { flex: 1; display: flex; gap: 1px; }
-    .grid-row span { flex: 1; background: #ffffff; }
-    .qr-helper-text { color: rgba(255, 255, 255, 0.5); font-size: 13px; font-weight: 500; text-align: center; margin: 0; }
-    .skeleton-line {
-      background: rgba(255, 255, 255, 0.05);
-      background: linear-gradient(90deg, 
-        rgba(255, 255, 255, 0.05) 25%, 
-        rgba(255, 255, 255, 0.1) 50%, 
-        rgba(255, 255, 255, 0.05) 75%
-      );
-      background-size: 200% 100%;
-      animation: skeleton-loading 1.5s infinite;
-    }
-    @keyframes skeleton-loading {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-    .invoice-content { 
-      padding: 32px; 
-      color: #334155; 
-      background: #ffffff; 
-      border-radius: 20px;
-      margin: 12px;
-      font-family: 'Inter', sans-serif;
-    }
-    .invoice-main-title { 
-      font-size: 24px; 
-      font-weight: 800; 
-      text-align: center; 
-      margin-bottom: 32px; 
-      letter-spacing: 0.05em; 
-      color: #1e293b;
-      text-transform: uppercase;
-    }
-    .invoice-meta-grid { 
-      display: grid; 
-      grid-template-columns: 80px 1fr; 
-      gap: 12px 24px; 
-      margin-bottom: 40px; 
-    }
-    .meta-item { display: contents; }
-    .meta-label { font-size: 14px; color: #1e293b; font-weight: 500; }
-    .meta-value { font-size: 14px; font-weight: 400; color: #334155; }
-    .meta-value.multi { line-height: 1.5; }
-    
-    .invoice-table-container { margin-bottom: 0; }
-    .invoice-table { width: 100%; border-collapse: collapse; }
-    .invoice-table th { 
-      padding: 12px 4px; 
-      border-bottom: 1.5px solid #1e293b; 
-      font-size: 15px; 
-      color: #1e293b; 
-      font-weight: 700; 
-    }
-    .invoice-table td { 
-      padding: 12px 4px; 
-      font-size: 14px; 
-      color: #475569;
-      vertical-align: top;
-    }
-    .item-name-td { width: 45%; line-height: 1.4; }
-    .text-left { text-align: left; }
-    .text-right { text-align: right; }
-    .text-center { text-align: center; }
-
-    .invoice-calc-footer { 
-      display: flex; 
-      flex-direction: column; 
-      padding-top: 12px; 
-      border-top: 1.5px solid #1e293b; 
-    }
-    .calc-row { 
-      display: grid; 
-      grid-template-columns: 1fr 100px; 
-      gap: 20px; 
-      padding: 8px 4px;
-      font-size: 14px; 
-    }
-    .calc-label { color: #1e293b; font-weight: 500; text-align: left; }
-    .calc-value { color: #1e293b; font-weight: 400; text-align: right; }
-    .pink-text { color: #e11d48 !important; }
-    
-    .calc-total-row { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      margin-top: 8px; 
-      padding: 16px 4px; 
-      border-top: 1.5px solid #1e293b; 
-    }
-    .total-text { font-size: 15px; font-weight: 500; color: #1e293b; }
-    .total-val { font-size: 18px; font-weight: 600; color: #1e293b; }
-
-    .invoice-icon { background: rgba(16,185,129,0.1); color: #10b981; }
-    .order-summary.invoice-mode { border: 1px solid rgba(255,255,255,0.1); background: rgba(15, 23, 42, 0.4); }
-  `]
+  styleUrl: './payment-card.component.css'
 })
 export class PaymentCardComponent implements OnInit, AfterViewInit {
   @ViewChild('tabsContainer') tabsContainer!: ElementRef;
@@ -606,6 +482,12 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   paytoEmail = signal('');
   paytoName = signal('');
   paytoID = signal('');
+  paytoMobile = signal('');
+  paytoValidationMessage = signal('');
+  paytoState = signal<'input' | 'authorizing' | 'waiting'>('input');
+  paytoTimerValue = signal(300);
+  showCancelConfirm = signal(false);
+  private timerInterval: any;
 
   isInvoice = signal(false);
   invoiceNo = signal('');
@@ -768,6 +650,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       this.useBackend = !!this.paymentId;
 
       this.startApiFlow();
+      this.restorePayToState();
     });
 
     try {
@@ -780,6 +663,66 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   showToast(message: string) {
     this.toastMessage.set(message);
     setTimeout(() => this.toastMessage.set(''), 4000);
+  }
+
+  validateMobile(val: string) {
+    this.paytoMobile.set(val);
+    this.paytoValidationMessage.set('');
+  }
+
+  formatTimer(seconds: number): string {
+    const min = Math.floor(seconds / 60);
+    const sec = seconds % 60;
+    return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+  }
+
+  startTimer() {
+    this.clearTimer();
+    const endTime = Date.now() + this.paytoTimerValue() * 1000;
+    localStorage.setItem('payto_timer_end', endTime.toString());
+    localStorage.setItem('payto_state', 'waiting');
+
+    this.timerInterval = setInterval(() => {
+      const remaining = Math.round((endTime - Date.now()) / 1000);
+      if (remaining <= 0) {
+        this.paytoTimerValue.set(0);
+        this.clearTimer();
+        this.confirmCancel(true);
+      } else {
+        this.paytoTimerValue.set(remaining);
+      }
+    }, 1000);
+  }
+
+  clearTimer() {
+    if (this.timerInterval) clearInterval(this.timerInterval);
+    localStorage.removeItem('payto_timer_end');
+    localStorage.removeItem('payto_state');
+  }
+
+  restorePayToState() {
+    const savedState = localStorage.getItem('payto_state');
+    const timerEnd = localStorage.getItem('payto_timer_end');
+
+    if (savedState === 'waiting' && timerEnd) {
+      const remaining = Math.round((parseInt(timerEnd) - Date.now()) / 1000);
+      if (remaining > 0) {
+        this.selectedMethod.set('payto');
+        this.paytoState.set('waiting');
+        this.paytoTimerValue.set(remaining);
+        this.startTimer();
+      } else {
+        localStorage.removeItem('payto_state');
+        localStorage.removeItem('payto_timer_end');
+      }
+    }
+  }
+
+  confirmCancel(isTimeout = false) {
+    this.clearTimer();
+    this.showCancelConfirm.set(false);
+    this.paytoState.set('input');
+    this.showToast(isTimeout ? "Payment Timeout" : "Payment Failed");
   }
 
   private generateDeviceId(length = 16): string {
@@ -925,7 +868,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
 
     const current = this.selectedMethod();
     const isAvailable = this.methods.find(m => m.id === current);
-    
+
     if (!isAvailable) {
       this.selectMethod(this.methods[0]?.id || 'card');
     } else if (this.isStripeMethod()) {
@@ -1153,7 +1096,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     const method = this.selectedMethod();
     const amountStr = this.totalAmount().toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 
-    if (method === 'payto') return `Authorize ${amountStr}`;
+    if (method === 'payto') return `Pay ${amountStr}`;
     if (method === 'zip') return 'Continue with Zip';
     if (method === 'afterpay') return 'Continue with Afterpay';
     if (method === 'klarna') return 'Pay first instalment';
@@ -1258,63 +1201,45 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     this.isProcessing.set(true);
 
     if (this.selectedMethod() === 'payto') {
+      if (!this.paytoMobile() || !this.paytoName() || !this.paytoEmail()) {
+        this.showToast("Please fill in all fields");
+        this.isProcessing.set(false);
+        return;
+      }
+
+      this.paytoState.set('authorizing');
+
       try {
-        console.log("[PayTo] Creating customer...");
-        const customerResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/customers", {
+        const response = await fetch("https://backend.kuberfinancial.com.au/api/payments/intiatePayTo", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "access_token": this.accessToken,
+            "deviceid": this.deviceId
+          },
           body: JSON.stringify({
+            orderID: this.orderID,
             email: this.paytoEmail(),
-            name: this.paytoName()
-          })
-        });
-        const customerData = await customerResponse.json();
-        const customerId = customerData.id;
-
-        console.log("[PayTo] Creating payment...");
-        const paymentResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/createPayToPayment", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            customerId: customerId,
-            amount: this.totalAmount()
-          })
-        });
-        const paymentData = await paymentResponse.json();
-        const clientSecret = paymentData.clientSecret;
-
-        console.log("[PayTo] Confirming payment via Backend...");
-        const confirmResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/confirmPayToPayment", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            paymentIntentId: clientSecret,
             name: this.paytoName(),
-            email: this.paytoEmail(),
-            pay_id: this.paytoID()
+            payId: this.paytoMobile()
           })
         });
 
-        if (confirmResponse.ok) {
-          const confirmData = await confirmResponse.json();
-          console.log("PayTo confirmation response:", confirmData);
-          this.checkPaymentStatus();
-        } else {
-          try {
-            const errorData = await confirmResponse.json();
-            console.error("Confirmation error:", errorData);
-            this.showToast(errorData.message || "Failed to confirm PayTo payment");
-          } catch (e) {
-            console.error("Confirmation error status:", confirmResponse.status);
-            this.showToast("Failed to confirm PayTo payment");
-          }
-          setTimeout(() => {
-            window.location.reload();
-          }, 3000);
-          this.isProcessing.set(false);
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
         }
+
+        setTimeout(() => {
+          this.paytoState.set('waiting');
+          this.paytoTimerValue.set(300);
+          this.startTimer();
+          this.isProcessing.set(false);
+        }, 1500);
+
       } catch (err: any) {
-        console.error("PayTo Error:", err);
+        console.error("PayTo API Error:", err);
+        this.showToast("PayTo initialization failed");
+        this.paytoState.set('input');
         this.isProcessing.set(false);
       }
       return;

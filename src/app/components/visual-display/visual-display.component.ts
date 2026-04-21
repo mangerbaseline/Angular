@@ -159,7 +159,7 @@ import { CommonModule } from '@angular/common';
               <span class="node-label">Merchant</span>
             </div>
           </div>
-          <div class="payto-pill" style="background: white; padding: 12px 24px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+          <div class="payto-pill" style="background: linear-gradient(      to right,      #06b6d4,      #3b82f6); padding: 0px 24px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
             <img src="payto-logo.png" style="height: 40px; width: auto; object-fit: contain;">
           </div>
         </div>
