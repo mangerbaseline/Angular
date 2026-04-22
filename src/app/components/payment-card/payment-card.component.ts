@@ -138,7 +138,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
               <div class="payto-header-row">
                 <h2 class="payto-main-title">Pay by Bank</h2>
                 <div class="payto-logos-top">
-                  <img src="https://backend.kuberfinancial.com.au/tableQR/assets/images/kuber-samal-logo.svg" style="height:15px; object-fit:contain; filter: brightness(0) invert(1);">
+                  <img src="https://www.kuberfinancial.com.au/tableQR/assets/images/kuber-samal-logo.svg" style="height:15px; object-fit:contain; filter: brightness(0) invert(1);">
                   <img src="/payto-logo.png" style="height:25px; object-fit:contain;">
                 </div>
               </div>
@@ -191,7 +191,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
             <div *ngIf="paytoState() === 'authorizing'" class="payto-authorizing-overlay fade-in">
               <div class="auth-spinner-wrap">
                 <div class="payto-custom-spinner logo-loader">
-                  <img src="https://backend.kuberfinancial.com.au/tableQR/assets/images/kuber-samal-logo.svg" alt="Loading...">
+                  <img src="https://www.kuberfinancial.com.au/tableQR/assets/images/kuber-samal-logo.svg" alt="Loading...">
                 </div>
                 <h3>Authorizing payment...</h3>
               </div>
@@ -1116,7 +1116,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   //   if (this.selectedMethod() === 'payto') {
   //     try {
   //       console.log("[PayTo] Creating customer...");
-  //       const customerResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/customers", {
+  //       const customerResponse = await fetch("https://www.kuberfinancial.com.au/api/payments/customers", {
   //         method: "POST",
   //         headers: { "Content-Type": "application/json" },
   //         body: JSON.stringify({
@@ -1128,7 +1128,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   //       const customerId = customerData.id;
 
   //       console.log("[PayTo] Creating payment...");
-  //       const paymentResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/createPayToPayment", {
+  //       const paymentResponse = await fetch("https://www.kuberfinancial.com.au/api/payments/createPayToPayment", {
   //         method: "POST",
   //         headers: { "Content-Type": "application/json" },
   //         body: JSON.stringify({
@@ -1140,7 +1140,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   //       const clientSecret = paymentData.clientSecret;
 
   //       console.log("[PayTo] Confirming payment via Backend...");
-  //       const confirmResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/confirmPayToPayment", {
+  //       const confirmResponse = await fetch("https://www.kuberfinancial.com.au/api/payments/confirmPayToPayment", {
   //         method: "POST",
   //         headers: { "Content-Type": "application/json" },
   //         body: JSON.stringify({
@@ -1210,7 +1210,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       this.paytoState.set('authorizing');
 
       try {
-        const response = await fetch("https://backend.kuberfinancial.com.au/api/payments/intiatePayTo", {
+        const response = await fetch("https://www.kuberfinancial.com.au/api/payments/intiatePayTo", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
