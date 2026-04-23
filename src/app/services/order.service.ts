@@ -9,11 +9,11 @@ export class OrderService {
   private http = inject(HttpClient);
 
   // Base URLs
-  // private wwwApi = 'https://www.kuberfinancial.com.au/api';
+  // private wwwApi = 'https://backend.kuberfinancial.com.au/api';
 
-  private wwwApi = 'https://www.kuberfinancial.com.au/api';
+  private wwwApi = 'https://backend.kuberfinancial.com.au/api';
 
-  private backendApi = 'https://www.kuberfinancial.com.au/api';
+  private backendApi = 'https://backend.kuberfinancial.com.au/api';
 
   // Shared state 
   totalAmount = signal(0);
@@ -67,6 +67,15 @@ export class OrderService {
       'Content-Type': 'application/json'
     });
     return this.http.post(`${this.backendApi}/payments/createPaymentSession`, { orderID, paymentType }, { headers });
+  }
+
+  cancelPaymentRequest(token: string, deviceId: string, orderID: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'access_token': token,
+      'deviceid': deviceId,
+      'Content-Type': 'application/json'
+    });
+    return this.http.post(`${this.backendApi}/payments/cancelPaymentRequest`, { orderID }, { headers });
   }
 }
 

@@ -138,7 +138,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
               <div class="payto-header-row">
                 <h2 class="payto-main-title">Pay by Bank</h2>
                 <div class="payto-logos-top">
-                  <img src="https://www.kuberfinancial.com.au/tableQR/assets/images/kuber-samal-logo.svg" style="height:15px; object-fit:contain; filter: brightness(0) invert(1);">
+                  <img src="https://backend.kuberfinancial.com.au/tableQR/assets/images/kuber-samal-logo.svg" style="height:15px; object-fit:contain; filter: brightness(0) invert(1);">
                   <img src="/payto-logo.png" style="height:25px; object-fit:contain;">
                 </div>
               </div>
@@ -147,7 +147,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
               </p>
 
               <div class="payid-banner">
-                <img src="/Payid.png" alt="PayID" style="height: 26px; object-fit: contain; filter: invert(1); mix-blend-mode: screen;">
+                <img src="/Payid.png" alt="PayID" style="height: 26px; object-fit: contain; mix-blend-mode: screen;">
               </div>
 
               <div class="payto-input-section">
@@ -191,7 +191,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
             <div *ngIf="paytoState() === 'authorizing'" class="payto-authorizing-overlay fade-in">
               <div class="auth-spinner-wrap">
                 <div class="payto-custom-spinner logo-loader">
-                  <img src="https://www.kuberfinancial.com.au/tableQR/assets/images/kuber-samal-logo.svg" alt="Loading...">
+                  <img src="https://backend.kuberfinancial.com.au/tableQR/assets/images/kuber-samal-logo.svg" alt="Loading...">
                 </div>
                 <h3>Authorizing payment...</h3>
               </div>
@@ -223,6 +223,29 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
               </div>
             </div>
 
+            <!-- Payload State: Failed -->
+            <div *ngIf="paytoState() === 'failed'" class="payto-waiting-view fade-in" style="text-align: center; padding: 40px 20px;">
+              <div style="margin-bottom: 24px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" width="64" style="margin: 0 auto;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              </div>
+              <h3 style="color: #fff; font-size: 20px; margin-bottom: 12px;">Payment Failed</h3>
+              <p style="color: rgba(255,255,255,0.6); margin-bottom: 32px;">The payment request was unsuccessful or has timed out. Please try again.</p>
+              <button class="pay-btn" (click)="paytoState.set('input')" style="max-width: 200px; margin: 0 auto;">Try Again</button>
+            </div>
+
+            <!-- Payload State: Success -->
+            <div *ngIf="paytoState() === 'success'" class="payto-waiting-view fade-in" style="text-align: center; padding: 40px 20px;">
+              <div style="margin-bottom: 24px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" width="64" style="margin: 0 auto;">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+              </div>
+              <h3 style="color: #fff; font-size: 20px; margin-bottom: 12px;">Payment Successful!</h3>
+              <p style="color: rgba(255,255,255,0.6); margin-bottom: 32px;">Redirecting you in 60 seconds... Please check the console for the API payload.</p>
+              <div class="spinner" style="margin: 0 auto;"></div>
+            </div>
+
             <!-- Cancel Confirmation Dialog -->
             <div *ngIf="showCancelConfirm()" class="modal-backdrop fade-in" (click)="showCancelConfirm.set(false)">
               <div class="cancel-modal" (click)="$event.stopPropagation()">
@@ -239,25 +262,25 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
             <h2 class="brand-title zip-c">zip</h2>
             <h3 class="form-title">Buy now, pay later</h3>
             <p class="form-text">Split your purchase into easy instalments. You'll be redirected to Zip to complete.</p>
-            <div class="status-badge">
+            <!-- <div class="status-badge">
               <span class="dot"></span> No impact on your credit score
-            </div>
+            </div> -->
           </div>
           <div *ngSwitchCase="'afterpay'" class="wallet-form fade-in">
             <h2 class="brand-title ap-c">afterpay</h2>
             <h3 class="form-title">Buy now, pay later</h3>
             <p class="form-text">Shop now and pay over time. You'll be redirected to Afterpay to set up your plan.</p>
-            <div class="status-badge">
+            <!-- <div class="status-badge">
               <span class="dot"></span> No impact on your credit score
-            </div>
+            </div> -->
           </div>
           <div *ngSwitchCase="'klarna'" class="wallet-form fade-in">
             <h2 class="brand-title kl-c">Klarna<span>.</span></h2>
             <h3 class="form-title">Flexible payment options</h3>
             <p class="form-text">Choose how you want to pay — now, later, or in slices. You'll be redirected to Klarna.</p>
-            <div class="status-badge">
+            <!-- <div class="status-badge">
               <span class="dot"></span> No impact on your credit score
-            </div>
+            </div> -->
           </div>
           <div *ngSwitchCase="'link'" class="wallet-form fade-in">
             <div class="wallet-card">
@@ -484,8 +507,8 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   paytoID = signal('');
   paytoMobile = signal('');
   paytoValidationMessage = signal('');
-  paytoState = signal<'input' | 'authorizing' | 'waiting'>('input');
-  paytoTimerValue = signal(300);
+  paytoState = signal<'input' | 'authorizing' | 'waiting' | 'failed' | 'success'>('input');
+  paytoTimerValue = signal(180);
   showCancelConfirm = signal(false);
   private timerInterval: any;
 
@@ -654,7 +677,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     });
 
     try {
-      this.stripe = Stripe("pk_live_51Q0xUnBrVsb68zkxIAj8YuXcN6nXJlyUKJyNHdek85ZZ6qrFiEC293Qz83hnvmwxV1tySjDFNile7X83yoQq5NNC00GbCsdGNJ");
+      this.stripe = Stripe("pk_test_51Q0xUnBrVsb68zkxVIQXjAHQqONjjk6jyFoE9HQ7zIn44MszuDGs6QT97k6QKQhNUfs7b54dVTV6A6tumWvD3nU200nU1Q1Yel");
     } catch (e) {
       console.error("Stripe.js not loaded", e);
     }
@@ -684,6 +707,12 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
 
     this.timerInterval = setInterval(() => {
       const remaining = Math.round((endTime - Date.now()) / 1000);
+
+      // Polling every 10 seconds
+      if (remaining > 0 && remaining < 180 && (180 - remaining) % 10 === 0) {
+        this.checkPayToStatus();
+      }
+
       if (remaining <= 0) {
         this.paytoTimerValue.set(0);
         this.clearTimer();
@@ -692,6 +721,32 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
         this.paytoTimerValue.set(remaining);
       }
     }, 1000);
+  }
+
+  checkPayToStatus() {
+    this.orderService.getPaymentStatus(this.accessToken, this.deviceId, this.orderID).subscribe({
+      next: (res) => {
+        console.log("PayTo Polling Status Payload:", res);
+        if (res.status === 'Success') {
+          this.clearTimer();
+          this.paytoState.set('success');
+          this.showToast("Payment Successful! Redirecting in 60s...");
+
+          setTimeout(() => {
+            if (res.redirectURL) {
+              window.location.href = res.redirectURL;
+            } else {
+              this.paymentSuccess.emit();
+            }
+          }, 60000);
+        } else if (res.status === 'Failed') {
+          this.clearTimer();
+          this.showToast("Payment Failed");
+          this.paytoState.set('failed');
+        }
+      },
+      error: (err) => console.error("Error polling PayTo status:", err)
+    });
   }
 
   clearTimer() {
@@ -719,9 +774,15 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   }
 
   confirmCancel(isTimeout = false) {
+    if (isTimeout) {
+      this.orderService.cancelPaymentRequest(this.accessToken, this.deviceId, this.orderID).subscribe({
+        next: (res) => console.log("Payment canceled due to timeout", res),
+        error: (err) => console.error("Error canceling payment", err)
+      });
+    }
     this.clearTimer();
     this.showCancelConfirm.set(false);
-    this.paytoState.set('input');
+    this.paytoState.set(isTimeout ? 'failed' : 'input');
     this.showToast(isTimeout ? "Payment Timeout" : "Payment Failed");
   }
 
@@ -1116,7 +1177,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   //   if (this.selectedMethod() === 'payto') {
   //     try {
   //       console.log("[PayTo] Creating customer...");
-  //       const customerResponse = await fetch("https://www.kuberfinancial.com.au/api/payments/customers", {
+  //       const customerResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/customers", {
   //         method: "POST",
   //         headers: { "Content-Type": "application/json" },
   //         body: JSON.stringify({
@@ -1128,7 +1189,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   //       const customerId = customerData.id;
 
   //       console.log("[PayTo] Creating payment...");
-  //       const paymentResponse = await fetch("https://www.kuberfinancial.com.au/api/payments/createPayToPayment", {
+  //       const paymentResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/createPayToPayment", {
   //         method: "POST",
   //         headers: { "Content-Type": "application/json" },
   //         body: JSON.stringify({
@@ -1140,7 +1201,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   //       const clientSecret = paymentData.clientSecret;
 
   //       console.log("[PayTo] Confirming payment via Backend...");
-  //       const confirmResponse = await fetch("https://www.kuberfinancial.com.au/api/payments/confirmPayToPayment", {
+  //       const confirmResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/confirmPayToPayment", {
   //         method: "POST",
   //         headers: { "Content-Type": "application/json" },
   //         body: JSON.stringify({
@@ -1210,7 +1271,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       this.paytoState.set('authorizing');
 
       try {
-        const response = await fetch("https://www.kuberfinancial.com.au/api/payments/intiatePayTo", {
+        const response = await fetch("https://backend.kuberfinancial.com.au/api/payments/intiatePayTo", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -1231,7 +1292,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
 
         setTimeout(() => {
           this.paytoState.set('waiting');
-          this.paytoTimerValue.set(300);
+          this.paytoTimerValue.set(180);
           this.startTimer();
           this.isProcessing.set(false);
         }, 1500);
@@ -1281,9 +1342,16 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   checkPaymentStatus() {
     this.orderService.getPaymentStatus(this.accessToken, this.deviceId, this.orderID).subscribe({
       next: (res) => {
-        console.log("Payment status response:", res);
+        console.log("Payment Status Response Payload:", res);
         if (res.status === 'Pending' || res.status === 'Success' || res.status === 'Completed' || res.status === 'Paid') {
-          this.paymentSuccess.emit();
+          this.showToast("Payment Status: " + res.status + ". Redirecting in 60s...");
+          setTimeout(() => {
+            if (res.redirectURL) {
+              window.location.href = res.redirectURL;
+            } else {
+              this.paymentSuccess.emit();
+            }
+          }, 60000);
         } else {
           this.showToast('Payment status: ' + res.status);
           setTimeout(() => {
@@ -1295,7 +1363,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       error: (err) => {
         console.error("Error checking payment status", err);
         // Fallback to emit just in case
-        this.paymentSuccess.emit();
+        setTimeout(() => this.paymentSuccess.emit(), 60000);
         this.isProcessing.set(false);
       }
     });

@@ -189,7 +189,7 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  countdown = signal(6);
+  countdown = signal(600);
   private timer: any;
 
   ngOnInit() {
