@@ -9,11 +9,11 @@ export class OrderService {
   private http = inject(HttpClient);
 
   // Base URLs
-  // private wwwApi = 'https://backend.kuberfinancial.com.au/api';
+  // private wwwApi = 'https://www.kuberfinancial.com.au/api';
 
-  private wwwApi = 'https://backend.kuberfinancial.com.au/api';
+  private wwwApi = 'https://www.kuberfinancial.com.au/api';
 
-  private backendApi = 'https://backend.kuberfinancial.com.au/api';
+  private backendApi = 'https://www.kuberfinancial.com.au/api';
 
   // Shared state 
   totalAmount = signal(0);

@@ -41,6 +41,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
           </div>
         </div>
       </div>
+
       <div class="method-tabs-section">
         <p class="section-title">Choose payment method</p>
         <div class="method-tabs">
@@ -138,7 +139,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
               <div class="payto-header-row">
                 <h2 class="payto-main-title">Pay by Bank</h2>
                 <div class="payto-logos-top">
-                  <img src="https://backend.kuberfinancial.com.au/tableQR/assets/images/kuber-samal-logo.svg" style="height:15px; object-fit:contain; filter: brightness(0) invert(1);">
+                  <img src="https://www.kuberfinancial.com.au/tableQR/assets/images/kuber-samal-logo.svg" style="height:15px; object-fit:contain; filter: brightness(0) invert(1);">
                   <img src="/payto-logo.png" style="height:25px; object-fit:contain;">
                 </div>
               </div>
@@ -191,7 +192,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
             <div *ngIf="paytoState() === 'authorizing'" class="payto-authorizing-overlay fade-in">
               <div class="auth-spinner-wrap">
                 <div class="payto-custom-spinner logo-loader">
-                  <img src="https://backend.kuberfinancial.com.au/tableQR/assets/images/kuber-samal-logo.svg" alt="Loading...">
+                  <img src="https://www.kuberfinancial.com.au/tableQR/assets/images/kuber-samal-logo.svg" alt="Loading...">
                 </div>
                 <h3>Authorizing payment...</h3>
               </div>
@@ -229,21 +230,10 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
                 <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" width="64" style="margin: 0 auto;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
               </div>
               <h3 style="color: #fff; font-size: 20px; margin-bottom: 12px;">Payment Failed</h3>
-              <p style="color: rgba(255,255,255,0.6); margin-bottom: 32px;">The payment request was unsuccessful or has timed out. Please try again.</p>
-              <button class="pay-btn" (click)="paytoState.set('input')" style="max-width: 200px; margin: 0 auto;">Try Again</button>
-            </div>
-
-            <!-- Payload State: Success -->
-            <div *ngIf="paytoState() === 'success'" class="payto-waiting-view fade-in" style="text-align: center; padding: 40px 20px;">
-              <div style="margin-bottom: 24px;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" width="64" style="margin: 0 auto;">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                </svg>
-              </div>
-              <h3 style="color: #fff; font-size: 20px; margin-bottom: 12px;">Payment Successful!</h3>
-              <p style="color: rgba(255,255,255,0.6); margin-bottom: 32px;">Redirecting you in 60 seconds... Please check the console for the API payload.</p>
-              <div class="spinner" style="margin: 0 auto;"></div>
+              <p style="color: rgba(255,255,255,0.6); margin-bottom: 32px;">
+                The payment request was unsuccessful or has timed out. 
+              </p>
+              <!-- <button class="pay-btn" (click)="paytoState.set('input')" style="max-width: 200px; margin: 0 auto;">Try Again</button> -->
             </div>
 
             <!-- Cancel Confirmation Dialog -->
@@ -477,6 +467,21 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
         </div>
       </div>
     </div>
+
+    <div *ngIf="tokenError()" class="session-expired-container fade-in">
+      <div class="error-card">
+        <div class="error-icon-circle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" width="48" height="48">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <h2>Session Expired / Invalid URL</h2>
+        <p>The payment session is no longer active or the URL provided was incorrect. Please contact the merchant for a new payment link.</p>
+        <button class="pay-btn" onclick="window.location.reload()" style="max-width: 200px; margin: 24px auto 0;">Reload Page</button>
+      </div>
+    </div>
   `,
   styleUrl: './payment-card.component.css'
 })
@@ -507,7 +512,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   paytoID = signal('');
   paytoMobile = signal('');
   paytoValidationMessage = signal('');
-  paytoState = signal<'input' | 'authorizing' | 'waiting' | 'failed' | 'success'>('input');
+  paytoState = signal<'input' | 'authorizing' | 'waiting' | 'failed'>('input');
   paytoTimerValue = signal(180);
   showCancelConfirm = signal(false);
   private timerInterval: any;
@@ -670,6 +675,14 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
         this.orderID = params['orderId'] || '';
         this.paymentId = params['paymentId'] || '';
       }
+
+      if (!this.merId && !this.orderID && !this.paymentId) {
+        console.warn("=== NO VALID IDS FOUND in URL ===");
+        this.tokenError.set(true);
+        this.tokenErrorEvent.emit(true);
+        return;
+      }
+
       this.useBackend = !!this.paymentId;
 
       this.startApiFlow();
@@ -677,7 +690,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     });
 
     try {
-      this.stripe = Stripe("pk_test_51Q0xUnBrVsb68zkxVIQXjAHQqONjjk6jyFoE9HQ7zIn44MszuDGs6QT97k6QKQhNUfs7b54dVTV6A6tumWvD3nU200nU1Q1Yel");
+      this.stripe = Stripe("pk_live_51Q0xUnBrVsb68zkxIAj8YuXcN6nXJlyUKJyNHdek85ZZ6qrFiEC293Qz83hnvmwxV1tySjDFNile7X83yoQq5NNC00GbCsdGNJ");
     } catch (e) {
       console.error("Stripe.js not loaded", e);
     }
@@ -726,19 +739,15 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   checkPayToStatus() {
     this.orderService.getPaymentStatus(this.accessToken, this.deviceId, this.orderID).subscribe({
       next: (res) => {
-        console.log("PayTo Polling Status Payload:", res);
+        console.log("PayTo Polling Status:", res);
         if (res.status === 'Success') {
           this.clearTimer();
-          this.paytoState.set('success');
-          this.showToast("Payment Successful! Redirecting in 60s...");
-
-          setTimeout(() => {
-            if (res.redirectURL) {
-              window.location.href = res.redirectURL;
-            } else {
-              this.paymentSuccess.emit();
-            }
-          }, 60000);
+          this.showToast("Payment Successful!");
+          if (res.redirectURL) {
+            window.location.href = res.redirectURL;
+          } else {
+            this.paymentSuccess.emit();
+          }
         } else if (res.status === 'Failed') {
           this.clearTimer();
           this.showToast("Payment Failed");
@@ -779,11 +788,21 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
         next: (res) => console.log("Payment canceled due to timeout", res),
         error: (err) => console.error("Error canceling payment", err)
       });
+
+      this.clearTimer();
+      this.showCancelConfirm.set(false);
+      this.paytoState.set('failed');
+      this.showToast("Payment Failed. Redirecting...");
+
+      setTimeout(() => {
+        window.location.href = 'https://angular-livid-eight.vercel.app';
+      }, 5000);
+    } else {
+      this.clearTimer();
+      this.showCancelConfirm.set(false);
+      this.paytoState.set('input');
+      this.showToast("Payment Request Cancelled");
     }
-    this.clearTimer();
-    this.showCancelConfirm.set(false);
-    this.paytoState.set(isTimeout ? 'failed' : 'input');
-    this.showToast(isTimeout ? "Payment Timeout" : "Payment Failed");
   }
 
   private generateDeviceId(length = 16): string {
@@ -1177,7 +1196,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   //   if (this.selectedMethod() === 'payto') {
   //     try {
   //       console.log("[PayTo] Creating customer...");
-  //       const customerResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/customers", {
+  //       const customerResponse = await fetch("https://www.kuberfinancial.com.au/api/payments/customers", {
   //         method: "POST",
   //         headers: { "Content-Type": "application/json" },
   //         body: JSON.stringify({
@@ -1189,7 +1208,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   //       const customerId = customerData.id;
 
   //       console.log("[PayTo] Creating payment...");
-  //       const paymentResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/createPayToPayment", {
+  //       const paymentResponse = await fetch("https://www.kuberfinancial.com.au/api/payments/createPayToPayment", {
   //         method: "POST",
   //         headers: { "Content-Type": "application/json" },
   //         body: JSON.stringify({
@@ -1201,7 +1220,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   //       const clientSecret = paymentData.clientSecret;
 
   //       console.log("[PayTo] Confirming payment via Backend...");
-  //       const confirmResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/confirmPayToPayment", {
+  //       const confirmResponse = await fetch("https://www.kuberfinancial.com.au/api/payments/confirmPayToPayment", {
   //         method: "POST",
   //         headers: { "Content-Type": "application/json" },
   //         body: JSON.stringify({
@@ -1271,7 +1290,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       this.paytoState.set('authorizing');
 
       try {
-        const response = await fetch("https://backend.kuberfinancial.com.au/api/payments/intiatePayTo", {
+        const response = await fetch("https://www.kuberfinancial.com.au/api/payments/intiatePayTo", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -1342,9 +1361,9 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   checkPaymentStatus() {
     this.orderService.getPaymentStatus(this.accessToken, this.deviceId, this.orderID).subscribe({
       next: (res) => {
-        console.log("Payment Status Response Payload:", res);
+        console.log("Payment status response payload:", res);
         if (res.status === 'Pending' || res.status === 'Success' || res.status === 'Completed' || res.status === 'Paid') {
-          this.showToast("Payment Status: " + res.status + ". Redirecting in 60s...");
+          this.showToast("Payment status: " + res.status + ". Redirecting in 60s...");
           setTimeout(() => {
             if (res.redirectURL) {
               window.location.href = res.redirectURL;
@@ -1362,7 +1381,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       },
       error: (err) => {
         console.error("Error checking payment status", err);
-        // Fallback to emit just in case
+        // Fallback with delay
         setTimeout(() => this.paymentSuccess.emit(), 60000);
         this.isProcessing.set(false);
       }

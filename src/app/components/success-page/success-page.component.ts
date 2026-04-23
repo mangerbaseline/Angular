@@ -93,7 +93,17 @@ import * as CryptoJS from 'crypto-js';
             </div>
           </div>
           <div class="u-space-y-3 pt-2">
-            <button (click)="onReturn()" class="return-btn u-relative u-w-full py-4 px-6 u-rounded-2xl u-flex u-items-center u-justify-center u-gap-3 transition-all duration-300 overflow-hidden bg-gradient-to-r from-primary to-emerald-400 text-primary-foreground u-font-semibold shadow-lg shadow-primary-25 hover:-translate-y-0.5 hover:shadow-[0_20px_20px_rgba(16,185,129,0.5)]" tabindex="0"><div class="shine-effect"></div><span class="u-relative u-flex u-items-center u-gap-2" style="font-family: 'Inter', sans-serif;">Redirecting to {{ orderService.orderData()?.merchantData?.name || 'Shop' }} in {{ countdown() }}...<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link w-5 h-5"><path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path></svg></span></button>
+            <button *ngIf="orderService.orderData()?.url" (click)="onReturn()" class="return-btn u-relative u-w-full py-4 px-6 u-rounded-2xl u-flex u-items-center u-justify-center u-gap-3 transition-all duration-300 overflow-hidden bg-gradient-to-r from-primary to-emerald-400 text-primary-foreground u-font-semibold shadow-lg shadow-primary-25 hover:-translate-y-0.5 hover:shadow-[0_20px_20px_rgba(16,185,129,0.5)]" tabindex="0">
+              <div class="shine-effect"></div>
+              <span class="u-relative u-flex u-items-center u-gap-2" style="font-family: 'Inter', sans-serif;">
+                Redirecting to {{ orderService.orderData()?.merchantData?.name || 'Shop' }} in {{ countdown() }}...
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link w-5 h-5"><path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path></svg>
+              </span>
+            </button>
+            <div *ngIf="!orderService.orderData()?.url" class="u-w-full py-4 px-6 u-rounded-2xl u-flex u-items-center u-justify-center u-gap-3 bg-white/5 text-white/50 border border-white/10 font-semibold" style="font-family: 'Inter', sans-serif;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-check"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg>
+              Payment Confirmed Successfully
+            </div>
             <div class="u-grid u-grid-cols-3 u-gap-3">
               <button class="action-btn u-flex u-flex-col u-items-center u-gap-2 u-p-4 u-rounded-2xl bg-secondary-50 hover-bg-secondary transition-colors" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download w-5 h-5 text-primary"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg><span class="text-xs text-muted-foreground">Receipt</span></button>
               <button class="action-btn u-flex u-flex-col u-items-center u-gap-2 u-p-4 u-rounded-2xl bg-secondary-50 hover-bg-secondary transition-colors" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail w-5 h-5 text-primary"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg><span class="text-xs text-muted-foreground">Email</span></button>
@@ -258,6 +268,12 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
   }
 
   private startCountdown() {
+    const url = this.orderService.orderData()?.url;
+    if (!url || url.trim() === '') {
+      console.log("No redirect URL found, staying on success page.");
+      return;
+    }
+
     this.timer = setInterval(() => {
       this.countdown.update(v => v - 1);
       if (this.countdown() <= 0) {
@@ -269,10 +285,8 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
 
   onReturn() {
     const url = this.orderService.orderData()?.url;
-    if (url) {
+    if (url && url.trim() !== '') {
       window.location.href = url;
-    } else {
-      this.router.navigate(['/']);
     }
   }
 }
