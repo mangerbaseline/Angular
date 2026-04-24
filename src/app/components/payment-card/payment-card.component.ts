@@ -690,7 +690,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     });
 
     try {
-      this.stripe = Stripe("pk_live_51Q0xUnBrVsb68zkxIAj8YuXcN6nXJlyUKJyNHdek85ZZ6qrFiEC293Qz83hnvmwxV1tySjDFNile7X83yoQq5NNC00GbCsdGNJ");
+      this.stripe = Stripe("pk_test_51Q0xUnBrVsb68zkxVIQXjAHQqONjjk6jyFoE9HQ7zIn44MszuDGs6QT97k6QKQhNUfs7b54dVTV6A6tumWvD3nU200nU1Q1Yel");
     } catch (e) {
       console.error("Stripe.js not loaded", e);
     }
@@ -1196,7 +1196,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   //   if (this.selectedMethod() === 'payto') {
   //     try {
   //       console.log("[PayTo] Creating customer...");
-  //       const customerResponse = await fetch("https://www.kuberfinancial.com.au/api/payments/customers", {
+  //       const customerResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/customers", {
   //         method: "POST",
   //         headers: { "Content-Type": "application/json" },
   //         body: JSON.stringify({
@@ -1208,7 +1208,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   //       const customerId = customerData.id;
 
   //       console.log("[PayTo] Creating payment...");
-  //       const paymentResponse = await fetch("https://www.kuberfinancial.com.au/api/payments/createPayToPayment", {
+  //       const paymentResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/createPayToPayment", {
   //         method: "POST",
   //         headers: { "Content-Type": "application/json" },
   //         body: JSON.stringify({
@@ -1220,7 +1220,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   //       const clientSecret = paymentData.clientSecret;
 
   //       console.log("[PayTo] Confirming payment via Backend...");
-  //       const confirmResponse = await fetch("https://www.kuberfinancial.com.au/api/payments/confirmPayToPayment", {
+  //       const confirmResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/confirmPayToPayment", {
   //         method: "POST",
   //         headers: { "Content-Type": "application/json" },
   //         body: JSON.stringify({
@@ -1290,7 +1290,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       this.paytoState.set('authorizing');
 
       try {
-        const response = await fetch("https://www.kuberfinancial.com.au/api/payments/intiatePayTo", {
+        const response = await fetch("https://backend.kuberfinancial.com.au/api/payments/intiatePayTo", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
