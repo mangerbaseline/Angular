@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -8,12 +9,9 @@ import { Observable, tap } from 'rxjs';
 export class OrderService {
   private http = inject(HttpClient);
 
-  // Base URLs
-  // private wwwApi = 'https://backend.kuberfinancial.com.au/api';
-
-  private wwwApi = 'https://backend.kuberfinancial.com.au/api';
-
-  private backendApi = 'https://backend.kuberfinancial.com.au/api';
+  // Base URLs from environment
+  private wwwApi = environment.apiUrl;
+  private backendApi = environment.apiUrl;
 
   // Shared state 
   totalAmount = signal(0);

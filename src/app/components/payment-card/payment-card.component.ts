@@ -2,11 +2,13 @@ import { Component, signal, Output, EventEmitter, ViewChild, ElementRef, OnInit,
 import { ActivatedRoute } from '@angular/router';
 import { OrderService } from '../../services/order.service';
 import { ToastService } from '../../services/toast.service';
+
 import * as CryptoJS from 'crypto-js';
 
 declare var Stripe: any;
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-payment-card',
@@ -637,7 +639,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
         encPart = encPart.slice(0, -1);
       }
 
-      const key = CryptoJS.SHA256("KuberSecureKey987654321");
+      const key = CryptoJS.SHA256(environment.encryptionKey);
       const iv = CryptoJS.enc.Hex.parse(ivPart);
       const cipherParams = CryptoJS.lib.CipherParams.create({ ciphertext: CryptoJS.enc.Hex.parse(encPart) });
       const decrypted = CryptoJS.AES.decrypt(cipherParams, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
@@ -709,7 +711,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     });
 
     try {
-      this.stripe = Stripe("pk_test_51Q0xUnBrVsb68zkxVIQXjAHQqONjjk6jyFoE9HQ7zIn44MszuDGs6QT97k6QKQhNUfs7b54dVTV6A6tumWvD3nU200nU1Q1Yel");
+      this.stripe = Stripe(environment.stripeKey);
     } catch (e) {
       console.error("Stripe.js not loaded", e);
     }
@@ -813,7 +815,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       this.showToast("Payment Failed. Redirecting...", "error");
 
       setTimeout(() => {
-        window.location.href = 'https://angular-livid-eight.vercel.app';
+        window.location.href = environment.appBaseUrl;
       }, 5000);
     } else {
       this.clearTimer();
@@ -966,7 +968,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     if (this.methods.length === 0) {
       this.methods = [...this.allMethods];
     }
-    
+
     this.loadingOrder.set(false);
 
     const current = this.selectedMethod();

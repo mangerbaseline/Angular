@@ -2,7 +2,9 @@ import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { OrderService } from '../../services/order.service';
+
 import * as CryptoJS from 'crypto-js';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-success-page',
@@ -62,10 +64,9 @@ import * as CryptoJS from 'crypto-js';
                       <h3 class="u-font-semibold text-foreground">{{ item.firstName }} {{ item.lastName }}</h3>
                       <p class="text-xs text-muted-foreground">{{ item.email }}</p>
                     </div>
-                    <img *ngIf="item.profile_pic" 
-                         [src]="item.profile_pic" 
-                         class="w-10 h-10 rounded-full object-cover border border-border-30" 
-                         alt="Profile">
+                    <span class="u-text-xs u-bg-primary-10 u-text-primary px-2 py-1 rounded-lg border border-primary-20">
+                      {{ item.itemCategoryName || 'General Entry' }}
+                    </span>
                   </div>
                   <div class="u-grid u-grid-cols-1 u-gap-2 text-[11px]">
                     <div class="u-flex u-items-center u-gap-2 text-muted-foreground">
@@ -248,7 +249,7 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
       let encPart = parts[1];
       if (encPart.endsWith("=")) encPart = encPart.slice(0, -1);
 
-      const key = CryptoJS.SHA256("KuberSecureKey987654321");
+      const key = CryptoJS.SHA256(environment.encryptionKey);
       const iv = CryptoJS.enc.Hex.parse(ivPart);
       const cipherParams = CryptoJS.lib.CipherParams.create({ ciphertext: CryptoJS.enc.Hex.parse(encPart) });
       const decrypted = CryptoJS.AES.decrypt(cipherParams, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
