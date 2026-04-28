@@ -836,6 +836,14 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       next: (response) => {
         if (response && response.data) {
           const orderData = response.data;
+
+          if (orderData.paymentStatus === 'Success') {
+            console.log("=== PAYMENT ALREADY SUCCESSFUL - SHOWING EXPIRED UI ===");
+            this.orderService.isError.set(true);
+            this.orderService.isLoading.set(false);
+            return;
+          }
+
           this.handleOrderResponse(orderData);
 
           const deviceId = this.generateDeviceId();

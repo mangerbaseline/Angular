@@ -47,8 +47,14 @@ import { environment } from '../../../environments/environment';
               <div class="u-space-y-3 text-sm">
                 <div class="u-flex u-justify-between"><span class="text-muted-foreground">Transaction ID</span><button class="transaction-button u-flex u-items-center u-gap-2"><span class="text-xs">{{ orderService.orderData()?.txn_id || 'Generating...' }}</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy w-3 h-3"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div>
                 <div class="u-flex u-justify-between"><span class="text-muted-foreground">Date & Time</span><span class="text-foreground u-text-right text-xs">{{ (orderService.orderData()?.addedOn * 1000) | date:'EEEE, d MMMM yyyy at h:mm a' }}</span></div>
-                <div class="u-flex u-justify-between"><span class="text-muted-foreground">Payment Method</span><span class="text-foreground">{{ orderService.orderData()?.paymentMode || 'Stripe' }}</span></div>
-                <div class="u-flex u-justify-between"><span class="text-muted-foreground">Status</span><span class="status-primary font-medium u-flex u-items-center u-gap-1"><div class="w-2 h-2 u-rounded-full bg-primary animate-pulse"></div>{{ orderService.orderData()?.paymentStatus || 'Completed' }}</span></div>
+                <div class="u-flex u-justify-between">
+                  <span class="text-muted-foreground">Payment Method</span>
+                  <div class="u-flex u-items-center" style="gap: 8px;">
+                    <img *ngIf="getPaymentIcon()" [src]="getPaymentIcon()" style="width: 20px; height: 16px; object-fit: contain;">
+                    <span class="text-foreground">{{ orderService.orderData()?.paymentMode || 'Stripe' }}</span>
+                  </div>
+                </div>
+                <div class="u-flex u-justify-between"><span class="text-muted-foreground">Status</span><span class="status-primary font-medium u-flex u-items-center" style="gap: 10px;"><div class="w-2 h-2 u-rounded-full bg-primary animate-pulse"></div>{{ orderService.orderData()?.paymentStatus || 'Completed' }}</span></div>
               </div>
             </div>
 
@@ -89,9 +95,9 @@ import { environment } from '../../../environments/environment';
             </div>
 
             <div class="border-t border-border-50 pt-4">
-              <h2 class="text-sm font-medium text-muted-foreground mb-3" style="font-family: 'Space Grotesk', sans-serif;">Order Summary</h2>
-              <div class="u-space-y-4 text-sm pt-2 border-t border-border-30">
-                <div class="u-flex u-justify-between u-font-semibold pt-2 border-t border-border-30 pt-2"><span class="text-foreground">Total Paid</span><span class="u-text-gradient">{{ orderService.totalAmount() | currency }}</span></div>
+              <h2 class="text-sm font-medium text-muted-foreground mb-5" style="font-family: 'Space Grotesk', sans-serif;">Order Summary</h2>
+              <div class="u-space-y-4 text-sm pt-4 border-t border-border-30">
+                <div class="u-flex u-justify-between u-font-semibold pt-2"><span class="text-foreground">Total Paid</span><span class="u-text-gradient">{{ orderService.totalAmount() | currency }}</span></div>
               </div>
             </div>
           </div>
@@ -291,6 +297,22 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
     if (url && url.trim() !== '') {
       window.location.href = url;
     }
+  }
+
+  getPaymentIcon(): string {
+    const mode = (this.orderService.orderData()?.paymentMode || '').toLowerCase();
+    
+    if (mode.startsWith('pay')) return 'payto-logo.png';
+    if (mode.includes('card')) return 'mastercard.svg';
+    if (mode.includes('apple')) return 'apple-pay.svg';
+    if (mode.includes('google')) return 'google-pay.svg';
+    if (mode.includes('klarna')) return 'klarna.svg';
+    if (mode.includes('afterpay')) return 'afterpay.svg';
+    if (mode.includes('bank')) return 'bank.svg';
+    if (mode.includes('upi')) return 'upi.svg';
+    if (mode.includes('link')) return 'link-stripe.svg';
+    
+    return '';
   }
 
   async downloadReceipt() {
