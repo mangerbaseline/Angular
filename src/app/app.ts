@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd, Event } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs';
 import { BackgroundAnimationComponent } from './components/background-animation/background-animation.component';
 import { BrandHeaderComponent } from './components/brand-header/brand-header.component';
+import { ToastService } from './services/toast.service';
 
 @Component({
   selector: 'app-root',
@@ -84,6 +85,7 @@ import { BrandHeaderComponent } from './components/brand-header/brand-header.com
 export class App implements OnInit {
   title = 'angularpaymentui';
   showHeaderFooter = true;
+  toastService = inject(ToastService);
 
   constructor(private router: Router) {}
 

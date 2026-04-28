@@ -1,6 +1,7 @@
 import { Component, signal, Output, EventEmitter, ViewChild, ElementRef, OnInit, AfterViewInit, inject, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { OrderService } from '../../services/order.service';
+import { ToastService } from '../../services/toast.service';
 import * as CryptoJS from 'crypto-js';
 
 declare var Stripe: any;
@@ -13,12 +14,22 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
   imports: [CommonModule, SafeHtmlPipe, CurrencyPipe],
   template: `
     <div class="sidebar-root" *ngIf="!tokenError()">
-      <div *ngIf="toastMessage()" class="toast-overlay fade-in">
-        <div class="toast-card">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-          <span>{{ toastMessage() }}</span>
+      <!-- GLOBAL INITIALIZATION LOADER -->
+      <div *ngIf="loadingOrder()" class="global-initial-loader fade-in">
+        <div class="loader-content">
+          <div class="payto-custom-spinner logo-loader">
+             <img src="https://www.kuberfinancial.com.au/tableQR/assets/images/kuber-samal-logo.svg" alt="Loading...">
+          </div>
+          <div class="loader-text-wrap">
+            <h3>Kuber Financial</h3>
+            <p>Setting up your secure payment session...</p>
+          </div>
+          <div class="loader-progress-bar">
+            <div class="progress-fill"></div>
+          </div>
         </div>
       </div>
+
       <div class="flex items-center justify-center gap-2 mb-8" style="display:flex; justify-content:center; align-items:center; gap: 12px; margin-bottom: 32px;">
         <!-- <div style="display:flex; align-items:center;">
           <div [style.background]="isStepActive(1) ? 'rgba(16,185,129,0.2)' : 'rgba(255,255,255,0.05)'" [style.color]="isStepActive(1) ? '#10b981' : '#94a3b8'" style="display:flex; align-items:center; gap: 8px; padding: 8px 16px; border-radius: 9999px;">
@@ -43,7 +54,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
       </div>
 
       <div class="method-tabs-section">
-        <p class="section-title">Choose payment method</p>
+        <p class="section-title">{{ methods.length === 1 ? 'Payment method' : 'Choose payment method' }}</p>
         <div class="method-tabs">
           <button
             *ngFor="let m of methods"
@@ -201,6 +212,14 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
             
             <!-- Payload State: Waiting for Approval -->
             <div *ngIf="paytoState() === 'waiting'" class="payto-waiting-view fade-in">
+              <div class="waiting-active-status">
+                 <div class="active-pulse">
+                   <div class="pulse-ring"></div>
+                   <div class="pulse-dot"></div>
+                 </div>
+                 <span>Awaiting your approval...</span>
+              </div>
+
               <div class="waiting-header">
                 <h3>How to Approve Your One-Time Payment</h3>
                 <div class="timer-display" [class.timer-low]="paytoTimerValue() < 60">
@@ -302,7 +321,7 @@ import { SafeHtmlPipe } from '../../pipes/safe-html.pipe';
         <button class="pay-btn" (click)="pay()" [class.loading]="isProcessing()">
           <ng-container *ngIf="!isProcessing()">
             {{ getCTA() }}
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" width="18"><path d="M4 10h12M10 4l6 6-6 6"/></svg>
+            <svg *ngIf="getCTA() !== 'Retry'" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" width="18"><path d="M4 10h12M10 4l6 6-6 6"/></svg>
           </ng-container>
           <div class="spinner" *ngIf="isProcessing()"></div>
         </button>
@@ -528,8 +547,8 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   private orderService = inject(OrderService);
   private route = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
+  private toastService = inject(ToastService);
 
-  toastMessage = signal('');
   allMethods = [
     {
       id: 'card', name: 'Card', color: '#3b82f6',
@@ -696,9 +715,8 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     }
   }
 
-  showToast(message: string) {
-    this.toastMessage.set(message);
-    setTimeout(() => this.toastMessage.set(''), 4000);
+  showToast(message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') {
+    this.toastService.show(message, type);
   }
 
   validateMobile(val: string) {
@@ -742,7 +760,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
         console.log("PayTo Polling Status:", res);
         if (res.status === 'Success') {
           this.clearTimer();
-          this.showToast("Payment Successful!");
+          this.showToast("Payment Successful!", "success");
           if (res.redirectURL) {
             window.location.href = res.redirectURL;
           } else {
@@ -750,7 +768,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
           }
         } else if (res.status === 'Failed') {
           this.clearTimer();
-          this.showToast("Payment Failed");
+          this.showToast("Payment Failed", "error");
           this.paytoState.set('failed');
         }
       },
@@ -792,7 +810,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       this.clearTimer();
       this.showCancelConfirm.set(false);
       this.paytoState.set('failed');
-      this.showToast("Payment Failed. Redirecting...");
+      this.showToast("Payment Failed. Redirecting...", "error");
 
       setTimeout(() => {
         window.location.href = 'https://angular-livid-eight.vercel.app';
@@ -801,7 +819,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       this.clearTimer();
       this.showCancelConfirm.set(false);
       this.paytoState.set('input');
-      this.showToast("Payment Request Cancelled");
+      this.showToast("Payment Request Cancelled", "warning");
     }
   }
 
@@ -821,7 +839,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       this.orderService.checkPaymentLinkStatus(this.paymentId).subscribe({
         next: (res) => {
           if (res.success) {
-            this.showToast("Payment link is active");
+            this.showToast("Payment link is active", "info");
           }
         },
         error: (err) => console.error("Error checking payment status", err)
@@ -856,15 +874,18 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
                 });
               } else {
                 this.methods = [...this.allMethods];
+                this.loadingOrder.set(false);
               }
             },
             error: (err) => {
               console.error("Error generating token", err);
               this.methods = [...this.allMethods];
+              this.loadingOrder.set(false);
             }
           });
+        } else {
+          this.loadingOrder.set(false);
         }
-        this.loadingOrder.set(false);
       },
       error: (error) => {
         console.error('Error fetching order items:', error);
@@ -945,6 +966,8 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     if (this.methods.length === 0) {
       this.methods = [...this.allMethods];
     }
+    
+    this.loadingOrder.set(false);
 
     const current = this.selectedMethod();
     const isAvailable = this.methods.find(m => m.id === current);
@@ -1176,7 +1199,10 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     const method = this.selectedMethod();
     const amountStr = this.totalAmount().toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 
-    if (method === 'payto') return `Pay ${amountStr}`;
+    if (method === 'payto') {
+      if (this.paytoState() === 'failed') return 'Retry';
+      return `Pay ${amountStr}`;
+    }
     if (method === 'zip') return 'Continue with Zip';
     if (method === 'afterpay') return 'Continue with Afterpay';
     if (method === 'klarna') return 'Pay first instalment';
@@ -1281,8 +1307,19 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     this.isProcessing.set(true);
 
     if (this.selectedMethod() === 'payto') {
+      if (this.paytoState() === 'failed') {
+        this.paytoState.set('input');
+        this.isProcessing.set(false);
+        return;
+      }
+
+      if (this.paytoState() === 'waiting' || this.paytoState() === 'authorizing') {
+        this.isProcessing.set(false);
+        return;
+      }
+
       if (!this.paytoMobile() || !this.paytoName() || !this.paytoEmail()) {
-        this.showToast("Please fill in all fields");
+        this.showToast("Please fill in all fields", "warning");
         this.isProcessing.set(false);
         return;
       }
@@ -1318,7 +1355,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
 
       } catch (err: any) {
         console.error("PayTo API Error:", err);
-        this.showToast("PayTo initialization failed");
+        this.showToast("PayTo initialization failed", "error");
         this.paytoState.set('input');
         this.isProcessing.set(false);
       }
@@ -1339,13 +1376,16 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
 
         if (result.error) {
           console.error(result.error.message);
-          this.showToast(result.error.message);
+          this.showToast(result.error.message || "Payment Error", "error");
           setTimeout(() => {
             window.location.reload();
           }, 3000);
           this.isProcessing.set(false);
         } else {
-          this.checkPaymentStatus();
+          this.showToast("Payment Successful! Redirecting...", "success");
+          setTimeout(() => {
+            window.location.href = window.location.origin + '/success' + window.location.search;
+          }, 2000);
         }
       } catch (e) {
         console.error("Payment confirmation failed", e);
@@ -1353,39 +1393,10 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       }
     } else {
       setTimeout(() => {
-        this.checkPaymentStatus();
+        this.showToast("Payment Successful! Redirecting...", "success");
+        window.location.href = window.location.origin + '/success' + window.location.search;
       }, 2000);
     }
-  }
-
-  checkPaymentStatus() {
-    this.orderService.getPaymentStatus(this.accessToken, this.deviceId, this.orderID).subscribe({
-      next: (res) => {
-        console.log("Payment status response payload:", res);
-        if (res.status === 'Pending' || res.status === 'Success' || res.status === 'Completed' || res.status === 'Paid') {
-          this.showToast("Payment status: " + res.status + ". Redirecting in 60s...");
-          setTimeout(() => {
-            if (res.redirectURL) {
-              window.location.href = res.redirectURL;
-            } else {
-              this.paymentSuccess.emit();
-            }
-          }, 60000);
-        } else {
-          this.showToast('Payment status: ' + res.status);
-          setTimeout(() => {
-            window.location.reload();
-          }, 3000);
-        }
-        this.isProcessing.set(false);
-      },
-      error: (err) => {
-        console.error("Error checking payment status", err);
-        // Fallback with delay
-        setTimeout(() => this.paymentSuccess.emit(), 60000);
-        this.isProcessing.set(false);
-      }
-    });
   }
 }
 

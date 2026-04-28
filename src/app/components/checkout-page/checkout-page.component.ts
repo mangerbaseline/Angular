@@ -152,7 +152,7 @@ import { VisualDisplayComponent } from '../visual-display/visual-display.compone
     }
 
     .fade-in {
-      animation: fadeInAnim 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: fadeInAnim 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     @keyframes fadeInAnim {
@@ -161,7 +161,7 @@ import { VisualDisplayComponent } from '../visual-display/visual-display.compone
     }
 
     .anim-fade-in {
-      animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     @keyframes fadeIn {
@@ -194,7 +194,7 @@ export class CheckoutPageComponent {
   totalAmount = signal(0);
   hasTokenError = signal(false);
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
   onMethodChange(method: string) {
     this.selectedMethod.set(method);

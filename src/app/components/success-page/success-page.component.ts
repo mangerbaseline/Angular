@@ -62,9 +62,10 @@ import * as CryptoJS from 'crypto-js';
                       <h3 class="u-font-semibold text-foreground">{{ item.firstName }} {{ item.lastName }}</h3>
                       <p class="text-xs text-muted-foreground">{{ item.email }}</p>
                     </div>
-                    <span class="u-text-xs u-bg-primary-10 u-text-primary px-2 py-1 rounded-lg border border-primary-20">
-                      {{ item.itemCategoryName || 'General Entry' }}
-                    </span>
+                    <img *ngIf="item.profile_pic" 
+                         [src]="item.profile_pic" 
+                         class="w-10 h-10 rounded-full object-cover border border-border-30" 
+                         alt="Profile">
                   </div>
                   <div class="u-grid u-grid-cols-1 u-gap-2 text-[11px]">
                     <div class="u-flex u-items-center u-gap-2 text-muted-foreground">

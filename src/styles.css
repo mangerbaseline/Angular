@@ -235,7 +235,7 @@ body {
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.4s ease-out forwards;
+  animation: fadeIn 0.4s ease-out;
 }
 
 .animate-float {
@@ -244,6 +244,38 @@ body {
 
 .animate-shine {
   animation: shineSlide 4s ease infinite;
+}
+
+/* GLOBAL TOAST STYLES */
+.toast-overlay {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 99999;
+  pointer-events: none;
+}
+
+.toast-card {
+  backdrop-filter: blur(8px);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.toast-card.success { background: rgba(16, 185, 129, 0.9); }
+.toast-card.error { background: rgba(239, 68, 68, 0.9); }
+.toast-card.warning { background: rgba(234, 179, 8, 0.9); }
+.toast-card.info { background: rgba(59, 130, 246, 0.9); }
+
+.fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
 /* Scrollbars */
