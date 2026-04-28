@@ -31,6 +31,7 @@ import { environment } from '../../../environments/environment';
           <div *ngIf="orderService.orderData()?.merchantData?.profile_pic" class="u-flex u-items-center u-justify-center u-gap-3 u-p-4 u-rounded-xl bg-secondary-50">
             <div style="width: 48px; height: 48px; min-width: 48px; border-radius: 50%;" class="bg-slate-800 u-flex u-items-center u-justify-center overflow-hidden border border-border-50">
                <img [src]="orderService.orderData()?.merchantData?.profile_pic" 
+                    crossOrigin="anonymous"
                     style="width: 100%; height: 100%; object-fit: cover;">
             </div>
             <div class="u-text-left"><p class="text-sm text-muted-foreground">Paid to</p><p class="u-font-semibold text-foreground">{{ orderService.orderData()?.merchantData?.name || 'TechStore Pro' }}</p></div>
@@ -63,9 +64,10 @@ import { environment } from '../../../environments/environment';
                     <div>
                       <h3 class="u-font-semibold text-foreground">{{ item.firstName }} {{ item.lastName }}</h3>
                     </div>
-                    <span class="u-text-xs u-bg-primary-10 u-text-primary px-2 py-1 rounded-lg border border-primary-20">
-                      {{ item.itemCategoryName || 'General Entry' }}
-                    </span>
+                    <img *ngIf="item.image && (item.image.startsWith('http') || item.image.startsWith('https'))" 
+                         [src]="item.image" 
+                         crossOrigin="anonymous"
+                         style="width: 48px; height: 48px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(255,255,255,0.1);">
                   </div>
                   <div class="u-grid u-grid-cols-1 u-gap-2 text-[11px]">
                     <div class="u-flex u-items-center u-gap-2 text-muted-foreground">
@@ -203,6 +205,7 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
   private timer: any;
 
   ngOnInit() {
+    this.orderService.isLoading.set(false);
     this.route.queryParams.subscribe(params => {
       let token = params['token'] || '';
       if (!token) {
@@ -295,7 +298,7 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
     if (!node) return;
 
     try {
-      const dataUrl = await toPng(node, { 
+      const dataUrl = await toPng(node, {
         backgroundColor: '#020617',
         cacheBust: true,
       });
