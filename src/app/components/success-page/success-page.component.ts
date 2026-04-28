@@ -297,17 +297,37 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
     const node = document.getElementById('receipt-content');
     if (!node) return;
 
+    // Small delay to ensure any dynamic styles or images are fully painted
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    const options = {
+      backgroundColor: '#020617',
+      cacheBust: true,
+      skipFonts: true,
+      pixelRatio: 2, // High quality
+      style: {
+        borderRadius: '24px',
+        padding: '20px'
+      }
+    };
+
     try {
-      const dataUrl = await toPng(node, {
-        backgroundColor: '#020617',
-        cacheBust: true,
-      });
+      const dataUrl = await toPng(node, options);
       const link = document.createElement('a');
-      link.download = `receipt-${this.orderService.orderData()?.txn_id || 'order'}.png`;
+      link.download = `Receipt-${this.orderService.orderData()?.txn_id || 'KuberPay'}.png`;
       link.href = dataUrl;
       link.click();
     } catch (error) {
-      console.error('oops, something went wrong!', error);
+      console.error('High-quality capture failed, trying fallback...', error);
+      try {
+        const dataUrl = await toPng(node, { ...options, filter: (n: any) => n.tagName !== 'IMG' });
+        const link = document.createElement('a');
+        link.download = `Receipt-${this.orderService.orderData()?.txn_id || 'KuberPay'}-Simple.png`;
+        link.href = dataUrl;
+        link.click();
+      } catch (err) {
+        console.error('Fallback failed', err);
+      }
     }
   }
 
@@ -315,27 +335,47 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
     const node = document.getElementById('receipt-content');
     if (!node) return;
 
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    const options = {
+      backgroundColor: '#020617',
+      cacheBust: true,
+      skipFonts: true,
+      pixelRatio: 2
+    };
+
     try {
-      const blob = await toBlob(node, {
-        backgroundColor: '#020617',
-        cacheBust: true,
-      });
+      const blob = await toBlob(node, options);
       if (!blob) return;
+      await this.performShare(blob);
+    } catch (error) {
+      console.error('High-quality share failed, trying fallback...', error);
+      try {
+        const blob = await toBlob(node, { ...options, filter: (n: any) => n.tagName !== 'IMG' });
+        if (blob) await this.performShare(blob);
+      } catch (err) {
+        console.error('Fallback share failed', err);
+      }
+    }
+  }
 
-      const file = new File([blob], `receipt-${this.orderService.orderData()?.txn_id || 'order'}.png`, { type: 'image/png' });
-
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+  private async performShare(blob: Blob) {
+    const filename = `Receipt-${this.orderService.orderData()?.txn_id || 'KuberPay'}.png`;
+    const file = new File([blob], filename, { type: 'image/png' });
+    
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
         await navigator.share({
           files: [file],
           title: 'Payment Receipt',
-          text: 'Here is my payment receipt from KuberPay',
+          text: 'My payment receipt from KuberPay',
         });
-      } else {
-        // Fallback to download if sharing is not supported
+      } catch (e) {
+        console.error('Share rejected', e);
         this.downloadReceipt();
       }
-    } catch (error) {
-      console.error('Error sharing receipt:', error);
+    } else {
+      this.downloadReceipt();
     }
   }
 }
