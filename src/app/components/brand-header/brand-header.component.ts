@@ -8,17 +8,9 @@ import { OrderService } from '../../services/order.service';
   imports: [CommonModule],
   template: `
     <div class="brand-header">
-      <div class="header-main-row">
-
-        <div class="mobile-price">
-          <div class="m-price-label">Amount</div>
-          <div class="m-price-value">{{ orderService.totalAmount() | currency }}</div>
-        </div>
-      </div>
-
-      <!-- Merchant info row -->
       <div class="merchant-row">
-        <div class="merchant-visual">
+        <div class="merchant-flex-container">
+          <div class="merchant-visual">
           <div class="merchant-logo-main">
             <ng-container *ngIf="orderService.orderData()?.merchantData?.profile_pic; else defaultIcon">
               <img [src]="orderService.orderData()?.merchantData?.profile_pic" alt="Merchant Logo" class="merchant-img">
@@ -41,8 +33,14 @@ import { OrderService } from '../../services/order.service';
             </div>
           </div>
         </div>
+
+        <div class="mobile-price">
+          <div class="m-price-label">Amount</div>
+          <div class="m-price-value">{{ orderService.totalAmount() | currency }}</div>
+        </div>
       </div>
     </div>
+  </div>
   `,
   styles: [`
     .brand-header {
@@ -56,10 +54,11 @@ import { OrderService } from '../../services/order.service';
       z-index: 100;
     }
 
-    .header-main-row {
+    .merchant-flex-container {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      width: 100%;
     }
 
     .mobile-price {
@@ -162,6 +161,9 @@ import { OrderService } from '../../services/order.service';
       font-size: 11px;
       color: rgba(255,255,255,0.4);
       margin-bottom: -4px;
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: 0.1em;
     }
 
     .merchant-visual {

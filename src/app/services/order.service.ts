@@ -16,6 +16,8 @@ export class OrderService {
   // Shared state 
   totalAmount = signal(0);
   orderData = signal<any>(null);
+  isLoading = signal(true);
+  isError = signal(false);
 
   checkPaymentLinkStatus(paymentId: string): Observable<any> {
     return this.http.post(`${this.backendApi}/paymentlink/checkPaymentLinkStatus`, { paymentId });

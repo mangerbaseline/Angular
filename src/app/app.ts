@@ -5,6 +5,7 @@ import { filter } from 'rxjs';
 import { BackgroundAnimationComponent } from './components/background-animation/background-animation.component';
 import { BrandHeaderComponent } from './components/brand-header/brand-header.component';
 import { ToastService } from './services/toast.service';
+import { OrderService } from './services/order.service';
 
 @Component({
   selector: 'app-root',
@@ -76,9 +77,100 @@ import { ToastService } from './services/toast.service';
       .global-footer {
         flex-direction: column;
         align-items: center;
-        gap: 12px;
+        gap: 20px;
         text-align: center;
+        padding: 40px 24px;
       }
+      .gf-left, .gf-right {
+        padding: 0;
+        width: 100%;
+        flex: none;
+      }
+      .footer-border {
+        width: 80%;
+        margin: 0 auto;
+      }
+    }
+
+    /* GLOBAL INITIAL LOADER OVERLAY */
+    .global-initial-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: #020617;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .loader-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 32px;
+      max-width: 300px;
+      text-align: center;
+    }
+
+    .loader-text-wrap h3 {
+      font-size: 20px;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .loader-text-wrap p {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.5);
+      margin: 0;
+    }
+
+    .loader-progress-bar {
+      width: 200px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 99px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 50%;
+      background: #10b981;
+      border-radius: 99px;
+      animation: progressMove 1.5s infinite ease-in-out;
+    }
+
+    @keyframes progressMove {
+      0% { left: -50%; }
+      100% { left: 100%; }
+    }
+
+    .payto-custom-spinner.logo-loader img {
+      width: 60px;
+      height: 60px;
+      animation: logoPulse 2s infinite ease-in-out;
+      filter: brightness(0) invert(1);
+    }
+
+    @keyframes logoPulse {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.1); opacity: 1; }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
   `],
 })
@@ -86,8 +178,9 @@ export class App implements OnInit {
   title = 'angularpaymentui';
   showHeaderFooter = true;
   toastService = inject(ToastService);
+  orderService = inject(OrderService);
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
   ngOnInit() {
     // Initial check for current URL

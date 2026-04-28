@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { OrderService } from '../../services/order.service';
 
 import * as CryptoJS from 'crypto-js';
+import { toPng, toBlob } from 'html-to-image';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -13,7 +14,7 @@ import { environment } from '../../../environments/environment';
   template: `
     <div class="success-layout anim-fade-in">
       <div class="success-container">
-        <div class="u-glass u-rounded-3xl u-p-8 u-space-y-6 max-w-lg u-w-full">
+        <div id="receipt-content" class="u-glass u-rounded-3xl u-p-8 u-space-y-6 max-w-lg u-w-full">
           <div class="u-flex u-flex-col u-items-center u-text-center">
             <div class="u-relative">
               <div class="u-absolute u-inset-0 rounded-full bg-primary-glow blur-xl anim-pulse-glow" style="transform: scale(1.18699);"></div>
@@ -27,16 +28,15 @@ import { environment } from '../../../environments/environment';
               <p class="text-muted-foreground">Your payment of <span class="u-text-gradient u-font-semibold">{{ orderService.totalAmount() | currency }}</span> has been processed</p>
             </div>  
           </div>
-          <div class="u-flex u-items-center u-justify-center u-gap-3 u-p-4 u-rounded-xl bg-secondary-50">
+          <div *ngIf="orderService.orderData()?.merchantData?.profile_pic" class="u-flex u-items-center u-justify-center u-gap-3 u-p-4 u-rounded-xl bg-secondary-50">
             <div style="width: 48px; height: 48px; min-width: 48px; border-radius: 50%;" class="bg-slate-800 u-flex u-items-center u-justify-center overflow-hidden border border-border-50">
-               <img *ngIf="orderService.orderData()?.merchantData?.profile_pic" 
-                    [src]="orderService.orderData()?.merchantData?.profile_pic" 
+               <img [src]="orderService.orderData()?.merchantData?.profile_pic" 
                     style="width: 100%; height: 100%; object-fit: cover;">
-               <div *ngIf="!orderService.orderData()?.merchantData?.profile_pic" class="u-flex u-items-center u-justify-center">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles w-5 h-5 text-primary"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path><path d="M20 3v4"></path><path d="M22 5h-4"></path><path d="M4 17v2"></path><path d="M5 18H3"></path></svg>
-               </div>
             </div>
             <div class="u-text-left"><p class="text-sm text-muted-foreground">Paid to</p><p class="u-font-semibold text-foreground">{{ orderService.orderData()?.merchantData?.name || 'TechStore Pro' }}</p></div>
+          </div>
+          <div *ngIf="!orderService.orderData()?.merchantData?.profile_pic" class="u-flex u-items-center u-justify-center u-p-4">
+             <div class="u-text-center"><p class="text-sm text-muted-foreground">Paid to</p><p class="u-text-xl u-font-bold text-foreground">{{ orderService.orderData()?.merchantData?.name || 'TechStore Pro' }}</p></div>
           </div>
           <div class="u-space-y-4">
             <div class="border-t border-border-50 pt-4">
@@ -62,7 +62,6 @@ import { environment } from '../../../environments/environment';
                   <div class="u-flex u-justify-between u-items-start mb-3">
                     <div>
                       <h3 class="u-font-semibold text-foreground">{{ item.firstName }} {{ item.lastName }}</h3>
-                      <p class="text-xs text-muted-foreground">{{ item.email }}</p>
                     </div>
                     <span class="u-text-xs u-bg-primary-10 u-text-primary px-2 py-1 rounded-lg border border-primary-20">
                       {{ item.itemCategoryName || 'General Entry' }}
@@ -90,7 +89,7 @@ import { environment } from '../../../environments/environment';
             <div class="border-t border-border-50 pt-4">
               <h2 class="text-sm font-medium text-muted-foreground mb-3" style="font-family: 'Space Grotesk', sans-serif;">Order Summary</h2>
               <div class="u-space-y-4 text-sm pt-2 border-t border-border-30">
-                <div class="u-flex u-justify-between u-font-semibold pt-2 border-t border-border-30"><span class="text-foreground">Total Paid</span><span class="u-text-gradient">{{ orderService.totalAmount() | currency }}</span></div>
+                <div class="u-flex u-justify-between u-font-semibold pt-2 border-t border-border-30 pt-2"><span class="text-foreground">Total Paid</span><span class="u-text-gradient">{{ orderService.totalAmount() | currency }}</span></div>
               </div>
             </div>
           </div>
@@ -106,10 +105,9 @@ import { environment } from '../../../environments/environment';
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-check"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg>
               Payment Confirmed Successfully
             </div>
-            <div class="u-grid u-grid-cols-3 u-gap-3">
-              <button class="action-btn u-flex u-flex-col u-items-center u-gap-2 u-p-4 u-rounded-2xl bg-secondary-50 hover-bg-secondary transition-colors" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download w-5 h-5 text-primary"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg><span class="text-xs text-muted-foreground">Receipt</span></button>
-              <button class="action-btn u-flex u-flex-col u-items-center u-gap-2 u-p-4 u-rounded-2xl bg-secondary-50 hover-bg-secondary transition-colors" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail w-5 h-5 text-primary"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg><span class="text-xs text-muted-foreground">Email</span></button>
-              <button class="action-btn u-flex u-flex-col u-items-center u-gap-2 u-p-4 u-rounded-2xl bg-secondary-50 hover-bg-secondary transition-colors" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share2 w-5 h-5 text-primary"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"></line><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"></line></svg><span class="text-xs text-muted-foreground">Share</span></button>
+            <div class="u-grid u-grid-cols-2 u-gap-3">
+              <button (click)="downloadReceipt()" class="action-btn u-flex u-flex-col u-items-center u-gap-2 u-p-4 u-rounded-2xl bg-secondary-50 hover-bg-secondary transition-colors" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download w-5 h-5 text-primary"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg><span class="text-xs text-muted-foreground">Receipt</span></button>
+              <button (click)="shareReceipt()" class="action-btn u-flex u-flex-col u-items-center u-gap-2 u-p-4 u-rounded-2xl bg-secondary-50 hover-bg-secondary transition-colors" tabindex="0"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share2 w-5 h-5 text-primary"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"></line><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"></line></svg><span class="text-xs text-muted-foreground">Share</span></button>
             </div>
           </div>
           <p class="u-text-center text-xs text-muted-fg-60 pt-4">A confirmation email has been sent to your registered email address.<br>Powered by <span class="text-gradient-gold u-font-semibold">KuberPay</span></p>
@@ -289,6 +287,52 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
     const url = this.orderService.orderData()?.url;
     if (url && url.trim() !== '') {
       window.location.href = url;
+    }
+  }
+
+  async downloadReceipt() {
+    const node = document.getElementById('receipt-content');
+    if (!node) return;
+
+    try {
+      const dataUrl = await toPng(node, { 
+        backgroundColor: '#020617',
+        cacheBust: true,
+      });
+      const link = document.createElement('a');
+      link.download = `receipt-${this.orderService.orderData()?.txn_id || 'order'}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (error) {
+      console.error('oops, something went wrong!', error);
+    }
+  }
+
+  async shareReceipt() {
+    const node = document.getElementById('receipt-content');
+    if (!node) return;
+
+    try {
+      const blob = await toBlob(node, {
+        backgroundColor: '#020617',
+        cacheBust: true,
+      });
+      if (!blob) return;
+
+      const file = new File([blob], `receipt-${this.orderService.orderData()?.txn_id || 'order'}.png`, { type: 'image/png' });
+
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'Payment Receipt',
+          text: 'Here is my payment receipt from KuberPay',
+        });
+      } else {
+        // Fallback to download if sharing is not supported
+        this.downloadReceipt();
+      }
+    } catch (error) {
+      console.error('Error sharing receipt:', error);
     }
   }
 }

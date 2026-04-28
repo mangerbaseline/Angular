@@ -15,22 +15,8 @@ import { environment } from '../../../environments/environment';
   standalone: true,
   imports: [CommonModule, SafeHtmlPipe, CurrencyPipe],
   template: `
-    <div class="sidebar-root" *ngIf="!tokenError()">
-      <!-- GLOBAL INITIALIZATION LOADER -->
-      <div *ngIf="loadingOrder()" class="global-initial-loader fade-in">
-        <div class="loader-content">
-          <div class="payto-custom-spinner logo-loader">
-             <img src="https://www.kuberfinancial.com.au/tableQR/assets/images/kuber-samal-logo.svg" alt="Loading...">
-          </div>
-          <div class="loader-text-wrap">
-            <h3>Kuber Financial</h3>
-            <p>Setting up your secure payment session...</p>
-          </div>
-          <div class="loader-progress-bar">
-            <div class="progress-fill"></div>
-          </div>
-        </div>
-      </div>
+    <div class="sidebar-root" *ngIf="!orderService.isError()">
+
 
       <div class="flex items-center justify-center gap-2 mb-8" style="display:flex; justify-content:center; align-items:center; gap: 12px; margin-bottom: 32px;">
         <!-- <div style="display:flex; align-items:center;">
@@ -355,11 +341,11 @@ import { environment } from '../../../environments/environment';
         </button>
 
         <div class="summary-body" *ngIf="showSummary()">
-          <div *ngIf="loadingOrder()" class="p-6">
+          <div *ngIf="orderService.isLoading()" class="p-6">
             <div class="skeleton-line mb-3" style="height: 50px; border-radius: 8px;"></div>
             <div class="skeleton-line" style="height: 50px; border-radius: 8px;"></div>
           </div>
-          <ng-container *ngIf="!isInvoice() && !loadingOrder()">
+          <ng-container *ngIf="!isInvoice() && !orderService.isLoading()">
             <div class="item-row" *ngFor="let item of items()">
               <div class="item-icon-wrap">
                 <svg viewBox="0 0 24 24" fill="none" width="18" stroke="currentColor" stroke-width="2">
@@ -391,7 +377,7 @@ import { environment } from '../../../environments/environment';
               </div>
             </div>
           </ng-container>
-          <ng-container *ngIf="isInvoice() && !loadingOrder()">
+          <ng-container *ngIf="isInvoice() && !orderService.isLoading()">
             <div class="invoice-content">
               <h2 class="invoice-main-title">INVOICE</h2>
               
@@ -489,7 +475,7 @@ import { environment } from '../../../environments/environment';
       </div>
     </div>
 
-    <div *ngIf="tokenError()" class="session-expired-container fade-in">
+    <div *ngIf="orderService.isError()" class="session-expired-container fade-in">
       <div class="error-card">
         <div class="error-icon-circle">
           <svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" width="48" height="48">
@@ -498,9 +484,7 @@ import { environment } from '../../../environments/environment';
             <line x1="12" y1="16" x2="12.01" y2="16"></line>
           </svg>
         </div>
-        <h2>Session Expired / Invalid URL</h2>
-        <p>The payment session is no longer active or the URL provided was incorrect. Please contact the merchant for a new payment link.</p>
-        <button class="pay-btn" onclick="window.location.reload()" style="max-width: 200px; margin: 24px auto 0;">Reload Page</button>
+        <h2 style="margin: 0;">This link no longer active</h2>
       </div>
     </div>
   `,
@@ -519,8 +503,6 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   isProcessing = signal(false);
   isStripeLoading = signal(false);
   showSummary = signal(true);
-  loadingOrder = signal(true);
-  tokenError = signal(false);
 
   items = signal<any[]>([]);
   subtotal = signal(0);
@@ -546,7 +528,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   merchantEmail = signal('');
   merchantPhone = signal('');
 
-  private orderService = inject(OrderService);
+  orderService = inject(OrderService);
   private route = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
   private toastService = inject(ToastService);
@@ -680,8 +662,9 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
         console.log("=== DECRYPTED PAYLOAD ===", decryptedPayload);
 
         if (!decryptedPayload) {
-          this.tokenError.set(true);
+          this.orderService.isError.set(true);
           this.tokenErrorEvent.emit(true);
+          this.orderService.isLoading.set(false);
           return;
         }
       }
@@ -699,8 +682,9 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
 
       if (!this.merId && !this.orderID && !this.paymentId) {
         console.warn("=== NO VALID IDS FOUND in URL ===");
-        this.tokenError.set(true);
+        this.orderService.isError.set(true);
         this.tokenErrorEvent.emit(true);
+        this.orderService.isLoading.set(false);
         return;
       }
 
@@ -835,7 +819,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   }
 
   async startApiFlow() {
-    this.loadingOrder.set(true);
+    this.orderService.isLoading.set(true);
 
     if (this.paymentId) {
       this.orderService.checkPaymentLinkStatus(this.paymentId).subscribe({
@@ -872,26 +856,27 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
                   error: (err) => {
                     console.error("Error fetching payment methods", err);
                     this.methods = [...this.allMethods];
+                    this.orderService.isLoading.set(false);
                   }
                 });
               } else {
                 this.methods = [...this.allMethods];
-                this.loadingOrder.set(false);
+                this.orderService.isLoading.set(false);
               }
             },
             error: (err) => {
               console.error("Error generating token", err);
               this.methods = [...this.allMethods];
-              this.loadingOrder.set(false);
+              this.orderService.isLoading.set(false);
             }
           });
         } else {
-          this.loadingOrder.set(false);
+          this.orderService.isLoading.set(false);
         }
       },
       error: (error) => {
         console.error('Error fetching order items:', error);
-        this.loadingOrder.set(false);
+        this.orderService.isLoading.set(false);
         this.methods = [...this.allMethods];
       }
     });
@@ -969,7 +954,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       this.methods = [...this.allMethods];
     }
 
-    this.loadingOrder.set(false);
+    this.orderService.isLoading.set(false);
 
     const current = this.selectedMethod();
     const isAvailable = this.methods.find(m => m.id === current);

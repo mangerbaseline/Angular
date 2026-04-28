@@ -35,11 +35,8 @@ import { VisualDisplayComponent } from '../visual-display/visual-display.compone
                 <line x1="12" y1="17" x2="12.01" y2="17"></line>
               </svg>
             </div>
-            <h1 class="error-title">URL Broken</h1>
-            <p class="error-message">The payment link you followed is invalid or has expired. Please contact the merchant for a new link.</p>
-            <div class="error-footer">
-              Error: Invalid Decryption Token
-            </div>
+            <h1 class="error-title">This link no longer active</h1>
+            <!-- <p class="error-message">The payment link you followed is invalid or has expired. Please contact the merchant for a new link.</p> -->
           </div>
         </div>
       </div>

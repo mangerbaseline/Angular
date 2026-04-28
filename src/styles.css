@@ -269,10 +269,21 @@ body {
   font-size: 14px;
 }
 
-.toast-card.success { background: rgba(16, 185, 129, 0.9); }
-.toast-card.error { background: rgba(239, 68, 68, 0.9); }
-.toast-card.warning { background: rgba(234, 179, 8, 0.9); }
-.toast-card.info { background: rgba(59, 130, 246, 0.9); }
+.toast-card.success {
+  background: rgba(16, 185, 129, 0.9);
+}
+
+.toast-card.error {
+  background: rgba(239, 68, 68, 0.9);
+}
+
+.toast-card.warning {
+  background: rgba(234, 179, 8, 0.9);
+}
+
+.toast-card.info {
+  background: rgba(59, 130, 246, 0.9);
+}
 
 .fade-in {
   animation: fadeIn 0.4s ease-out forwards;
