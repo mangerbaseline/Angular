@@ -331,7 +331,8 @@ import { environment } from '../../../environments/environment';
             </div>
             <div>
               <div class="sh-title">{{ isInvoice() ? 'Invoice Details' : 'Order Summary' }}</div>
-              <div class="sh-items">{{ isInvoice() ? invoiceNo() : items().length + ' items' }}</div>
+              <div class="sh-items" *ngIf="items().length > 0">{{ isInvoice() ? invoiceNo() : items().length + ' items' }}</div>
+              <div class="sh-items" *ngIf="items().length === 0 && isInvoice()">{{ invoiceNo() }}</div>
             </div>
           </div>
           <div class="sh-right">

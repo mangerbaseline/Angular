@@ -16,7 +16,7 @@ import { OrderService } from '../../services/order.service';
           </svg>
           <div class="text">
             <div class="title">Order Summary</div>
-            <div class="item-count">{{ items().length }} items</div>
+            <div class="item-count" *ngIf="items().length > 0">{{ items().length }} items</div>
           </div>
         </div>
         <div class="price-info">
