@@ -306,7 +306,7 @@ import { environment } from '../../../environments/environment';
           </div>
         </div>
       </div>
-      <div class="cta-section">
+      <div class="cta-section" *ngIf="selectedMethod() !== 'payto' || (paytoState() !== 'waiting' && paytoState() !== 'authorizing')">
         <button type="button" class="pay-btn" (click)="pay($event)" [class.loading]="isProcessing()">
           <ng-container *ngIf="!isProcessing()">
             {{ getCTA() }}
@@ -314,7 +314,6 @@ import { environment } from '../../../environments/environment';
           </ng-container>
           <div class="spinner" *ngIf="isProcessing()"></div>
         </button>
-        <!-- <p class="cta-note" style="margin-top:16px;">0% interest • No hidden fees • Approval in seconds</p> -->
       </div>
 
       <div class="order-summary" [class.invoice-mode]="isInvoice()">
@@ -901,7 +900,12 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
         qty: orderData.qrTableData.quantity || 1
       }]);
     } else if (Array.isArray(orderData.menuList)) {
-      this.items.set(orderData.menuList.map((item: any) => ({
+      const filteredList = orderData.menuList.filter((item: any) => {
+        const price = item.itemPrice || item.perItemPrice || item.amount || 0;
+        return price > 0;
+      });
+      
+      this.items.set(filteredList.map((item: any) => ({
         name: item.itemName || 'Unknown Item',
         price: item.itemPrice || item.perItemPrice || item.amount || 0,
         desc: item.description || '',
@@ -1186,6 +1190,10 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     }
     this.selectedMethod.set(id);
     this.methodChange.emit(id);
+    
+    if (id === 'payto' && this.paytoState() === 'failed') {
+      this.paytoState.set('input');
+    }
 
     if (this.isStripeMethod()) {
       await this.initStripeElement(id);

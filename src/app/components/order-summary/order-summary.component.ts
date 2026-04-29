@@ -148,9 +148,14 @@ export class OrderSummaryComponent implements OnInit {
 
           // Map menuList to items
           if (Array.isArray(orderData.menuList)) {
-            this.items.set(orderData.menuList.map((item: any) => ({
+            const filteredList = orderData.menuList.filter((item: any) => {
+              const price = item.itemPrice || item.perItemPrice || item.amount || 0;
+              return price > 0;
+            });
+            
+            this.items.set(filteredList.map((item: any) => ({
               name: item.itemName || 'Unknown Item',
-              price: item.itemPrice || 0,
+              price: item.itemPrice || item.perItemPrice || item.amount || 0,
               desc: item.description || '',
               qty: item.quantity || 1
             })));
