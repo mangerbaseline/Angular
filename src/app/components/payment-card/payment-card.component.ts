@@ -47,13 +47,14 @@ import { environment } from '../../../environments/environment';
           <button
             *ngFor="let m of methods"
             [class.selected]="selectedMethod() === m.id"
+            [class.disabled-tab]="m.id === 'upi'"
             (click)="selectMethod(m.id)"
             class="method-tab"
             [style.--m-color]="m.color">
             <span class="tab-icon" [innerHTML]="m.svg | safeHtml"></span>
             <div class="tab-text">
               <span class="tab-name">{{ m.name }}</span>
-               <span *ngIf="m.name === 'UPI'" class="tab-name">Disabled</span>
+               <span *ngIf="m.id === 'upi'" class="tab-status">Coming Soon</span>
             </div>
           </button>
         </div>
@@ -306,7 +307,7 @@ import { environment } from '../../../environments/environment';
         </div>
       </div>
       <div class="cta-section">
-        <button class="pay-btn" (click)="pay()" [class.loading]="isProcessing()">
+        <button type="button" class="pay-btn" (click)="pay($event)" [class.loading]="isProcessing()">
           <ng-container *ngIf="!isProcessing()">
             {{ getCTA() }}
             <svg *ngIf="getCTA() !== 'Retry'" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" width="18"><path d="M4 10h12M10 4l6 6-6 6"/></svg>
@@ -825,7 +826,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       this.orderService.checkPaymentLinkStatus(this.paymentId).subscribe({
         next: (res) => {
           if (res.success) {
-            this.showToast("Payment link is active", "info");
+            console.log("Payment link is active");
           }
         },
         error: (err) => console.error("Error checking payment status", err)
@@ -1178,6 +1179,10 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   }
 
   async selectMethod(id: string) {
+    if (id === 'upi') {
+      this.showToast("Coming soon...", "info");
+      return;
+    }
     this.selectedMethod.set(id);
     this.methodChange.emit(id);
 
@@ -1211,94 +1216,12 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
 
   @Output() paymentSuccess = new EventEmitter<void>();
 
-  // async pay() {
-  //   this.isProcessing.set(true);
+  async pay(event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
 
-  //   if (this.selectedMethod() === 'payto') {
-  //     try {
-  //       console.log("[PayTo] Creating customer...");
-  //       const customerResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/customers", {
-  //         method: "POST",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify({
-  //           email: this.paytoEmail(),
-  //           name: this.paytoName()
-  //         })
-  //       });
-  //       const customerData = await customerResponse.json();
-  //       const customerId = customerData.id;
-
-  //       console.log("[PayTo] Creating payment...");
-  //       const paymentResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/createPayToPayment", {
-  //         method: "POST",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify({
-  //           customerId: customerId,
-  //           amount: this.totalAmount()
-  //         })
-  //       });
-  //       const paymentData = await paymentResponse.json();
-  //       const clientSecret = paymentData.clientSecret;
-
-  //       console.log("[PayTo] Confirming payment via Backend...");
-  //       const confirmResponse = await fetch("https://backend.kuberfinancial.com.au/api/payments/confirmPayToPayment", {
-  //         method: "POST",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify({
-  //           paymentIntentId: clientSecret,
-  //           name: this.paytoName(),
-  //           email: this.paytoEmail(),
-  //           pay_id: this.paytoID()
-  //         })
-  //       });
-
-  //       if (confirmResponse.ok) {
-  //         const confirmData = await confirmResponse.json();
-  //         console.log("PayTo confirmation response:", confirmData);
-  //         this.paymentSuccess.emit();
-  //       } else {
-  //         try {
-  //            const errorData = await confirmResponse.json();
-  //            console.error("Confirmation error:", errorData);
-  //            alert(errorData.message || "Failed to confirm PayTo payment");
-  //         } catch(e) {
-  //            console.error("Confirmation error status:", confirmResponse.status);
-  //            alert("Failed to confirm PayTo payment");
-  //         }
-  //       }
-  //     } catch (err: any) {
-  //       console.error("PayTo Error:", err);
-  //     } finally {
-  //       this.isProcessing.set(false);
-  //     }
-  //     return;
-  //   }
-
-  //   if (this.isStripeMethod() && this.paymentElement) {
-  //     try {
-  //       const { error } = await this.stripe.confirmPayment({
-  //         elements: this.elements,
-  //         confirmParams: {
-  //           return_url: window.location.origin + '/success',
-  //         },
-  //       });
-
-  //       if (error) {
-  //         console.error(error.message);
-  //       }
-  //     } catch (e) {
-  //       console.error("Payment confirmation failed", e);
-  //     } finally {
-  //       this.isProcessing.set(false);
-  //     }
-  //   } else {
-  //     setTimeout(() => {
-  //       this.isProcessing.set(false);
-  //       this.paymentSuccess.emit();
-  //     }, 2000);
-  //   }
-  // }
-  async pay() {
     this.isProcessing.set(true);
 
     if (this.selectedMethod() === 'payto') {
@@ -1372,9 +1295,6 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
         if (result.error) {
           console.error(result.error.message);
           this.showToast(result.error.message || "Payment Error", "error");
-          setTimeout(() => {
-            window.location.reload();
-          }, 3000);
           this.isProcessing.set(false);
         } else {
           this.showToast("Payment Successful! Redirecting...", "success");

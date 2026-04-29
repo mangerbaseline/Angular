@@ -297,7 +297,8 @@ import { OrderService } from '../../services/order.service';
               </div>
               <div class="merchant-name-row">
                 <span class="merchant-name">{{ getMerchantName() }}</span>
-                <svg viewBox="0 0 24 24" fill="none" width="14" height="14" class="ext-icon" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6m4-3h6v6m-11 5L21 3"/></svg>
+                <!-- <svg viewBox="0 0 24 24" fill="none" width="14" height="14" class="ext-icon" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6m4-3h6v6m-11 5L21 3"/></svg> -->
+         
               </div>
             </div>
           </div>
@@ -520,14 +521,9 @@ import { OrderService } from '../../services/order.service';
         gap: 16px;
       }
     }
+ `]
 
-    .ext-icon {
-      opacity: 0.4;
-      cursor: pointer;
-    }
 
-    .ext-icon:hover { opacity: 0.7; }
-  `]
 })
 export class BrandHeaderComponent {
   orderService = inject(OrderService);

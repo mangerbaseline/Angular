@@ -139,6 +139,29 @@
   transform: none;
 }
 
+.method-tab.disabled-tab {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+.method-tab.disabled-tab:hover {
+  background: rgba(15, 23, 42, 0.4);
+  border-color: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  transform: none;
+}
+
+.tab-status {
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: #fbbf24;
+  margin-top: -1px;
+}
+
+
 .tab-icon {
   display: flex;
   align-items: center;
@@ -586,6 +609,8 @@
   font-size: 14px;
   font-weight: 400;
   color: #334155;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .meta-value.multi {
@@ -1237,5 +1262,69 @@
   100% {
     transform: scale(3.5);
     opacity: 0;
+  }
+}
+
+/* Responsive Invoice Styles */
+@media (max-width: 600px) {
+  .invoice-content {
+    padding: 24px 16px;
+    margin: 8px 4px;
+  }
+
+  .invoice-main-title {
+    font-size: 20px;
+    margin-bottom: 24px;
+  }
+
+  .invoice-meta-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .meta-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.6;
+  }
+
+  .meta-value {
+    font-size: 14px;
+  }
+
+  .invoice-table th {
+    font-size: 12px;
+    padding: 10px 2px;
+  }
+
+  .invoice-table td {
+    font-size: 12px;
+    padding: 8px 2px;
+  }
+
+  .item-name-td {
+    width: 40%;
+  }
+
+  .calc-row {
+    grid-template-columns: 1fr 85px;
+    gap: 12px;
+    font-size: 13px;
+  }
+
+  .total-text {
+    font-size: 14px;
+  }
+
+  .total-val {
+    font-size: 16px;
   }
 }

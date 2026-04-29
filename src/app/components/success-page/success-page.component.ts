@@ -28,15 +28,16 @@ import { environment } from '../../../environments/environment';
               <p class="text-muted-foreground">Your payment of <span class="u-text-gradient u-font-semibold">{{ orderService.totalAmount() | currency }}</span> has been processed</p>
             </div>  
           </div>
-          <div *ngIf="orderService.orderData()?.merchantData?.profile_pic" class="u-flex u-items-center u-justify-center u-gap-3 u-p-4 u-rounded-xl bg-secondary-50">
+          <div *ngIf="orderService.orderData()?.merchantData?.profile_pic && isMerchantImageValid() && (orderService.orderData()?.merchantData?.profile_pic?.startsWith('http'))" class="u-flex u-items-center u-justify-center u-gap-3 u-p-4 u-rounded-xl bg-secondary-50">
             <div style="width: 48px; height: 48px; min-width: 48px; border-radius: 50%;" class="bg-slate-800 u-flex u-items-center u-justify-center overflow-hidden border border-border-50">
                <img [src]="orderService.orderData()?.merchantData?.profile_pic" 
                     crossOrigin="anonymous"
+                    (error)="handleMerchantImageError()"
                     style="width: 100%; height: 100%; object-fit: cover;">
             </div>
             <div class="u-text-left"><p class="text-sm text-muted-foreground">Paid to</p><p class="u-font-semibold text-foreground">{{ orderService.orderData()?.merchantData?.name || 'TechStore Pro' }}</p></div>
           </div>
-          <div *ngIf="!orderService.orderData()?.merchantData?.profile_pic" class="u-flex u-items-center u-justify-center u-p-4">
+          <div *ngIf="!orderService.orderData()?.merchantData?.profile_pic || !isMerchantImageValid() || !(orderService.orderData()?.merchantData?.profile_pic?.startsWith('http'))" class="u-flex u-items-center u-justify-center u-p-4">
              <div class="u-text-center"><p class="text-sm text-muted-foreground">Paid to</p><p class="u-text-xl u-font-bold text-foreground">{{ orderService.orderData()?.merchantData?.name || 'TechStore Pro' }}</p></div>
           </div>
           <div class="u-space-y-4">
@@ -46,7 +47,7 @@ import { environment } from '../../../environments/environment';
               </h2>
               <div class="u-space-y-3 text-sm">
                 <div class="u-flex u-justify-between"><span class="text-muted-foreground">Transaction ID</span><button class="transaction-button u-flex u-items-center u-gap-2"><span class="text-xs">{{ orderService.orderData()?.txn_id || 'Generating...' }}</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy w-3 h-3"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg></button></div>
-                <div class="u-flex u-justify-between"><span class="text-muted-foreground">Date & Time</span><span class="text-foreground u-text-right text-xs">{{ (orderService.orderData()?.addedOn * 1000) | date:'EEEE, d MMMM yyyy at h:mm a' }}</span></div>
+                <div class="u-flex u-justify-between"><span class="text-muted-foreground">Date & Time</span><span class="text-foreground u-text-right text-xs">{{ (orderService.orderData()?.addedOn * 1000) | date:"EEEE, d MMMM yyyy 'at' h:mm a" }}</span></div>
                 <div class="u-flex u-justify-between">
                   <span class="text-muted-foreground">Payment Method</span>
                   <div class="u-flex u-items-center" style="gap: 8px;">
@@ -208,7 +209,13 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
   private router = inject(Router);
 
   countdown = signal(600);
+  isMerchantImageValid = signal(true);
   private timer: any;
+
+  handleMerchantImageError() {
+    this.isMerchantImageValid.set(false);
+  }
+
 
   ngOnInit() {
     this.orderService.isLoading.set(false);
