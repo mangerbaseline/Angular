@@ -821,6 +821,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
 
   async startApiFlow() {
     this.orderService.isLoading.set(true);
+    this.orderService.loadingMessage.set('Setting up your secure payment session...');
 
     if (this.paymentId) {
       this.orderService.checkPaymentLinkStatus(this.paymentId).subscribe({

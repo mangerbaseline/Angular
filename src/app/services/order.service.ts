@@ -17,6 +17,7 @@ export class OrderService {
   totalAmount = signal(0);
   orderData = signal<any>(null);
   isLoading = signal(true);
+  loadingMessage = signal('Setting up your secure payment session...');
   isError = signal(false);
 
   checkPaymentLinkStatus(paymentId: string): Observable<any> {

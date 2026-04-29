@@ -218,7 +218,9 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    this.orderService.isLoading.set(false);
+    this.orderService.isLoading.set(true);
+    this.orderService.isError.set(false);
+    this.orderService.loadingMessage.set('Confirming your payment and generating receipt...');
     this.route.queryParams.subscribe(params => {
       let token = params['token'] || '';
       if (!token) {
@@ -244,9 +246,20 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
       }
 
       if (orderID) {
-        this.orderService.getOrderItems(orderID, !!paymentId).subscribe(res => {
-          this.startCountdown();
+        this.orderService.getOrderItems(orderID, !!paymentId).subscribe({
+          next: (res) => {
+            this.startCountdown();
+            this.orderService.isLoading.set(false);
+          },
+          error: (err) => {
+            console.error("Error fetching order items:", err);
+            this.orderService.isLoading.set(false);
+            this.orderService.isError.set(true);
+          }
         });
+      } else {
+        this.orderService.isLoading.set(false);
+        this.orderService.isError.set(true);
       }
     });
   }
