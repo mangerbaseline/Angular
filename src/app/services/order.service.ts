@@ -31,7 +31,9 @@ export class OrderService {
         if (response && response.data) {
           this.orderData.set(response.data);
           if (response.data.finalAmount) {
-            this.totalAmount.set(response.data.finalAmount);
+            const finalAmt = parseFloat(response.data.finalAmount) || 0;
+            const fees = parseFloat(response.data.plateformFees) || 0;
+            this.totalAmount.set(finalAmt + fees);
           }
         }
       })

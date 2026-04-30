@@ -905,7 +905,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
         const price = item.itemPrice || item.perItemPrice || item.amount || 0;
         return price > 0;
       });
-      
+
       this.items.set(filteredList.map((item: any) => ({
         name: item.itemName || 'Unknown Item',
         price: item.itemPrice || item.perItemPrice || item.amount || 0,
@@ -918,7 +918,9 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     this.tax.set(parseFloat(orderData.gstAmount || orderData.GSTAmt || 0));
     this.fees.set(orderData.plateformFees || 0);
     this.discount.set(orderData.discount || 0);
-    this.totalAmount.set(orderData.finalAmount || orderData.totalAmount || 0);
+    const finalAmt = parseFloat(orderData.finalAmount || orderData.totalAmount) || 0;
+    const platformFees = parseFloat(orderData.plateformFees) || 0;
+    this.totalAmount.set(finalAmt + platformFees);
     this.totalAmountChange.emit(this.totalAmount());
     this.isInvoice.set(orderData.orderedThrough === 'invoice');
     if (orderData.invoiceDetails) {
@@ -1189,9 +1191,17 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       this.showToast("Coming soon...", "info");
       return;
     }
+
+    // Reset PayTo inputs when changing tabs
+    this.paytoName.set('');
+    this.paytoEmail.set('');
+    this.paytoMobile.set('');
+    this.paytoID.set('');
+    this.paytoValidationMessage.set('');
+
     this.selectedMethod.set(id);
     this.methodChange.emit(id);
-    
+
     if (id === 'payto' && this.paytoState() === 'failed') {
       this.paytoState.set('input');
     }

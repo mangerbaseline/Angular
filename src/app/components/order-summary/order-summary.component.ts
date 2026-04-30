@@ -53,7 +53,7 @@ import { OrderService } from '../../services/order.service';
 
         <div class="breakdown">
           <div class="line">
-            <span>Subtotalll</span>
+            <span>Subtotal</span>
             <span>{{ subtotal() | currency }}</span>
           </div>
           <div class="line">
@@ -152,7 +152,7 @@ export class OrderSummaryComponent implements OnInit {
               const price = item.itemPrice || item.perItemPrice || item.amount || 0;
               return price > 0;
             });
-            
+
             this.items.set(filteredList.map((item: any) => ({
               name: item.itemName || 'Unknown Item',
               price: item.itemPrice || item.perItemPrice || item.amount || 0,
@@ -172,7 +172,7 @@ export class OrderSummaryComponent implements OnInit {
           this.tax.set(parseFloat(orderData.gstAmount || orderData.GSTAmt || 0));
           this.fees.set(orderData.plateformFees || 0);
           this.discount.set(orderData.discount || 0);
-          this.total.set(orderData.finalAmount || 0);
+          this.total.set((parseFloat(orderData.finalAmount) || 0) + (parseFloat(orderData.plateformFees) || 0));
 
           // If we want to show platform fees, we might need another line in the UI
           // For now, let's keep it simple or include platform fees in the subtotal/tax if needed

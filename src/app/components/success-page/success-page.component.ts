@@ -321,7 +321,7 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
 
   getPaymentIcon(): string {
     const mode = (this.orderService.orderData()?.paymentMode || '').toLowerCase();
-    
+
     if (mode.startsWith('pay')) return 'payto-logo.png';
     if (mode.includes('card')) return 'mastercard.svg';
     if (mode.includes('apple')) return 'apple-pay.svg';
@@ -331,7 +331,7 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
     if (mode.includes('bank')) return 'bank.svg';
     if (mode.includes('upi')) return 'upi.svg';
     if (mode.includes('link')) return 'link-stripe.svg';
-    
+
     return '';
   }
 
@@ -404,7 +404,7 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
   private async performShare(blob: Blob) {
     const filename = `Receipt-${this.orderService.orderData()?.txn_id || 'KuberPay'}.png`;
     const file = new File([blob], filename, { type: 'image/png' });
-    
+
     if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
         await navigator.share({
