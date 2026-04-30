@@ -365,7 +365,7 @@ import { environment } from '../../../environments/environment';
             
             <div class="breakdown">
               <div class="br-row"><span>Subtotal</span><span>{{ subtotal() | currency }}</span></div>
-              <div class="br-row" *ngIf="fees() > 0">
+              <div class="br-row">
                  <span>Platform Fees</span>
                  <span>{{ fees() | currency }}</span>
               </div>
@@ -461,11 +461,6 @@ import { environment } from '../../../environments/environment';
             <span class="trust-item">
               <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" width="12" height="12"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
               Secure checkout
-            </span>
-            <span class="trust-sep">·</span>
-            <span class="trust-item">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" width="12" height="12"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
-              Fast delivery
             </span>
           </div>
         </div>
