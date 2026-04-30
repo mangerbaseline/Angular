@@ -30,10 +30,14 @@ export class OrderService {
       tap((response: any) => {
         if (response && response.data) {
           this.orderData.set(response.data);
-          if (response.data.finalAmount) {
-            const finalAmt = parseFloat(response.data.finalAmount) || 0;
+          if (response.data) {
+            const subtotal = parseFloat(response.data.subTotal || response.data.prevAmt || response.data.amount) || 0;
             const fees = parseFloat(response.data.plateformFees) || 0;
-            this.totalAmount.set(finalAmt + fees);
+            const discount = parseFloat(response.data.discount) || 0;
+            const gst = response.data.gstEnabled ? (parseFloat(response.data.gstAmount || response.data.GSTAmt) || 0) : 0;
+            
+            const calculatedTotal = subtotal + fees - discount + gst;
+            this.totalAmount.set(calculatedTotal);
           }
         }
       })

@@ -430,15 +430,11 @@ import { environment } from '../../../environments/environment';
                   <span class="calc-label">Subtotal</span>
                   <span class="calc-value">{{ subtotal() | number:'1.2-2' }}</span>
                 </div>
-                <div class="calc-row">
-                  <span class="calc-label">Shipping</span>
-                  <span class="calc-value green">FREE</span>
-                </div>
                 <div class="calc-row discount" *ngIf="discount() > 0">
                   <span class="calc-label pink-text">Discount</span>
                   <span class="calc-value pink-text">{{ discount() | number:'1.2-2' }}</span>
                 </div>
-                <div class="calc-row">
+                <div class="calc-row" *ngIf="gstEnabled()">
                   <span class="calc-label">Total Tax (GST)</span>
                   <span class="calc-value">{{ tax() | number:'1.2-2' }}</span>
                 </div>
@@ -457,7 +453,7 @@ import { environment } from '../../../environments/environment';
           <div class="total-row" *ngIf="!isInvoice()">
             <div>
               <div class="total-label">Total</div>
-              <div class="gst-note">Including GST</div>
+              <div class="gst-note" *ngIf="gstEnabled()">Including GST</div>
             </div>
             <div class="total-price">{{ totalAmount() | currency }}</div>
           </div>
@@ -510,6 +506,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
   tax = signal(0);
   fees = signal(0);
   discount = signal(0);
+  gstEnabled = signal(false);
   totalAmount = signal(0);
   paytoEmail = signal('');
   paytoName = signal('');
@@ -918,9 +915,12 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     this.tax.set(parseFloat(orderData.gstAmount || orderData.GSTAmt || 0));
     this.fees.set(orderData.plateformFees || 0);
     this.discount.set(orderData.discount || 0);
-    const finalAmt = parseFloat(orderData.finalAmount || orderData.totalAmount) || 0;
-    const platformFees = parseFloat(orderData.plateformFees) || 0;
-    this.totalAmount.set(finalAmt + platformFees);
+    this.gstEnabled.set(!!orderData.gstEnabled);
+
+    // Calculate total: subtotal + platformFees - discount + (gst if enabled)
+    const calculatedTotal = this.subtotal() + this.fees() - this.discount() + (this.gstEnabled() ? this.tax() : 0);
+    this.totalAmount.set(calculatedTotal);
+
     this.totalAmountChange.emit(this.totalAmount());
     this.isInvoice.set(orderData.orderedThrough === 'invoice');
     if (orderData.invoiceDetails) {

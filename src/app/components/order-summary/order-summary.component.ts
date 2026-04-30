@@ -60,7 +60,7 @@ import { OrderService } from '../../services/order.service';
             <span>Shipping</span>
             <span class="free">FREE</span>
           </div>
-          <div class="line">
+          <div class="line" *ngIf="gstEnabled()">
             <span>Tax (GST)</span>
             <span>{{ tax() | currency }}</span>
           </div>
@@ -81,7 +81,7 @@ import { OrderService } from '../../services/order.service';
           <div class="final-total">
             <div class="total-label">
               <span>Total</span>
-              <span class="gst-label">Including GST</span>
+              <span class="gst-label" *ngIf="gstEnabled()">Including GST</span>
             </div>
             <div class="total-value">{{ total() | currency }}</div>
           </div>
@@ -130,6 +130,7 @@ export class OrderSummaryComponent implements OnInit {
   fees = signal(0);
   discount = signal(0);
   total = signal(0);
+  gstEnabled = signal(false);
 
   ngOnInit() {
     this.fetchOrderDetails();
@@ -166,13 +167,17 @@ export class OrderSummaryComponent implements OnInit {
           // discount is the discount amount
           // GSTAmt is the tax
           // plateformFees is an additional fee
-          // finalAmount is the total to be paid
+          // amount is the total to be paid
 
           this.subtotal.set(orderData.prevAmt || 0);
           this.tax.set(parseFloat(orderData.gstAmount || orderData.GSTAmt || 0));
           this.fees.set(orderData.plateformFees || 0);
           this.discount.set(orderData.discount || 0);
-          this.total.set((parseFloat(orderData.finalAmount) || 0) + (parseFloat(orderData.plateformFees) || 0));
+          this.gstEnabled.set(!!orderData.gstEnabled);
+          
+          // Calculate total: subtotal + platformFees - discount + (gst if enabled)
+          const calculatedTotal = this.subtotal() + this.fees() - this.discount() + (this.gstEnabled() ? this.tax() : 0);
+          this.total.set(calculatedTotal);
 
           // If we want to show platform fees, we might need another line in the UI
           // For now, let's keep it simple or include platform fees in the subtotal/tax if needed
