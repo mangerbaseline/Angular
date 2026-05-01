@@ -164,7 +164,7 @@ import { environment } from '../../../environments/environment';
                   <!-- Mobile/PayID Input -->
                   <div class="payto-label-pill">Mobile</div>
                   <div class="payto-input-pill" [class.error-border]="paytoValidationMessage()">
-                    <input type="text" placeholder="0123456789" [value]="paytoMobile()" (input)="validateMobile($any($event.target).value)">
+                    <input type="tel" inputmode="numeric" maxlength="10" placeholder="0123456789" [value]="paytoMobile()" (input)="validateMobile($event)">
                   </div>
                 </div>
 
@@ -698,8 +698,14 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     this.toastService.show(message, type);
   }
 
-  validateMobile(val: string) {
-    this.paytoMobile.set(val);
+  validateMobile(event: any) {
+    const target = event.target as HTMLInputElement;
+    let numericVal = target.value.replace(/\D/g, '');
+    if (numericVal.length > 10) {
+      numericVal = numericVal.substring(0, 10);
+    }
+    target.value = numericVal;
+    this.paytoMobile.set(numericVal);
     this.paytoValidationMessage.set('');
   }
 
