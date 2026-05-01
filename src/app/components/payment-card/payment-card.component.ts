@@ -1266,7 +1266,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       this.paytoState.set('authorizing');
 
       try {
-        const response = await fetch("https://backend.kuberfinancial.com.au/api/payments/intiatePayTo", {
+        const response = await fetch("https://www.kuberfinancial.com.au/api/payments/intiatePayTo", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
