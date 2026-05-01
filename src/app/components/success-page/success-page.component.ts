@@ -52,6 +52,7 @@ import { environment } from '../../../environments/environment';
                   <span class="text-muted-foreground">Payment Method</span>
                   <div class="u-flex u-items-center" style="gap: 8px;">
                     <img *ngIf="getPaymentIcon()" [src]="getPaymentIcon()" style="width: 20px; height: 16px; object-fit: contain;">
+                    <span *ngIf="isZipPay()" style="font-weight:800; font-size:16px; letter-spacing:-0.02em; background: linear-gradient(to right, #a78bfa, #e879f9); -webkit-background-clip: text; color: transparent;">zip</span>
                     <span class="text-foreground">{{ orderService.orderData()?.paymentMode || 'Stripe' }}</span>
                   </div>
                 </div>
@@ -333,6 +334,11 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
     if (mode.includes('link')) return 'link-stripe.svg';
 
     return '';
+  }
+
+  isZipPay(): boolean {
+    const mode = (this.orderService.orderData()?.paymentMode || '').toLowerCase();
+    return mode.includes('zip');
   }
 
   async downloadReceipt() {
