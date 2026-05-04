@@ -139,7 +139,7 @@ import { environment } from '../../../environments/environment';
               <div class="payto-header-row">
                 <h2 class="payto-main-title">Pay by Bank</h2>
                 <div class="payto-logos-top">
-                  <img src="https://www.kuberfinancial.com.au/tableQR/assets/images/kuber-samal-logo.svg" style="height:15px; object-fit:contain; filter: brightness(0) invert(1);">
+                  <img src="https://backend.kuberfinancial.com.au/tableQR/assets/images/kuber-samal-logo.svg" style="height:15px; object-fit:contain; filter: brightness(0) invert(1);">
                   <img src="/payto-logo.png" style="height:25px; object-fit:contain;">
                 </div>
               </div>
@@ -192,7 +192,7 @@ import { environment } from '../../../environments/environment';
             <div *ngIf="paytoState() === 'authorizing'" class="payto-authorizing-overlay fade-in">
               <div class="auth-spinner-wrap">
                 <div class="payto-custom-spinner logo-loader">
-                  <img src="https://www.kuberfinancial.com.au/tableQR/assets/images/kuber-samal-logo.svg" alt="Loading...">
+                  <img src="https://backend.kuberfinancial.com.au/tableQR/assets/images/kuber-samal-logo.svg" alt="Loading...">
                 </div>
                 <h3>Authorizing payment...</h3>
               </div>
@@ -1266,7 +1266,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       this.paytoState.set('authorizing');
 
       try {
-        const response = await fetch("https://www.kuberfinancial.com.au/api/payments/intiatePayTo", {
+        const response = await fetch("https://backend.kuberfinancial.com.au/api/payments/intiatePayTo", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
