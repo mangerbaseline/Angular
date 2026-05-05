@@ -331,8 +331,8 @@ import { environment } from '../../../environments/environment';
             </div>
             <div>
               <div class="sh-title">{{ isInvoice() ? 'Invoice Details' : 'Order Summary' }}</div>
-              <div class="sh-items" *ngIf="items().length > 0">{{ isInvoice() ? invoiceNo() : items().length + ' items' }}</div>
-              <div class="sh-items" *ngIf="items().length === 0 && isInvoice()">{{ invoiceNo() }}</div>
+              <div class="sh-items" *ngIf="(items().length > 0 && !isInvoice()) || (isInvoice() && invoiceNo())">{{ isInvoice() ? invoiceNo() : items().length + ' items' }}</div>
+              <div class="sh-items" *ngIf="items().length === 0 && isInvoice() && invoiceNo()">{{ invoiceNo() }}</div>
             </div>
           </div>
           <div class="sh-right">
@@ -357,7 +357,7 @@ import { environment } from '../../../environments/environment';
               </div>
               <div class="item-body">
                 <div class="item-name">{{ item.name }}</div>
-                <div class="item-desc">{{ item.desc }}</div>
+                <div class="item-desc" *ngIf="item.desc">{{ item.desc }}</div>
                 <div class="item-qty">Qty: {{ item.qty }}</div>
               </div>
               <div class="item-price">{{ item.price | currency }}</div>
@@ -383,23 +383,23 @@ import { environment } from '../../../environments/environment';
               <h2 class="invoice-main-title">INVOICE</h2>
               
               <div class="invoice-meta-grid">
-                <div class="meta-item">
+                <div class="meta-item" *ngIf="customerName()">
                   <span class="meta-label">To</span>
                   <span class="meta-value">{{ customerName() }}</span>
                 </div>
-                <div class="meta-item">
+                <div class="meta-item" *ngIf="invoiceNo()">
                   <span class="meta-label">Invoice No.</span>
                   <span class="meta-value">{{ invoiceNo() }}</span>
                 </div>
-                <div class="meta-item">
+                <div class="meta-item" *ngIf="issueDate()">
                   <span class="meta-label">Issued On</span>
                   <span class="meta-value">{{ issueDate() | date:'dd-MM-yyyy' }}</span>
                 </div>
-                <div class="meta-item">
+                <div class="meta-item" *ngIf="merchantPhone() || merchantEmail()">
                   <span class="meta-label">From</span>
                   <div class="meta-value multi">
-                    <div>{{ merchantPhone() }}</div>
-                    <div>{{ merchantEmail() }}</div>
+                    <div *ngIf="merchantPhone()">{{ merchantPhone() }}</div>
+                    <div *ngIf="merchantEmail()">{{ merchantEmail() }}</div>
                   </div>
                 </div>
               </div>
@@ -892,10 +892,17 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
 
   private handleOrderResponse(orderData: any) {
     if (orderData.orderedThrough === 'QR' && orderData.qrTableData) {
+      const qr = orderData.qrTableData;
+      const parts = [];
+      if (qr.name) parts.push(`Name: ${qr.name}`);
+      if (qr.email) parts.push(`Email: ${qr.email}`);
+      if (qr.phone) parts.push(`Phone: ${qr.phone}`);
+      if (qr.tableNumber) parts.push(`Location: ${qr.tableNumber}`);
+
       this.items.set([{
         name: 'QR Payment',
         price: orderData.amount || 0,
-        desc: `Name: ${orderData.qrTableData.name || 'N/A'} | Email: ${orderData.qrTableData.email || 'N/A'} | Phone: ${orderData.qrTableData.phone || 'N/A'} | Location: ${orderData.qrTableData.tableNumber || 'N/A'}`,
+        desc: parts.join(' | '),
         qty: orderData.qrTableData.quantity || 1
       }]);
     } else if (Array.isArray(orderData.menuList)) {

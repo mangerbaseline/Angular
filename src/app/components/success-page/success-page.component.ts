@@ -69,7 +69,7 @@ import { environment } from '../../../environments/environment';
               <div class="u-space-y-4 pt-2">
                 <div *ngFor="let item of orderService.orderData()?.menuList" class="u-bg-secondary-30 u-rounded-xl u-p-4 border border-border-30">
                   <div class="u-flex u-justify-between u-items-start mb-3">
-                    <div>
+                    <div *ngIf="item.firstName || item.lastName">
                       <h3 class="u-font-semibold text-foreground">{{ item.firstName }} {{ item.lastName }}</h3>
                     </div>
                     <img *ngIf="item.image && (item.image.startsWith('http') || item.image.startsWith('https'))" 
@@ -78,14 +78,14 @@ import { environment } from '../../../environments/environment';
                          style="width: 48px; height: 48px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(255,255,255,0.1);">
                   </div>
                   <div class="u-grid u-grid-cols-1 u-gap-2 text-[11px]">
-                    <div class="u-flex u-items-center u-gap-2 text-muted-foreground">
+                    <div class="u-flex u-items-center u-gap-2 text-muted-foreground" *ngIf="item.mobile">
                       <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                       {{ item.mobile }}
                     </div>
-                    <div class="u-flex u-items-start u-gap-2 text-muted-foreground">
+                    <div class="u-flex u-items-start u-gap-2 text-muted-foreground" *ngIf="item.streetName || item.city || item.state">
                       <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
                       <span class="flex-1">
-                        {{ item.streetNumber }} {{ item.streetName }}, {{ item.city }}, {{ item.state }} {{ item.postal }}, {{ item.country }}
+                        {{ item.streetNumber }} {{ item.streetName }}{{ item.streetName && (item.city || item.state) ? ',' : '' }} {{ item.city }}{{ item.city && item.state ? ',' : '' }} {{ item.state }} {{ item.postal }} {{ item.country }}
                       </span>
                     </div>
                     <div *ngIf="item.aboutEvent" class="u-mt-2 u-p-2 rounded bg-black/20 text-muted-foreground italic border-l-2 border-primary">

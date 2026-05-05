@@ -1,6 +1,9 @@
 import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OrderService } from '../../services/order.service';
+import { ActivatedRoute } from '@angular/router';
+import * as CryptoJS from 'crypto-js';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-order-summary',
@@ -45,7 +48,7 @@ import { OrderService } from '../../services/order.service';
                 <span class="item-name">{{ item.name }}</span>
                 <span class="item-price">{{ item.price | currency }}</span>
               </div>
-              <div class="item-desc">{{ item.desc }}</div>
+              <div class="item-desc" *ngIf="item.desc">{{ item.desc }}</div>
               <div class="item-qty">Qty: {{ item.qty }}</div>
             </div>
           </div>
@@ -131,16 +134,76 @@ export class OrderSummaryComponent implements OnInit {
   total = signal(0);
   gstEnabled = signal(false);
 
+  private route = inject(ActivatedRoute);
+
+  decryptToken(token: string): any {
+    try {
+      const parts = token.split(":");
+      if (parts.length < 2) return null;
+      const ivPart = parts[0];
+      let encPart = parts[1];
+      if (encPart.endsWith("=")) {
+        encPart = encPart.slice(0, -1);
+      }
+
+      const key = CryptoJS.SHA256(environment.encryptionKey);
+      const iv = CryptoJS.enc.Hex.parse(ivPart);
+      const cipherParams = CryptoJS.lib.CipherParams.create({ ciphertext: CryptoJS.enc.Hex.parse(encPart) });
+      const decrypted = CryptoJS.AES.decrypt(cipherParams, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
+      const decStr = decrypted.toString(CryptoJS.enc.Utf8);
+
+      if (!decStr) return null;
+
+      const params = new URLSearchParams(decStr);
+      return {
+        merId: params.get('merId') || '',
+        orderId: params.get('orderId') || '',
+        paymentId: params.get('paymentId') || ''
+      };
+    } catch (error) {
+      console.error("Decryption error:", error);
+      return null;
+    }
+  }
+
   ngOnInit() {
     this.fetchOrderDetails();
   }
 
   fetchOrderDetails() {
     this.loading.set(true);
-    // Static orderID as requested
-    const orderID = "69d8c39a8465304915452e1d";
 
-    this.orderService.getOrderItems(orderID).subscribe({
+    this.route.queryParams.subscribe(params => {
+      let token = params['token'] || '';
+      if (!token) {
+        const keys = Object.keys(params);
+        const tokenKey = keys.find(k => k.includes(':') && k.length > 30);
+        if (tokenKey) {
+          token = tokenKey;
+          if (params[tokenKey] && params[tokenKey] !== '') {
+            token += '=' + params[tokenKey];
+          }
+        }
+      }
+
+      let orderID = params['orderId'] || '';
+      let paymentId = params['paymentId'] || '';
+
+      if (token) {
+        const decrypted = this.decryptToken(token);
+        if (decrypted) {
+          orderID = decrypted.orderId;
+          paymentId = decrypted.paymentId;
+        }
+      }
+
+      if (!orderID) {
+        this.loading.set(false);
+        this.orderService.isError.set(true);
+        return;
+      }
+
+      this.orderService.getOrderItems(orderID, !!paymentId).subscribe({
       next: (response) => {
         console.log('Order Items:', response);
         if (response && response.data) {
@@ -173,7 +236,7 @@ export class OrderSummaryComponent implements OnInit {
           this.fees.set(orderData.plateformFees || 0);
           this.discount.set(orderData.discount || 0);
           this.gstEnabled.set(!!orderData.gstEnabled);
-          
+
           // Calculate total: subtotal + platformFees - discount + (gst if enabled)
           const calculatedTotal = this.subtotal() + this.fees() - this.discount() + (this.gstEnabled() ? this.tax() : 0);
           this.total.set(calculatedTotal);
@@ -186,9 +249,11 @@ export class OrderSummaryComponent implements OnInit {
       error: (error) => {
         console.error('Error fetching order items:', error);
         this.loading.set(false);
+        this.orderService.isError.set(true);
       }
     });
-  }
+  });
+}
 
 
   toggleExpand() {
