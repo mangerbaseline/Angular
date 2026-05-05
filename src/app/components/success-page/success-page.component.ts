@@ -12,8 +12,10 @@ import { environment } from '../../../environments/environment';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="success-layout anim-fade-in">
-      <div class="success-container">
+    <div class="success-layout anim-fade-in" [class.event-mode]="isEvent()">
+      
+      <!-- DEFAULT SUCCESS DESIGN -->
+      <div *ngIf="!isEvent()" class="success-container">
         <div id="receipt-content" class="u-glass u-rounded-3xl u-p-8 u-space-y-6 max-w-lg u-w-full">
           <div class="u-flex u-flex-col u-items-center u-text-center">
             <div class="u-relative">
@@ -123,6 +125,118 @@ import { environment } from '../../../environments/environment';
           <p class="u-text-center text-xs text-muted-fg-60 pt-4">A confirmation email has been sent to your registered email address.<br>Powered by <span class="text-gradient-gold u-font-semibold">KuberPay</span></p>
         </div>
       </div>
+
+      <!-- EVENT BOOKING SUCCESS DESIGN -->
+      <div *ngIf="isEvent()" class="event-success-container">
+        <!-- Header -->
+        <div class="event-header">
+          <div class="header-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+          <h1>Booking Confirmed!</h1>
+          <p>Thank you for your purchase</p>
+        </div>
+
+        <!-- Body -->
+        <div id="receipt-content" class="event-body">
+          <!-- Booking Reference -->
+          <div class="section-reference">
+            <label>Booking Reference</label>
+            <div class="txn-id">{{ orderService.orderData()?.txn_id }}</div>
+            <div class="txn-date">{{ (orderService.orderData()?.addedOn * 1000) | date:"MMMM d, yyyy, h:mm a" }}</div>
+          </div>
+
+          <hr class="divider" />
+
+          <!-- Event Info Titles -->
+          <div class="event-titles">
+            <h2>{{ getEventItem()?.firstName }} {{ getEventItem()?.lastName }}</h2>
+            <p>{{ getEventItem()?.itemName }}</p>
+          </div>
+
+          <!-- Info Cards Grid -->
+          <div class="info-grid">
+            <div class="info-card card-pink">
+              <div class="card-icon">📅</div>
+              <label>Date</label>
+              <div class="value">{{ getEventItem()?.eventDate || 'Friday, 20 February 2026' }}</div>
+            </div>
+            <div class="info-card card-green">
+              <div class="card-icon">📍</div>
+              <label>Location</label>
+              <div class="value">{{ getEventItem()?.city || 'dfgdg' }}</div>
+            </div>
+            <div class="info-card card-pink">
+              <div class="card-icon">⏰</div>
+              <label>Start Time</label>
+              <div class="value">{{ getEventItem()?.eventStartTime || '01:47' }}</div>
+            </div>
+            <div class="info-card card-green">
+              <div class="card-icon">👥</div>
+              <label>Tickets</label>
+              <div class="value">{{ orderService.totalAmount() | currency }} Persons</div>
+            </div>
+          </div>
+
+          <hr class="divider" />
+
+          <!-- Booking Details -->
+          <div class="details-section">
+            <h3>Booking Details</h3>
+            <div class="detail-row">
+              <label>Name</label>
+              <span>{{ getEventItem()?.firstName }} {{ getEventItem()?.lastName }}</span>
+            </div>
+            <div class="detail-row">
+              <label>Email</label>
+              <span>{{ getEventItem()?.email || 'st83210@gmail.com' }}</span>
+            </div>
+            <div class="detail-row">
+              <label>Mobile</label>
+              <span>{{ getEventItem()?.mobile || '8294483221' }}</span>
+            </div>
+            <div class="detail-row" *ngIf="getEventItem()?.city">
+              <label>Pickup Location</label>
+              <span>{{ getEventItem()?.city }}</span>
+            </div>
+          </div>
+
+          <hr class="divider" />
+
+          <!-- Payment Summary -->
+          <div class="details-section">
+            <h3>Payment Summary</h3>
+            <div class="detail-row">
+              <label>Tickets (1 × {{ getEventItem()?.itemPrice || getEventItem()?.amount | currency }})</label>
+              <span>{{ getEventItem()?.itemPrice || getEventItem()?.amount | currency }}</span>
+            </div>
+            <div class="detail-row">
+              <label>Fees</label>
+              <span>{{ orderService.orderData()?.plateformFees | currency }}</span>
+            </div>
+            <div class="detail-row font-bold text-black border-t pt-2 mt-2">
+              <label>Total Paid</label>
+              <span>{{ orderService.totalAmount() | currency }}</span>
+            </div>
+          </div>
+
+          <div class="footer-messages">
+            <p>A confirmation email has been sent to</p>
+            <p class="font-semibold">{{ getEventItem()?.email || 'st83210@gmail.com' }}</p>
+            <p class="mt-4">Please take screenshot and save this and booking reference for the event</p>
+            <p class="text-pink-500 font-bold mt-6 italic">✔ We look forward to seeing you!</p>
+          </div>
+        </div>
+
+        <!-- Fixed Bottom Action -->
+        <div class="fixed-bottom">
+          <button (click)="onReturn()" class="book-another-btn">
+            Book Another Ticket
+          </button>
+        </div>
+      </div>
     </div>
   `,
   styles: [`
@@ -202,6 +316,220 @@ import { environment } from '../../../environments/environment';
     .action-btn:hover { transform: translateY(-2px); }
     .return-btn { transition: transform 0.3s ease, box-shadow 0.3s ease; border: none; }
     .return-btn:hover { transform: translateY(-2px); box-shadow: 0 20px 20px rgba(16, 185, 129, 0.5); }
+
+    /* EVENT MODE STYLES */
+    .success-layout.event-mode {
+      background: #f8fafc;
+      justify-content: flex-start;
+      padding-bottom: 80px; /* Space for fixed button */
+    }
+
+    .event-success-container {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      min-height: 100vh;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+
+    .event-header {
+      background: #4CAF50;
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-check {
+      width: 64px;
+      height: 64px;
+      border: 3px solid white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+
+    .header-check svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    .event-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .event-header p {
+      font-size: 14px;
+      opacity: 0.9;
+      margin: 0;
+    }
+
+    .event-body {
+      padding: 30px 24px;
+      background: white;
+    }
+
+    .section-reference {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .section-reference label {
+      display: block;
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+
+    .txn-id {
+      font-size: 24px;
+      font-weight: 700;
+      color: #f43f5e; /* Pink-ish as in screenshot */
+      margin-bottom: 4px;
+    }
+
+    .txn-date {
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    .divider {
+      border: 0;
+      border-top: 1px solid #f1f5f9;
+      margin: 24px 0;
+    }
+
+    .event-titles {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .event-titles h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0 0 8px 0;
+    }
+
+    .event-titles p {
+      font-size: 16px;
+      font-weight: 600;
+      color: #334155;
+      margin: 0;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .info-card {
+      padding: 16px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .card-pink { background: #fff1f2; }
+    .card-green { background: #f0fdf4; }
+
+    .card-icon {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .info-card label {
+      font-size: 11px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+
+    .info-card .value {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .details-section h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 16px;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+
+    .detail-row label {
+      color: #64748b;
+    }
+
+    .detail-row span {
+      color: #1e293b;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .footer-messages {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 13px;
+      color: #475569;
+    }
+
+    .footer-messages .font-semibold {
+      color: #1e293b;
+    }
+
+    .text-pink-500 { color: #ec4899; }
+
+    .fixed-bottom {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      padding: 16px 20px;
+      box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+    }
+
+    .book-another-btn {
+      width: 100%;
+      max-width: 800px;
+      background: #000;
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .text-black { color: #000 !important; }
+    .font-bold { font-weight: 700 !important; }
   `]
 })
 export class SuccessPageComponent implements OnInit, OnDestroy {
@@ -215,6 +543,15 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
 
   handleMerchantImageError() {
     this.isMerchantImageValid.set(false);
+  }
+
+  isEvent(): boolean {
+    return this.orderService.orderData()?.payment_sub_type === 'event';
+  }
+
+  getEventItem() {
+    const list = this.orderService.orderData()?.menuList;
+    return (list && list.length > 0) ? list[0] : null;
   }
 
 
