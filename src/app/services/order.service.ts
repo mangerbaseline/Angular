@@ -84,5 +84,9 @@ export class OrderService {
     });
     return this.http.post(`${this.backendApi}/payments/cancelPaymentRequest`, { orderID }, { headers });
   }
+
+  getTicketByMerchantId(merchantID: string): Observable<any> {
+    return this.http.get(`${this.backendApi}/getTicketByMerchantId/${merchantID}`);
+  }
 }
 

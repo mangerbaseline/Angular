@@ -71,8 +71,13 @@ import { environment } from '../../../environments/environment';
               <div class="u-space-y-4 pt-2">
                 <div *ngFor="let item of orderService.orderData()?.menuList" class="u-bg-secondary-30 u-rounded-xl u-p-4 border border-border-30">
                   <div class="u-flex u-justify-between u-items-start mb-3">
-                    <div *ngIf="item.firstName || item.lastName">
-                      <h3 class="u-font-semibold text-foreground">{{ item.firstName }} {{ item.lastName }}</h3>
+                    <div *ngIf="item.firstName || item.lastName || item.itemName">
+                      <h3 class="u-font-semibold text-foreground">
+                        {{ item.firstName }} {{ item.lastName }}
+                        <span *ngIf="!item.firstName && !item.lastName">{{ item.itemName }}</span>
+                      </h3>
+                      <p class="text-[11px] text-muted-foreground" *ngIf="item.itemName && (item.firstName || item.lastName)">{{ item.itemName }}</p>
+                      <p class="text-[10px] text-muted-fg-60 mt-1" *ngIf="item.description">{{ item.description }}</p>
                     </div>
                     <img *ngIf="item.image && (item.image.startsWith('http') || item.image.startsWith('https'))" 
                          [src]="item.image" 
@@ -80,6 +85,10 @@ import { environment } from '../../../environments/environment';
                          style="width: 48px; height: 48px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(255,255,255,0.1);">
                   </div>
                   <div class="u-grid u-grid-cols-1 u-gap-2 text-[11px]">
+                    <div class="u-flex u-justify-between u-items-center border-t border-border-30 pt-2" *ngIf="item.quantity || item.perItemPrice || item.amount">
+                      <span class="text-muted-foreground">Quantity: {{ item.quantity || 1 }}</span>
+                      <span class="u-font-semibold text-foreground">{{ (item.perItemPrice || item.amount) | currency }}</span>
+                    </div>
                     <div class="u-flex u-items-center u-gap-2 text-muted-foreground" *ngIf="item.mobile">
                       <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                       {{ item.mobile }}
@@ -152,8 +161,8 @@ import { environment } from '../../../environments/environment';
 
           <!-- Event Info Titles -->
           <div class="event-titles">
-            <h2>{{ getEventItem()?.firstName }} {{ getEventItem()?.lastName }}</h2>
-            <p>{{ getEventItem()?.itemName }}</p>
+            <h2>{{ getEventItem()?.firstName || orderService.orderData()?.qrTableData?.name }} {{ getEventItem()?.lastName || '' }}</h2>
+            <p>{{ getEventItem()?.itemName || ticketData()?.bannerHeading || 'Event Booking' }}</p>
           </div>
 
           <!-- Info Cards Grid -->
@@ -166,17 +175,17 @@ import { environment } from '../../../environments/environment';
             <div class="info-card card-green">
               <div class="card-icon">📍</div>
               <label>Location</label>
-              <div class="value">{{ getEventItem()?.city || 'dfgdg' }}</div>
+              <div class="value">{{ ticketData()?.location || getEventItem()?.city || 'N/A' }}</div>
             </div>
             <div class="info-card card-pink">
               <div class="card-icon">⏰</div>
               <label>Start Time</label>
-              <div class="value">{{ getEventItem()?.eventStartTime || '01:47' }}</div>
+              <div class="value">{{ ticketData()?.pickup || getEventItem()?.eventStartTime || 'N/A' }}</div>
             </div>
             <div class="info-card card-green">
               <div class="card-icon">👥</div>
               <label>Tickets</label>
-              <div class="value">{{ orderService.totalAmount() | currency }} Persons</div>
+              <div class="value">{{ getQuantity() }} Persons</div>
             </div>
           </div>
 
@@ -185,21 +194,21 @@ import { environment } from '../../../environments/environment';
           <!-- Booking Details -->
           <div class="details-section">
             <h3>Booking Details</h3>
-            <div class="detail-row">
+            <div class="detail-row" *ngIf="getEventItem()?.firstName || orderService.orderData()?.qrTableData?.name">
               <label>Name</label>
-              <span>{{ getEventItem()?.firstName }} {{ getEventItem()?.lastName }}</span>
+              <span>{{ getEventItem()?.firstName || orderService.orderData()?.qrTableData?.name }} {{ getEventItem()?.lastName || '' }}</span>
             </div>
-            <div class="detail-row">
+            <div class="detail-row" *ngIf="getEventItem()?.email || orderService.orderData()?.qrTableData?.email">
               <label>Email</label>
-              <span>{{ getEventItem()?.email || 'st83210@gmail.com' }}</span>
+              <span>{{ getEventItem()?.email || orderService.orderData()?.qrTableData?.email }}</span>
             </div>
-            <div class="detail-row">
+            <div class="detail-row" *ngIf="getEventItem()?.mobile || orderService.orderData()?.qrTableData?.phone">
               <label>Mobile</label>
-              <span>{{ getEventItem()?.mobile || '8294483221' }}</span>
+              <span>{{ getEventItem()?.mobile || orderService.orderData()?.qrTableData?.phone }}</span>
             </div>
-            <div class="detail-row" *ngIf="getEventItem()?.city">
+            <div class="detail-row" *ngIf="getEventItem()?.city || ticketData()?.location">
               <label>Pickup Location</label>
-              <span>{{ getEventItem()?.city }}</span>
+              <span>{{ ticketData()?.location || getEventItem()?.city }}</span>
             </div>
           </div>
 
@@ -209,10 +218,10 @@ import { environment } from '../../../environments/environment';
           <div class="details-section">
             <h3>Payment Summary</h3>
             <div class="detail-row">
-              <label>Tickets (1 × {{ getEventItem()?.itemPrice || getEventItem()?.amount | currency }})</label>
-              <span>{{ getEventItem()?.itemPrice || getEventItem()?.amount | currency }}</span>
+              <label>Tickets ({{ getQuantity() }} × {{ (ticketData()?.perPerson || getEventItem()?.perItemPrice || getEventItem()?.amount) | currency }})</label>
+              <span>{{ ( getQuantity() * (ticketData()?.perPerson || getEventItem()?.perItemPrice || getEventItem()?.amount) ) | currency }}</span>
             </div>
-            <div class="detail-row">
+            <div class="detail-row" *ngIf="orderService.orderData()?.plateformFees">
               <label>Fees</label>
               <span>{{ orderService.orderData()?.plateformFees | currency }}</span>
             </div>
@@ -223,8 +232,10 @@ import { environment } from '../../../environments/environment';
           </div>
 
           <div class="footer-messages">
-            <p>A confirmation email has been sent to</p>
-            <p class="font-semibold">{{ getEventItem()?.email || 'st83210@gmail.com' }}</p>
+            <p *ngIf="getEventItem()?.email || orderService.orderData()?.qrTableData?.email">A confirmation email has been sent to</p>
+            <p class="font-semibold" *ngIf="getEventItem()?.email || orderService.orderData()?.qrTableData?.email">
+              {{ getEventItem()?.email || orderService.orderData()?.qrTableData?.email }}
+            </p>
             <p class="mt-4">Please take screenshot and save this and booking reference for the event</p>
             <p class="text-pink-500 font-bold mt-6 italic">✔ We look forward to seeing you!</p>
           </div>
@@ -539,6 +550,7 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
 
   countdown = signal(600);
   isMerchantImageValid = signal(true);
+  ticketData = signal<any>(null);
   private timer: any;
 
   handleMerchantImageError() {
@@ -552,6 +564,23 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
   getEventItem() {
     const list = this.orderService.orderData()?.menuList;
     return (list && list.length > 0) ? list[0] : null;
+  }
+
+  getQuantity(): number {
+    const data = this.orderService.orderData();
+    if (!data) return 1;
+    
+    // Check menuList first
+    if (data.menuList && data.menuList.length > 0) {
+      return data.menuList[0].quantity || 1;
+    }
+    
+    // Fallback to qrTableData
+    if (data.qrTableData && data.qrTableData.quantity) {
+      return data.qrTableData.quantity;
+    }
+    
+    return 1;
   }
 
 
@@ -588,6 +617,20 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
           next: (res) => {
             this.startCountdown();
             this.orderService.isLoading.set(false);
+            
+            // If event booking, fetch additional ticket details
+            if (this.isEvent()) {
+              const merchantId = res.data?.merchantID || res.data?.userID;
+              if (merchantId) {
+                this.orderService.getTicketByMerchantId(merchantId).subscribe({
+                  next: (ticketRes) => {
+                    if (ticketRes && ticketRes.success) {
+                      this.ticketData.set(ticketRes.response);
+                    }
+                  }
+                });
+              }
+            }
           },
           error: (err) => {
             console.error("Error fetching order items:", err);
