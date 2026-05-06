@@ -416,7 +416,10 @@ import { environment } from '../../../environments/environment';
                   </thead>
                   <tbody>
                     <tr *ngFor="let item of items()">
-                      <td class="text-left item-name-td">{{ item.name }}</td>
+                      <td class="text-left item-name-td">
+                        <div class="invoice-item-name">{{ item.name }}</div>
+                        <div *ngIf="item.desc" class="invoice-item-desc">{{ item.desc }}</div>
+                      </td>
                       <td class="text-center">{{ item.qty | number:'2.0-0' }}</td>
                       <td class="text-right">{{ item.price | number:'1.2-2' }}</td>
                       <td class="text-right">{{ (item.price * item.qty) | number:'1.2-2' }}</td>
@@ -907,12 +910,25 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
         return price > 0;
       });
 
-      this.items.set(filteredList.map((item: any) => ({
-        name: item.itemName || 'Unknown Item',
-        price: item.itemPrice || item.perItemPrice || item.amount || 0,
-        desc: item.description || '',
-        qty: item.quantity || 1
-      })));
+      this.items.set(filteredList.map((item: any) => {
+        let name = item.itemName;
+        if (!name && item.firstName) {
+          name = `${item.firstName} ${item.lastName || ''}`.trim();
+        }
+        if (!name) name = 'Unknown Item';
+
+        const descParts = [];
+        if (item.description) descParts.push(item.description);
+        if (item.email) descParts.push(item.email);
+        if (item.mobile) descParts.push(item.mobile);
+
+        return {
+          name: name,
+          price: item.itemPrice || item.perItemPrice || item.amount || 0,
+          desc: descParts.join(' | '),
+          qty: item.quantity || 1
+        };
+      }));
     }
 
     this.subtotal.set(orderData.subTotal || orderData.prevAmt || orderData.amount || 0);
