@@ -96,29 +96,7 @@ import { environment } from '../../../environments/environment';
       </div>
     </div>
   `,
-  styles: [`
-    .loading-state {
-      padding: 1rem;
-    }
-    .skeleton {
-      background: rgba(255, 255, 255, 0.05);
-      background: linear-gradient(90deg, 
-        rgba(255, 255, 255, 0.05) 25%, 
-        rgba(255, 255, 255, 0.1) 50%, 
-        rgba(255, 255, 255, 0.05) 75%
-      );
-      background-size: 200% 100%;
-      animation: skeleton-loading 1.5s infinite;
-    }
-    @keyframes skeleton-loading {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-    .free {
-      color: #10b981;
-      font-weight: 600;
-    }
-  `]
+  styleUrls: ['./order-summary.component.css']
 })
 export class OrderSummaryComponent implements OnInit {
   private orderService = inject(OrderService);
@@ -204,56 +182,56 @@ export class OrderSummaryComponent implements OnInit {
       }
 
       this.orderService.getOrderItems(orderID, !!paymentId).subscribe({
-      next: (response) => {
-        console.log('Order Items:', response);
-        if (response && response.data) {
-          const orderData = response.data;
+        next: (response) => {
+          console.log('Order Items:', response);
+          if (response && response.data) {
+            const orderData = response.data;
 
-          // Map menuList to items
-          if (Array.isArray(orderData.menuList)) {
-            const filteredList = orderData.menuList.filter((item: any) => {
-              const price = item.itemPrice || item.perItemPrice || item.amount || 0;
-              return price > 0;
-            });
+            if (Array.isArray(orderData.menuList)) {
+              const filteredList = orderData.menuList.filter((item: any) => {
+                const price = item.itemPrice || item.perItemPrice || item.amount || 0;
+                return price > 0;
+              });
 
-            this.items.set(filteredList.map((item: any) => ({
-              name: item.itemName || 'Unknown Item',
-              price: item.itemPrice || item.perItemPrice || item.amount || 0,
-              desc: item.description || '',
-              qty: item.quantity || 1
-            })));
+              this.items.set(filteredList.map((item: any) => ({
+                name: item.itemName || 'Unknown Item',
+                price: item.itemPrice || item.perItemPrice || item.amount || 0,
+                desc: item.description || '',
+                qty: item.quantity || 1
+              })));
+            }
+
+            // In this API structure:
+            // prevAmt seems to be the raw subtotal (sum of item prices)
+            // discount is the discount amount
+            // GSTAmt is the tax
+            // plateformFees is an additional fee
+            // amount is the total to be paid
+
+            const itemsSum = (orderData.menuList || []).reduce((acc: number, item: any) => acc + (parseFloat(item.totalPrice || item.amount || 0) || 0), 0);
+            this.subtotal.set(itemsSum || orderData.prevAmt || 0);
+            
+            this.tax.set(parseFloat(orderData.gstAmount || orderData.GSTAmt || 0));
+            this.fees.set(orderData.plateformFees || 0);
+            this.discount.set(orderData.discount || 0);
+            this.gstEnabled.set(!!orderData.gstEnabled);
+
+            const calculatedTotal = this.subtotal() - this.discount() + (this.gstEnabled() ? this.tax() : 0) + this.fees();
+            this.total.set(calculatedTotal);
+
+            // If we want to show platform fees, we might need another line in the UI
+            // For now, let's keep it simple or include platform fees in the subtotal/tax if needed
           }
-
-          // In this API structure:
-          // prevAmt seems to be the raw subtotal (sum of item prices)
-          // discount is the discount amount
-          // GSTAmt is the tax
-          // plateformFees is an additional fee
-          // amount is the total to be paid
-
-          this.subtotal.set(orderData.prevAmt || 0);
-          this.tax.set(parseFloat(orderData.gstAmount || orderData.GSTAmt || 0));
-          this.fees.set(orderData.plateformFees || 0);
-          this.discount.set(orderData.discount || 0);
-          this.gstEnabled.set(!!orderData.gstEnabled);
-
-          // Calculate total: subtotal + platformFees - discount + (gst if enabled)
-          const calculatedTotal = this.subtotal() + this.fees() - this.discount() + (this.gstEnabled() ? this.tax() : 0);
-          this.total.set(calculatedTotal);
-
-          // If we want to show platform fees, we might need another line in the UI
-          // For now, let's keep it simple or include platform fees in the subtotal/tax if needed
+          this.loading.set(false);
+        },
+        error: (error) => {
+          console.error('Error fetching order items:', error);
+          this.loading.set(false);
+          this.orderService.isError.set(true);
         }
-        this.loading.set(false);
-      },
-      error: (error) => {
-        console.error('Error fetching order items:', error);
-        this.loading.set(false);
-        this.orderService.isError.set(true);
-      }
+      });
     });
-  });
-}
+  }
 
 
   toggleExpand() {

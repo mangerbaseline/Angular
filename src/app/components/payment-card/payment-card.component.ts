@@ -441,9 +441,13 @@ import { environment } from '../../../environments/environment';
                   <span class="calc-label">Total Tax (GST)</span>
                   <span class="calc-value">{{ tax() | number:'1.2-2' }}</span>
                 </div>
+                <div class="calc-row" *ngIf="fees() > 0">
+                  <span class="calc-label">Platform Fees</span>
+                  <span class="calc-value">{{ fees() | number:'1.2-2' }}</span>
+                </div>
                 <div class="calc-total-row">
                   <span class="total-text">Total Amount</span>
-                  <span class="total-val">{{ totalAmount() | currency:'USD' }}</span>
+                  <span class="total-val">{{ totalAmount() | currency }}</span>
                 </div>
               </div>
             </div>
@@ -931,14 +935,17 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       }));
     }
 
-    this.subtotal.set(orderData.subTotal || orderData.prevAmt || orderData.amount || 0);
+    // Sum up items for true subtotal (matching your image: 50 + 20 + 200 = 270)
+    const itemsSum = (orderData.menuList || []).reduce((acc: number, item: any) => acc + (parseFloat(item.totalPrice || item.amount || 0) || 0), 0);
+    this.subtotal.set(itemsSum || orderData.amount || 0);
+    
     this.tax.set(parseFloat(orderData.gstAmount || orderData.GSTAmt || 0));
     this.fees.set(orderData.plateformFees || 0);
     this.discount.set(orderData.discount || 0);
     this.gstEnabled.set(!!orderData.gstEnabled);
 
-    // Calculate total: subtotal + platformFees - discount + (gst if enabled)
-    const calculatedTotal = this.subtotal() + this.fees() - this.discount() + (this.gstEnabled() ? this.tax() : 0);
+    // Calculate total: subtotal - discount + tax + fees (matching image: 270 - 50 + 22 = 242)
+    const calculatedTotal = this.subtotal() - this.discount() + (this.gstEnabled() ? this.tax() : 0) + this.fees();
     this.totalAmount.set(calculatedTotal);
 
     this.totalAmountChange.emit(this.totalAmount());
@@ -1237,7 +1244,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
 
   getCTA() {
     const method = this.selectedMethod();
-    const amountStr = this.totalAmount().toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    const amountStr = '$' + this.totalAmount().toFixed(2);
 
     if (method === 'payto') {
       if (this.paytoState() === 'failed') return 'Retry';
@@ -1285,7 +1292,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
       this.paytoState.set('authorizing');
 
       try {
-        const response = await fetch("https://backend.kuberfinancial.com.au/api/payments/intiatePayTo", {
+        const response = await fetch(`${environment.apiUrl}/payments/intiatePayTo`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

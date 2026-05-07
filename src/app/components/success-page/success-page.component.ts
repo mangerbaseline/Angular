@@ -107,10 +107,87 @@ import { environment } from '../../../environments/environment';
               </div>
             </div>
 
-            <div class="border-t border-border-50 pt-4">
+            <!-- Detailed Invoice Section (for Invoices) -->
+            <div *ngIf="orderService.orderData()?.addedby === 'invoice'" class="border-t border-border-50 pt-6">
+              <h1 class="u-text-center u-text-xl u-font-bold text-foreground mb-8 uppercase tracking-[0.2em]" style="font-family: 'Space Grotesk', sans-serif;">Invoice</h1>
+              
+              <div class="u-flex u-justify-between u-items-start mb-6">
+                <div class="u-space-y-1">
+                  <p class="text-[8px] text-muted-foreground uppercase tracking-wider font-bold">To</p>
+                  <p class="text-sm font-semibold text-foreground">{{ orderService.orderData()?.invoiceDetails?.invoiceTitle || 'Customer' }}</p>
+                </div>
+                <div class="u-text-right u-space-y-1">
+                  <p class="text-[8px] text-muted-foreground uppercase tracking-wider font-bold">Invoice No.</p>
+                  <p class="text-sm font-semibold text-foreground">{{ orderService.orderData()?.invoiceDetails?.invoiceNo || orderService.orderData()?.txn_id }}</p>
+                </div>
+              </div>
+
+              <div class="u-flex u-justify-between u-items-start mb-8">
+                <div class="u-space-y-1">
+                  <p class="text-[8px] text-muted-foreground uppercase tracking-wider font-bold">Issued On</p>
+                  <p class="text-sm font-semibold text-foreground">{{ (orderService.orderData()?.addedOn * 1000) | date:'dd-MM-yyyy' }}</p>
+                </div>
+                <div class="u-text-right u-space-y-1">
+                  <p class="text-[8px] text-muted-foreground uppercase tracking-wider font-bold">From</p>
+                  <p class="text-sm font-semibold text-foreground">
+                    {{ orderService.orderData()?.merchantData?.email || orderService.orderData()?.merchantData?.name }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Itemized Table Header -->
+          <div class="u-grid u-grid-cols-12 u-gap-2 u-pb-2 border-b border-border-30 mb-4 text-[6px] font-bold text-muted-foreground uppercase tracking-widest">
+  <div class="u-col-span-6">Item</div>
+  <div class="u-col-span-2 u-text-center">Qty.</div>
+  <div class="u-col-span-2 u-text-right">Rate</div>
+  <div class="u-col-span-2 u-text-right">Amount</div>
+</div>
+
+              <!-- Items -->
+              <div class="u-space-y-4 mb-8">
+                <div *ngFor="let item of orderService.orderData()?.menuList" class="u-grid u-grid-cols-12 u-gap-2 text-sm">
+                  <div class="u-col-span-6 u-font-bold text-foreground">{{ item.itemName }}</div>
+                  <div class="u-col-span-2 u-text-center text-muted-foreground">{{ item.quantity | number:'2.0-0' }}</div>
+                  <div class="u-col-span-2 u-text-right text-muted-foreground">{{ (item.itemPrice || item.perItemPrice) | number:'1.2-2' }}</div>
+                  <div class="u-col-span-2 u-text-right u-font-semibold text-foreground">{{ (item.totalPrice || item.amount) | number:'1.2-2' }}</div>
+                </div>
+              </div>
+
+              <!-- Footer Calculations (Matches sidebar logic) -->
+              <div class="border-t border-border-50 pt-4 u-space-y-3">
+                <div class="u-flex u-justify-between text-sm">
+                  <span class="text-foreground font-medium">Subtotal</span>
+                  <span class="text-foreground u-font-medium">{{ getRawSubtotal() | number:'1.2-2' }}</span>
+                </div>
+                <div class="u-flex u-justify-between text-sm" *ngIf="(orderService.orderData()?.discount || 0) > 0">
+                  <span class="text-pink-500 font-medium">Discount</span>
+                  <span class="text-pink-500">-{{ (orderService.orderData()?.discount || 0) | number:'1.2-2' }}</span>
+                </div>
+                <div class="u-flex u-justify-between text-sm" *ngIf="orderService.orderData()?.gstEnabled">
+                  <span class="text-foreground font-medium">Total Tax (GST)</span>
+                  <span class="text-foreground u-font-medium">{{ (orderService.orderData()?.GSTAmt || orderService.orderData()?.gstAmount || 0) | number:'1.2-2' }}</span>
+                </div>
+                <div class="u-flex u-justify-between text-sm" *ngIf="(orderService.orderData()?.plateformFees || 0) > 0">
+                  <span class="text-foreground font-medium">Platform Fees</span>
+                  <span class="text-foreground u-font-medium">{{ (orderService.orderData()?.plateformFees || 0) | number:'1.2-2' }}</span>
+                </div>
+                <div class="u-flex u-justify-between u-items-center pt-3 border-t border-border-30">
+                  <span class="u-text-lg u-font-bold text-foreground">Total Amount</span>
+                  <span class="u-text-2xl u-font-extrabold u-text-gradient">
+                    {{ (getRawSubtotal() - (orderService.orderData()?.discount || 0) + (orderService.orderData()?.gstEnabled ? (orderService.orderData()?.GSTAmt || orderService.orderData()?.gstAmount || 0) : 0) + (orderService.orderData()?.plateformFees || 0)) | currency }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Standard Summary (for non-invoices) -->
+            <div *ngIf="orderService.orderData()?.addedby !== 'invoice'" class="border-t border-border-50 pt-4">
               <h2 class="text-sm font-medium text-muted-foreground mb-5" style="font-family: 'Space Grotesk', sans-serif;">Order Summary</h2>
               <div class="u-space-y-4 text-sm pt-4 border-t border-border-30">
-                <div class="u-flex u-justify-between u-font-semibold pt-2"><span class="text-foreground">Total Paid</span><span class="u-text-gradient">{{ orderService.totalAmount() | currency }}</span></div>
+                <div class="u-flex u-justify-between u-font-semibold pt-2">
+                  <span class="text-foreground">Total Paid</span>
+                  <span class="u-text-gradient">{{ orderService.totalAmount() | currency }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -250,298 +327,7 @@ import { environment } from '../../../environments/environment';
       </div>
     </div>
   `,
-  styles: [`
-    .success-layout {
-      width: 100%;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 50;
-    }
-    
-    .success-container { width: 100%; display: flex; align-items: center; justify-content: center; padding: 60px 20px; z-index: 1000; overflow-y: auto; position: relative; }
-    .max-w-lg { max-width: 32rem; }
-    .pt-4 { padding-top: 1rem; }
-    .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
-    .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
-    .mb-2 { margin-bottom: 0.5rem; }
-    .mb-3 { margin-bottom: 0.75rem; }
-    .mb-4 { margin-bottom: 1rem; }
-    .u-rounded-lg { border-radius: 0.5rem; }
-    .u-rounded-full { border-radius: 9999px; }
-    .border-t { border-top: 1px solid; }
-    .border-border-50 { border-color: rgba(255, 255, 255, 0.05); }
-    .border-border-30 { border-color: rgba(255, 255, 255, 0.03); }
-    .w-2 { width: 0.5rem; } .h-2 { height: 0.5rem; }
-    .w-4 { width: 1rem; } .h-4 { height: 1rem; }
-    .w-5 { width: 1.25rem; } .h-5 { height: 1.25rem; }
-    .w-10 { width: 2.5rem; } .h-10 { height: 2.5rem; }
-    .w-12 { width: 3rem; } .h-12 { height: 3rem; }
-    .w-24 { width: 6rem; } .h-24 { height: 6rem; }
-    .bg-primary { background-color: #10b981; }
-    .bg-primary-glow { background-color: rgba(16, 185, 129, 0.3); }
-    .bg-secondary-50 { background: rgba(30, 41, 59, 0.5); }
-    .from-primary { --tw-gradient-from: #10b981; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(16, 185, 129, 0)); }
-    .to-accent { --tw-gradient-to: #14b8a6; }
-    .from-primary-20 { --tw-gradient-from: rgba(16, 185, 129, 0.2); }
-    .to-accent-20 { --tw-gradient-to: rgba(20, 184, 166, 0.2); }
-    .u-bg-secondary-30 { background: rgba(30, 41, 59, 0.3); }
-    .u-bg-primary-10 { background: rgba(16, 185, 129, 0.1); }
-    .u-text-primary { color: #10b981; }
-    .u-bg-primary-glow { background-color: rgba(16, 185, 129, 0.15); }
-    .u-text-xs { font-size: 0.7rem; }
-    .u-bg-black-20 { background: rgba(0, 0, 0, 0.2); }
-    .to-emerald-400 { --tw-gradient-to: #34d399; }
-    .bg-gradient-to-br { background-image: linear-gradient(to bottom right, var(--tw-gradient-stops)); }
-    .bg-gradient-to-r { background-image: linear-gradient(to right, var(--tw-gradient-stops)); }
-    .text-foreground { color: #ffffff; }
-    .text-primary { color: #10b981; }
-    .text-primary-foreground { color: #000000; }
-    .text-muted-foreground { color: rgba(255, 255, 255, 0.6); }
-    .text-muted-fg-60 { color: rgba(255, 255, 255, 0.4); }
-    .status-primary { color: #10b981; }
-    .text-xs { font-size: 0.75rem; }
-    .text-sm { font-size: 0.875rem; }
-    .font-medium { font-weight: 500; }
-    .font-mono { font-family: monospace; }
-    .text-gradient-gold { background: linear-gradient(to right, #fbbf24, #d97706); -webkit-background-clip: text; color: transparent; }
-    .blur-xl { filter: blur(24px); }
-    .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-    .shadow-primary-25 { box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.3); }
-    .transition-all { transition: all 0.3s ease; }
-    .duration-300 { transition-duration: 300ms; }
-    .overflow-hidden { overflow: hidden; }
-    .u-text-right { text-align: right; }
-    .hover-bg-secondary:hover { background: rgba(51, 65, 85, 0.8); }
-    .hover-text-primary:hover { color: #10b981; }
-    .hover-shadow-xl:hover { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
-    .hover-shadow-primary-30:hover { box-shadow: 0 15px 30px -10px rgba(16, 185, 129, 0.5); }
-    .anim-fade-in { animation: gFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    .anim-pulse-glow { animation: gPulseGlow 3s ease-in-out infinite; }
-    .animate-pulse { animation: gPulse 2s infinite; }
-    .shine-effect { position: absolute; inset: 0; background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent); transform: translateX(-100%); animation: shine 3s infinite; }
-    @keyframes shine { 100% { transform: translateX(100%); } }
-    .action-btn { transition: all 0.2s ease; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.05); }
-    .action-btn:hover { transform: translateY(-2px); }
-    .return-btn { transition: transform 0.3s ease, box-shadow 0.3s ease; border: none; }
-    .return-btn:hover { transform: translateY(-2px); box-shadow: 0 20px 20px rgba(16, 185, 129, 0.5); }
-
-    /* EVENT MODE STYLES */
-    .success-layout.event-mode {
-      background: #f8fafc;
-      justify-content: flex-start;
-      padding-bottom: 80px; /* Space for fixed button */
-    }
-
-    .event-success-container {
-      width: 100%;
-      max-width: 800px;
-      margin: 0 auto;
-      background: white;
-      min-height: 100vh;
-      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-    }
-
-    .event-header {
-      background: #4CAF50;
-      color: white;
-      padding: 40px 20px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .header-check {
-      width: 64px;
-      height: 64px;
-      border: 3px solid white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 8px;
-    }
-
-    .header-check svg {
-      width: 32px;
-      height: 32px;
-    }
-
-    .event-header h1 {
-      font-size: 28px;
-      font-weight: 700;
-      margin: 0;
-    }
-
-    .event-header p {
-      font-size: 14px;
-      opacity: 0.9;
-      margin: 0;
-    }
-
-    .event-body {
-      padding: 30px 24px;
-      background: white;
-    }
-
-    .section-reference {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .section-reference label {
-      display: block;
-      font-size: 13px;
-      color: #64748b;
-      margin-bottom: 4px;
-      font-weight: 500;
-    }
-
-    .txn-id {
-      font-size: 24px;
-      font-weight: 700;
-      color: #f43f5e; /* Pink-ish as in screenshot */
-      margin-bottom: 4px;
-    }
-
-    .txn-date {
-      font-size: 13px;
-      color: #64748b;
-    }
-
-    .divider {
-      border: 0;
-      border-top: 1px solid #f1f5f9;
-      margin: 24px 0;
-    }
-
-    .event-titles {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
-    .event-titles h2 {
-      font-size: 18px;
-      font-weight: 700;
-      color: #1e293b;
-      margin: 0 0 8px 0;
-    }
-
-    .event-titles p {
-      font-size: 16px;
-      font-weight: 600;
-      color: #334155;
-      margin: 0;
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-
-    .info-card {
-      padding: 16px;
-      border-radius: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-    }
-
-    .card-pink { background: #fff1f2; }
-    .card-green { background: #f0fdf4; }
-
-    .card-icon {
-      font-size: 20px;
-      margin-bottom: 8px;
-    }
-
-    .info-card label {
-      font-size: 11px;
-      color: #64748b;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 4px;
-    }
-
-    .info-card .value {
-      font-size: 13px;
-      font-weight: 700;
-      color: #1e293b;
-    }
-
-    .details-section h3 {
-      font-size: 14px;
-      font-weight: 700;
-      color: #1e293b;
-      margin-bottom: 16px;
-    }
-
-    .detail-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 12px;
-      font-size: 13px;
-    }
-
-    .detail-row label {
-      color: #64748b;
-    }
-
-    .detail-row span {
-      color: #1e293b;
-      font-weight: 600;
-      text-align: right;
-    }
-
-    .footer-messages {
-      text-align: center;
-      margin-top: 40px;
-      font-size: 13px;
-      color: #475569;
-    }
-
-    .footer-messages .font-semibold {
-      color: #1e293b;
-    }
-
-    .text-pink-500 { color: #ec4899; }
-
-    .fixed-bottom {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: white;
-      padding: 16px 20px;
-      box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
-      z-index: 100;
-      display: flex;
-      justify-content: center;
-    }
-
-    .book-another-btn {
-      width: 100%;
-      max-width: 800px;
-      background: #000;
-      color: white;
-      border: none;
-      padding: 16px;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 15px;
-      cursor: pointer;
-    }
-
-    .text-black { color: #000 !important; }
-    .font-bold { font-weight: 700 !important; }
-  `]
+  styleUrls: ['./success-page.component.css']
 })
 export class SuccessPageComponent implements OnInit, OnDestroy {
   orderService = inject(OrderService);
@@ -552,6 +338,11 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
   isMerchantImageValid = signal(true);
   ticketData = signal<any>(null);
   private timer: any;
+
+  getRawSubtotal(): number {
+    const list = this.orderService.orderData()?.menuList || [];
+    return list.reduce((acc: number, item: any) => acc + (parseFloat(item.totalPrice || item.amount || 0) || 0), 0);
+  }
 
   handleMerchantImageError() {
     this.isMerchantImageValid.set(false);
@@ -569,17 +360,17 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
   getQuantity(): number {
     const data = this.orderService.orderData();
     if (!data) return 1;
-    
+
     // Check menuList first
     if (data.menuList && data.menuList.length > 0) {
       return data.menuList[0].quantity || 1;
     }
-    
+
     // Fallback to qrTableData
     if (data.qrTableData && data.qrTableData.quantity) {
       return data.qrTableData.quantity;
     }
-    
+
     return 1;
   }
 
@@ -617,7 +408,7 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
           next: (res) => {
             this.startCountdown();
             this.orderService.isLoading.set(false);
-            
+
             // If event booking, fetch additional ticket details
             if (this.isEvent()) {
               const merchantId = res.data?.merchantID || res.data?.userID;
@@ -694,6 +485,14 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
   }
 
   onReturn() {
+    if (this.isEvent()) {
+      const merchantId = this.orderService.orderData()?.merchantID || this.orderService.orderData()?.userID;
+      if (merchantId) {
+        window.location.href = `https://backend.kuberfinancial.com.au/tableQR?merId=${merchantId}&spl=true&event=true`;
+        return;
+      }
+    }
+
     const url = this.orderService.orderData()?.url;
     if (url && url.trim() !== '') {
       window.location.href = url;
