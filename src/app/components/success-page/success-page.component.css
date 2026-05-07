@@ -10,10 +10,12 @@
 
 .success-container {
   width: 100%;
+  min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
+  padding: 40px 20px;
   z-index: 1000;
   overflow-y: auto;
   position: relative;
@@ -21,6 +23,14 @@
 
 .max-w-lg {
   max-width: 32rem;
+}
+
+.u-w-full {
+  width: 100% !important;
+}
+
+.u-max-w-md {
+  max-width: 28rem !important;
 }
 
 .pt-4 {
@@ -148,6 +158,65 @@
 
 .u-bg-secondary-30 {
   background: rgba(30, 41, 59, 0.3);
+}
+
+.u-p-8 {
+  padding: 2rem !important;
+}
+
+.u-p-4 {
+  padding: 1rem !important;
+}
+
+.u-space-y-6 > * + * {
+  margin-top: 1.5rem !important;
+}
+
+.u-flex-col {
+  flex-direction: column !important;
+}
+
+.u-items-center {
+  align-items: center !important;
+}
+
+.u-text-center {
+  text-align: center !important;
+}
+
+.u-relative {
+  position: relative !important;
+}
+
+.u-absolute {
+  position: absolute !important;
+}
+
+.u-inset-0 {
+  inset: 0 !important;
+}
+
+.u-justify-center {
+  justify-content: center !important;
+}
+
+.u-mt-6 {
+  margin-top: 1.5rem !important;
+}
+
+.u-glass {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.u-rounded-3xl {
+  border-radius: 1.5rem !important;
+}
+
+.u-gap-3 {
+  gap: 0.75rem !important;
 }
 
 .u-bg-primary-10 {
@@ -541,8 +610,28 @@
 
 .u-text-gradient {
   background: linear-gradient(to right, #10b981, #34d399);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  display: inline-block;
+}
+
+.success-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  animation: stackSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes stackSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .fixed-bottom {

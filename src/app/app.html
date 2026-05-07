@@ -1,4 +1,4 @@
-<!-- GLOBAL INITIALIZATION LOADER -->
+
 <div *ngIf="orderService.isLoading()" class="global-initial-loader fade-in">
   <div class="loader-content">
     <div class="payto-custom-spinner logo-loader">
@@ -14,7 +14,7 @@
   </div>
 </div>
 
-  <!-- GLOBAL TOAST -->
+  
   <div *ngIf="toastService.message()" class="toast-overlay fade-in">
     <div class="toast-card" [ngClass]="toastService.type()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18">

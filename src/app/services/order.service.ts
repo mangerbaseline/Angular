@@ -34,11 +34,11 @@ export class OrderService {
             // Sum up items for true subtotal (matching your image: 50 + 20 + 200 = 270)
             const menuList = response.data.menuList || [];
             const subtotal = menuList.reduce((acc: number, item: any) => acc + (parseFloat(item.totalPrice || item.amount || 0) || 0), 0) || parseFloat(response.data.subTotal || response.data.prevAmt || response.data.amount || 0);
-            
+
             const fees = parseFloat(response.data.plateformFees) || 0;
             const discount = parseFloat(response.data.discount) || 0;
             const gst = response.data.gstEnabled ? (parseFloat(response.data.gstAmount || response.data.GSTAmt) || 0) : 0;
-            
+
             const calculatedTotal = subtotal + fees - discount + gst;
             this.totalAmount.set(calculatedTotal);
           }
