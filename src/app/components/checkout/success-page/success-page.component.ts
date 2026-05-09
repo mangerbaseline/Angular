@@ -1,11 +1,11 @@
 import { Component, inject, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
-import { OrderService } from '../../services/order.service';
+import { OrderService } from '../../../services/order.service';
 
 import * as CryptoJS from 'crypto-js';
 import { toPng, toBlob } from 'html-to-image';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-success-page',

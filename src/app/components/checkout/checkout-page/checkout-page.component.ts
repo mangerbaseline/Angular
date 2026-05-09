@@ -1,8 +1,8 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { PaymentCardComponent } from '../payment-card/payment-card.component';
-import { VisualDisplayComponent } from '../visual-display/visual-display.component';
+import { PaymentCardComponent } from '../../payment-card/payment-card.component';
+import { VisualDisplayComponent } from '../../visual-display/visual-display.component';
 
 @Component({
   selector: 'app-checkout-page',
@@ -32,7 +32,7 @@ export class CheckoutPageComponent {
   }
 
   onPaymentSuccess() {
-    this.router.navigate(['/success'], { queryParamsHandling: 'preserve' });
+    this.router.navigate(['/checkout/success'], { queryParamsHandling: 'preserve' });
   }
 
   onTokenError(isError: boolean) {
