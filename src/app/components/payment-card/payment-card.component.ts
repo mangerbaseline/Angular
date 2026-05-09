@@ -76,7 +76,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     },
     {
       id: 'bank', name: 'PayID', color: '#10b981',
-      svg: '<svg style="width:20px; height:20px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v4M12 14v4M16 14v4"></path></svg>'
+      svg: '<img src="Payid.png" style="width:20px; height:20px; object-fit: contain;">'
     },
     {
       id: 'upi', name: 'UPI', color: '#f97316',

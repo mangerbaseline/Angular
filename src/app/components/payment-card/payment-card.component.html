@@ -43,12 +43,12 @@
     <p class="section-title">{{ methods.length === 1 ? 'Payment method' : 'Choose payment method' }}</p>
     <div class="method-tabs">
       <button *ngFor="let m of methods" [class.selected]="selectedMethod() === m.id"
-        [class.disabled-tab]="m.id === 'upi'" (click)="selectMethod(m.id)" class="method-tab"
+        [class.disabled-tab]="m.id === 'upi' || m.id === 'bank'" (click)="selectMethod(m.id)" class="method-tab"
         [style.--m-color]="m.color">
         <span class="tab-icon" [innerHTML]="m.svg | safeHtml"></span>
         <div class="tab-text">
           <span class="tab-name">{{ m.name }}</span>
-          <span *ngIf="m.id === 'upi'" class="tab-status">Coming Soon</span>
+          <span *ngIf="m.id === 'upi' || m.id === 'bank'" class="tab-status">Coming Soon</span>
         </div>
       </button>
     </div>
