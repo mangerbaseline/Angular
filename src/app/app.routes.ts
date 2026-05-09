@@ -10,6 +10,7 @@ export const routes: Routes = [
       { path: 'success', component: SuccessPageComponent }
     ]
   },
+  { path: 'success', redirectTo: 'checkout/success', pathMatch: 'full' },
   { path: '', redirectTo: 'checkout', pathMatch: 'full' },
   { path: '**', redirectTo: 'checkout' }
 ];
