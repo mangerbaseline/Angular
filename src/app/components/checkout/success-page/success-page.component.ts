@@ -184,15 +184,15 @@ export class SuccessPageComponent implements OnInit, OnDestroy {
   getPaymentIcon(): string {
     const mode = (this.orderService.orderData()?.paymentMode || '').toLowerCase();
 
-    if (mode.startsWith('pay')) return 'payto-logo.png';
-    if (mode.includes('card')) return 'mastercard.svg';
-    if (mode.includes('apple')) return 'apple-pay.svg';
-    if (mode.includes('google')) return 'google-pay.svg';
-    if (mode.includes('klarna')) return 'klarna.svg';
-    if (mode.includes('afterpay')) return 'afterpay.svg';
-    if (mode.includes('bank')) return 'bank.svg';
-    if (mode.includes('upi')) return 'upi.svg';
-    if (mode.includes('link')) return 'link-stripe.svg';
+    if (mode.startsWith('pay')) return 'images/payto-logo.png';
+    if (mode.includes('card')) return 'images/mastercard.svg';
+    if (mode.includes('apple')) return 'images/apple-pay.svg';
+    if (mode.includes('google')) return 'images/google-pay.svg';
+    if (mode.includes('klarna')) return 'images/klarna.svg';
+    if (mode.includes('afterpay')) return 'images/afterpay.svg';
+    if (mode.includes('bank')) return 'images/bank.svg';
+    if (mode.includes('upi')) return 'images/upi.svg';
+    if (mode.includes('link')) return 'images/link-stripe.svg';
 
     return '';
   }

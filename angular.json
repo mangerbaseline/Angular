@@ -56,7 +56,18 @@
                   "maximumError": "30kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "baseHref": "/checkout/"
+            },
+            "test": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.test.ts"
+                }
+              ],
+              "outputHashing": "all",
+              "baseHref": "/checkout/"
             },
             "development": {
               "optimization": false,
@@ -71,6 +82,9 @@
           "configurations": {
             "production": {
               "buildTarget": "angularpaymentui:build:production"
+            },
+            "test": {
+              "buildTarget": "angularpaymentui:build:test"
             },
             "development": {
               "buildTarget": "angularpaymentui:build:development"

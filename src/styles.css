@@ -2592,7 +2592,7 @@ body {
 
 
 .save-check input:checked {
-  background: url("/tick.svg");
+  background: url("/images/tick.svg");
   background-color: #00D66F;
   background-repeat: no-repeat;
   background-size: 8px 8px;

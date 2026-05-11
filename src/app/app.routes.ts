@@ -4,13 +4,11 @@ import { SuccessPageComponent } from './components/checkout/success-page/success
 
 export const routes: Routes = [
   {
-    path: 'checkout',
+    path: '',
     children: [
       { path: '', component: CheckoutPageComponent },
       { path: 'success', component: SuccessPageComponent }
     ]
   },
-  { path: 'success', redirectTo: 'checkout/success', pathMatch: 'full' },
-  { path: '', redirectTo: 'checkout', pathMatch: 'full' },
-  { path: '**', redirectTo: 'checkout' }
+  { path: '**', redirectTo: '' }
 ];

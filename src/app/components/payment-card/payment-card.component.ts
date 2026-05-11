@@ -76,7 +76,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     },
     {
       id: 'bank', name: 'PayID', color: '#10b981',
-      svg: '<img src="Payid.png" style="width:20px; height:20px; object-fit: contain;">'
+      svg: '<img src="images/Payid.png" style="width:20px; height:20px; object-fit: contain;">'
     },
     {
       id: 'upi', name: 'UPI', color: '#f97316',
@@ -84,7 +84,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     },
     {
       id: 'payto', name: 'PayTo', color: '#22d3ee',
-      svg: '<img src="payto-logo.png" style="width:20px; height:20px; object-fit: contain;">'
+      svg: '<img src="images/payto-logo.png" style="width:20px; height:20px; object-fit: contain;">'
     },
     {
       id: 'zip', name: 'Zip', color: '#a78bfa',
@@ -839,7 +839,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
         const result = await this.stripe.confirmPayment({
           elements: this.elements,
           confirmParams: {
-            return_url: window.location.origin + '/success' + window.location.search,
+            return_url: window.location.origin + window.location.pathname.replace(/\/$/, '') + '/success' + window.location.search,
           },
           redirect: 'if_required'
         });
@@ -851,7 +851,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
         } else {
           this.showToast("Payment Successful! Redirecting...", "success");
           setTimeout(() => {
-            window.location.href = window.location.origin + '/success' + window.location.search;
+            window.location.href = window.location.origin + window.location.pathname.replace(/\/$/, '') + '/success' + window.location.search;
           }, 2000);
         }
       } catch (e) {
@@ -860,7 +860,7 @@ export class PaymentCardComponent implements OnInit, AfterViewInit {
     } else {
       setTimeout(() => {
         this.showToast("Payment Successful! Redirecting...", "success");
-        window.location.href = window.location.origin + '/success' + window.location.search;
+        window.location.href = window.location.origin + window.location.pathname.replace(/\/$/, '') + '/success' + window.location.search;
       }, 2000);
     }
   }
